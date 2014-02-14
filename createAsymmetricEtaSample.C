@@ -8,7 +8,9 @@
 #include <iomanip>
 #include <cstring>
 #include <deque>
+#include <map>
 
+#include "TROOT.h"
 #include "TMath.h"
 #include "TString.h"
 #include "TTree.h"
@@ -31,6 +33,7 @@ Float_t PedestalMeanOld[8][256];
 UChar_t Det_ADC[8][256];
 UShort_t Dia_ADC[128];
 int verbosity = 5;
+map<UInt_t,UInt_t> errorCounter;
 
 TObject* getTreeName(TFile* file){
 	if(file==NULL) exit(-1);
@@ -163,7 +166,7 @@ void updateSilicon(){
 //			cout<<det<< " startchannel: "<<startChannel<<" - " << endChannel<<endl;
 		}
 		bool finished = false;
-		for(UInt_t ch=startChannel;!finished;ch){
+		for(UInt_t ch=startChannel;!finished;){
 			if(det==2||det==6){
 				if(eventNumber <5&&false)
 					cout<<det<<" "<<eventNumber<<" ch: "<<ch<<endl;
@@ -172,10 +175,26 @@ void updateSilicon(){
 			Float_t adc = oldADC;
 			Float_t pedMean = PedestalMean[det][ch];
 			if (pedMean<37){
-				cout<<"\ntaking old pedValue for: \t";
-				cout<<eventNumber<<" "<<ch<<" "<<(int)	adc<<", "<<pedMean<<"->";
-				pedMean = PedestalMeanOld[det][ch];
-				cout<<pedMean<<" = "<<", "<< share<<" --> ";
+                UInt_t key = det*1000+ch;
+                bool bprint = false;
+                if (errorCounter.count(key)){
+                    if (errorCounter[key] < 10){
+                        errorCounter[key]++;
+                        bprint = true;
+                    }
+                }
+                else{
+                    bprint = true;
+                    errorCounter[key]=1;
+                }
+                if (bprint){
+                        cout<<"\ntaking old pedValue for: \t";
+                        cout<<eventNumber<<" "<<ch<<" "<<(int)	adc<<", "<<pedMean<<"->";
+                }
+                pedMean = PedestalMeanOld[det][ch];
+                if (bprint){
+                    cout<<pedMean<<" = "<<", "<< share<<" --> ";
+                }
 			}
 			else PedestalMeanOld[det][ch] = pedMean;
 			Float_t signal = (Float_t)adc-pedMean;
@@ -256,19 +275,27 @@ void LoopOverTree(TTree* inputTree,TTree* outputTree){
 	}
 }
 
+bool is_file_exist(const char *fileName)
+{
+    std::ifstream infile(fileName);
+    return infile.good();
+}
 
-int createAsymmetricEtaSample(){
+int createAsymmetricEtaSample(int runNo,float silCor,float diaCor,int corRunNo= -1){
 	cout<<"Enter RunNumber: "<<flush;
-	cin>>runNumber;
+//#	cin>>runNumber;
+    runNumber = runNo;
 	cout<<"The entered runnumber is "<<runNumber<<endl;
 
 	cout<<"\nHow much charge sharing do you want to activate in the Silicon (in %): "<<flush;
-	cin>>chargeShareSil;
+	//cin>>chargeShareSil;
+    chargeShareSil = silCor;
 	chargeShareSil /=100;
 	cout<<"There is charge sharing of "<<chargeShareSil*100<<"%."<<endl;
 
 	cout<<"\nHow much charge sharing do you want to activate in the Diamond (in %): "<<flush;
-	cin>>chargeShareDia;
+	//cin>>chargeShareDia;
+    chargeShareDia = diaCor;
 	chargeShareDia /=100;
 	cout<<"There is charge sharing of "<<chargeShareDia*100<<"%."<<endl;
 
@@ -292,13 +319,31 @@ int createAsymmetricEtaSample(){
 		cerr<<"Tree does not exists... EXIT"<<endl;
 		return -1;
 	}
-	TFile* outputFile = new TFile(TString::Format("rawData.%05d-%05d-%0d.root",runNumber,(int)(chargeShareSil*1e4),(int)(chargeShareDia*1e4)),"RECREATE");
-	outputFile->cd();
-	TTree* outputTree =  new TTree("pedestalTree","pedestalTree");
-	setBranches(outputTree);
-	LoopOverTree(tree,outputTree);
-	outputTree->Write("rawTree");
-	outputFile->Close();
+	TString outputfileName = TString::Format("rawData.%05d-%05d-%05d.root",runNumber,(int)(chargeShareSil*1e4),(int)(chargeShareDia*1e4));
+	cout<<outputfileName;
+	if (!is_file_exist(outputfileName)){
+        TFile* outputFile = new TFile(outputfileName,"RECREATE");
+        outputFile->cd();
+        TTree* outputTree =  new TTree("pedestalTree","pedestalTree");
+        setBranches(outputTree);
+        LoopOverTree(tree,outputTree);
+        outputTree->Write("rawTree");
+        outputFile->Close();
+	}
+	else{
+	    cout<<"File already exists! "<<outputfileName<<endl;
+	}
+	TString command = ".! ln -s ";
+	command += outputfileName;
+	if (corRunNo == -1)
+	    corRunNo = runNumber*10+1;
+	command += TString::Format(" rawData.%d.root",corRunNo);
+	cout<<command<<endl;
+    TString linkFileName = TString::Format("rawData.%d.root",corRunNo);
+    if (!is_file_exist(linkFileName))
+        gROOT->ProcessLine(command);
+    else
+        cout<<"Link already exists: "<<linkFileName<<endl;
 	return 1;
 
 
