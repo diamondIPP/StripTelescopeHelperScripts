@@ -76,6 +76,15 @@ class RunListReader:
         for row in rows:
             writer.writerow(row)
         ofile.close()
+
+    def uniq(input):
+        output = []
+        for x in input:
+            if x not in output:
+                output.append(x)
+            else:
+                print 'dublicated entry: %s'%x
+        return output
         
     def check_run_list(self):
         for key in self.runList:
@@ -86,6 +95,8 @@ class RunListReader:
         for run in self.runListKeys:
             if not self.runList.has_key(run):
                 print 'cannot find run %s in runlist '%run
+        self.runListKeys = uniq(self.runListKeys)
+
         
     def read_rows(self,rows,resetLevel):
 #         print 'read rows %s'%len(rows)
