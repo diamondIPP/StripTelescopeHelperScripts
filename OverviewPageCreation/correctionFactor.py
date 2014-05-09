@@ -5,10 +5,10 @@ import ConfigParser
 
 verbosity = 0
 
-def get_crosstalk_factor_map():
+def get_crosstalk_factor_map(dir):
     #    crossTalkCorrectionFactors.17100.txt
     print 'get crosstalk factor map'
-    fileList = utilities.list_files('.','crossTalkCorrectionFactors')
+    fileList = utilities.list_files(dir,'crossTalkCorrectionFactors')
     crosstalks = {}
     for fileName in fileList:
         f = open(fileName)
@@ -96,14 +96,14 @@ def create_new_results_text_file(runNo, crosstalk):
     for line in lines:
         newResFile.write(line)
 
-def update_crosstalk_factors():
-    crosstalks = get_crosstalk_factor_map()
+def update_crosstalk_factors(dir):
+    crosstalks = get_crosstalk_factor_map(dir)
     for runNo in crosstalks:
         create_new_results_text_file(runNo,crosstalks[runNo])
         create_new_results_res_file(runNo,crosstalks[runNo])
 
 
 if __name__ == "__main__":
-    update_crosstalk_factors()
+    update_crosstalk_factors('.')
     pass
 

@@ -2,6 +2,7 @@ import os
 import math
 
 def list_files(dir,name):
+    print 'list_files in "%s" with name "%s"'%(dir,name)
     r = []                                                                                                            
     subdirs = [x[0] for x in os.walk(dir)]                                                                            
     for subdir in subdirs:                                                                                            
@@ -12,6 +13,7 @@ def list_files(dir,name):
             for file in files:                                                                                        
                 if name in file:
                     r.append(subdir + "/" + file)                                                                         
+    print 'found %d files'%len(r)
     return r
 
 def get_dict_from_file(filename):

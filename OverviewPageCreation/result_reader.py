@@ -13,7 +13,7 @@ import re
 
 class result_reader:
 	def __init__(self,configDir):
-		self.verbosity = 1
+		self.verbosity = 2
 		self.configDir = configDir
 		self.configFileName = configDir+'/creation.ini'
 		self.config = ConfigParser.ConfigParser()
@@ -22,7 +22,7 @@ class result_reader:
 	def create_tables(self):
 		
 		print 'update correction factors'
-		correctionFactor.update_crosstalk_factors()
+		correctionFactor.update_crosstalk_factors(self.config.get('Results','inputDir'))
 		
 		print 'read dictionaries'
 		mapper = dictCreater.dictCreater(self.configDir)
@@ -31,8 +31,9 @@ class result_reader:
 		print 'get file list'
 		# get list of files wich starts with 'results'
 		file_list = utilities.list_files(self.config.get('Results','inputDir'),'results')
+		if self.verbosity: print 'staring list',file_list
 		self.file_list = [i for i in file_list if i.endswith('.res') and '_new' in i]
-		print self.file_list
+		print 'updated file list ', self.file_list
 		self.results = self.read_result_config()
 
 	
@@ -230,6 +231,7 @@ class result_reader:
 			self.create_html_overview_table(results,fileName)
 		htmlcode = HTML.list(diamondLinkList) 
 		fileName = '%s/results_diamonds.html'%self.config.get('HTML','outputDir')
+		if self.verbosity: print 'save diamond file to: "%s"'%fileName
 		self.save_html_code(fileName,htmlcode)
 		pass
 	
@@ -241,7 +243,7 @@ class result_reader:
 	def create_testbeam_html_pages(self):
 		testbeams = [self.results[x].getint('RunInfo','runno')/100 for x in self.results]
 		testbeams = sorted(list(set(testbeams)))
-		testbeamDate = utilities.get_dict_from_file('testBeamDates.cfg')
+		testbeamDate = utilities.get_dict_from_file('%s/testBeamDates.cfg'%self.configDir)
 		for testbeam in testbeams:
 			key = '%s'%testbeam
 			if not testbeamDate.has_key(key):
