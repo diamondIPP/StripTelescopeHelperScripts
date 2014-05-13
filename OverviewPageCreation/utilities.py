@@ -1,18 +1,18 @@
 import os
+import scandir
 import math
 
-def list_files(dir,name):
+def list_files(dir,name,level=0):
     print 'list_files in "%s" with name "%s"'%(dir,name)
     r = []                                                                                                            
-    subdirs = [x[0] for x in os.walk(dir)]                                                                            
-    for subdir in subdirs:                                                                                            
-        if '/root' in subdir:
+    walk = scandir.walk(dir,followlinks=True)
+    for root,dirs,files in walk:
+        if '/root' in root:
             continue
-        files = os.walk(subdir).next()[2]                                                                             
         if (len(files) > 0):                                                                                          
             for file in files:                                                                                        
                 if name in file:
-                    r.append(subdir + "/" + file)                                                                         
+                    r.append(root + "/" + file)                                                                         
     print 'found %d files'%len(r)
     return r
 
@@ -82,6 +82,8 @@ def get_value(input,convert,default=''):
         try:
             retVal = float(input)
         except:
+            retVal= get_value(default,'float','-9999')
+        if abs(retVal) >  1e10:
             retVal= get_value(default,'float','-9999')
     else:
         retVal = input

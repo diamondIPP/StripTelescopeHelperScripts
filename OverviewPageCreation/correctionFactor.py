@@ -7,8 +7,9 @@ verbosity = 0
 
 def get_crosstalk_factor_map(dir):
     #    crossTalkCorrectionFactors.17100.txt
-    print 'get crosstalk factor map'
+    print 'get crosstalk factor map,"%s"'%dir
     fileList = utilities.list_files(dir,'crossTalkCorrectionFactors')
+    print 'list: ',fileList
     crosstalks = {}
     for fileName in fileList:
         f = open(fileName)
@@ -98,6 +99,7 @@ def create_new_results_text_file(runNo, crosstalk):
 
 def update_crosstalk_factors(dir):
     crosstalks = get_crosstalk_factor_map(dir)
+
     for runNo in crosstalks:
         create_new_results_text_file(runNo,crosstalks[runNo])
         create_new_results_res_file(runNo,crosstalks[runNo])

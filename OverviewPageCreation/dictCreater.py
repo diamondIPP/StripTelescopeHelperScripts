@@ -5,17 +5,17 @@ import ConfigParser
 
 class dictCreater:
     def __init__(self,configDir):
+        self.verbosity = 0
     	self.configDir = configDir
         self.configFileName = configDir+'/creation.ini'
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.configFileName)
         for i in self.config.sections():
-        	print i, self.config.options(i)
+            if self.verbosity: print i, self.config.options(i)
         contentDesc = self.config.get('RepeaterCards','content')
         self.contentDescRepCard = [i.split('/') for i in contentDesc.strip('[]').split(',')]
         contentDesc = self.config.get('RunInfo','content')
         self.contentDescRunInfo = [i.split('/') for i in contentDesc.strip('[]').split(',')]
-        self.verbosity = 0
         
     def add_default(self,item,contentDesc):
         for i in contentDesc:
