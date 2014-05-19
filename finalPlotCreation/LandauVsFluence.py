@@ -58,7 +58,10 @@ class LandauVsFluence():
                 name = 'hDiaTranspAnaPulseHeightOf2HighestIn10Strips'
 
             rundes =''
-            plot = utilities.get_plot(config,runno,rundes,'hDiaTranspAnaPulseHeightOf2HighestIn10Strips')
+            plot = utilities.get_plot(config,runno,rundes,name)
+            if plot == 0:
+                print 'cannot find plot for %s'%runno
+                continue
             plot.SetName(str(plot.GetName)+'%s'%runno)
             newPlot = utilities.convert_x_to_electrons(plot,self.get_conversion(runno))
             if self.config and self.config.has_option('Plot','XTitle'):
