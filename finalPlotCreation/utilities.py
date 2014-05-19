@@ -18,9 +18,8 @@ def get_file(config,runno,rundes):
     else:
         path += 'histograms.root'
     print path
-    raw_input()
 
-    f =ROOT.TFile('histograms.root')
+    f =ROOT.TFile(path)
     return f
 
 def get_color(index):
