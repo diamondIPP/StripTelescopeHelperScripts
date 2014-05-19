@@ -14,13 +14,24 @@ class LandauVsFluence():
         self.set_irradiations()
         pass
     def set_runnos(self):
+        self.rundes = {}
+        self.runnos = []
         if not self.config:
             self.runnos = [172080]
             return
         runs = sorted([int(i) for i in self.config.options('Runs')])
-        runnos = [self.config.getint('Runs','%d'%x) for x in runs]
-        self.runnos = runnos
+        for x in runs:
+            run = self.config.get('Runs','%d'%x).split()
+            if len(run) == 1:
+                rundes = '0'
+            else:
+                rundes = run[1]
+            runno = int(run[0])
+            self.rundes[runno] = rundes
+            self.runnos.append(runno)
         print 'runnos: ',self.runnos
+        print self.rundes
+
     def set_conversions(self):
         self.conversions={}
         for run in self.runnos:
@@ -58,7 +69,7 @@ class LandauVsFluence():
                 name = 'hDiaTranspAnaPulseHeightOf2HighestIn10Strips'
 
             rundes =''
-            plot = utilities.get_plot(config,runno,rundes,name)
+            plot = utilities.get_plot(config,runno,self.rundes[runno],name)
             if plot == 0:
                 print 'cannot find plot for %s'%runno
                 continue
