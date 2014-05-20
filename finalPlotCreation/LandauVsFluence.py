@@ -50,6 +50,13 @@ class LandauVsFluence():
         print 'conversions',self.conversions
     def set_irradiations(self):
         pass
+    def get_irradiation(self,runno):
+
+        runno = '%d'%runno
+        runno = runno[:3]
+        if self.config.has_option('Irradiation',runno):
+            return self.config.getfloat('Irradiation',runno)
+        return -1
 
 
 
@@ -61,14 +68,20 @@ class LandauVsFluence():
         
     def create_plot(self):
         self.plots ={}
+        self.normPlots={}
         c1 = TCanvas()
+        title = ''
+        if self.config and self.config.has_option('Plot','Title'):
+            title = self.config.get('Plot','Title')
+
+        hs = ROOT.THStack("hs",title);
+        
         for runno in self.runnos:
             if self.config:
                 name = self.config.get('Main','histoName')
             else:
                 name = 'hDiaTranspAnaPulseHeightOf2HighestIn10Strips'
 
-            rundes =''
             plot = utilities.get_plot(config,runno,self.rundes[runno],name)
             if plot == 0:
                 print 'cannot find plot for %s'%runno
@@ -79,19 +92,37 @@ class LandauVsFluence():
                 newPlot.GetXaxis().SetTitle(self.config.get('Plot','XTitle'))
             if self.config and self.config.has_option('Plot','YTitle'):
                 newPlot.GetYaxis().SetTitle(self.config.get('Plot','YTitle'))
-            if self.config and self.config.has_option('Plot','Title'):
-                newPlot.SetTitle(self.config.get('Plot','Title') + ' %s'%runno )
+            if self.config and self.config.has_option('Plot','LegendTitle'):
+                irr = self.get_irradiation(runno)
+                newPlot.SetTitle(self.config.get('Plot','LegendTitle') + '#Phi = %.2e p/cm^{2}'%irr )
             self.plots[runno] = newPlot
             c1.cd()
             index = self.runnos.index(runno)
             color = utilities.get_color(index)
             newPlot.SetLineColor(color)
-            if index==0:
-                newPlot.DrawNormalized()
-            else:
-                newPlot.DrawNormalized('same')
+            self.plots[runno] = newPlot
+            norm = newPlot.GetBinContent(newPlot.GetMaximumBin())
+            newPlot.Scale(1./norm)
+            normPlot = newPlot.DrawNormalized("")
+            print normPlot
+            normPlot = normPlot.Clone()
+            self.normPlots[runno]=  normPlot
+            hs.Add(newPlot)
+        hs.Draw('nostack')
+        if self.config and self.config.has_option('Plot','XTitle'):
+                hs.GetXaxis().SetTitle(self.config.get('Plot','XTitle'))
+        if self.config and self.config.has_option('Plot','YTitle'):
+                hs.GetYaxis().SetTitle(self.config.get('Plot','YTitle'))
+        hs.Draw('nostack')
+        c1.Update()
+        leg = c1.BuildLegend()
+        leg.SetFillColor(ROOT.kWhite)
         c1.Update()
         self.canvas = c1
+        fileName = 'PW205B_irradiation'
+        c1.SaveAs('%s.png'%fileName)
+
+        c1.SaveAs('%s.pdf'%fileName)
                 
 
 

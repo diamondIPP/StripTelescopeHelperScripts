@@ -23,7 +23,7 @@ def get_file(config,runno,rundes):
     return f
 
 def get_color(index):
-    return index
+    return index+1
     
 def get_plot(config,runno,rundes,name):
 
