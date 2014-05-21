@@ -1,3 +1,6 @@
+import time
+import csv
+import re
 import HTML
 import ConfigParser
 #import math
@@ -36,6 +39,8 @@ class result_reader:
         self.file_list = [i for i in file_list if i.endswith('.res') and '_new' in i]
         #print 'updated file list ', self.file_list
         self.results = self.read_result_config()
+        self.set_csv_mapping()
+        
 
     
     
@@ -55,7 +60,7 @@ class result_reader:
                 if config.has_option(keyName[0],keyName[1]):
                     key += config.get(keyName[0],keyName[1])
                 else:
-                    key +='??'
+                    key +='unnown'
             else:
                 key += i
         return key           
@@ -72,6 +77,7 @@ class result_reader:
                 raw_input('section does not exist....')
                 continue
             config.set('RunInfo','realRunNo',runno)
+            config.set('RunInfo','runno',runno)
             if self.verbosity:
                 for section_name in config.sections():
                     #print 'Section:', section_name
@@ -81,10 +87,21 @@ class result_reader:
                         pass
                     #print
                     pass
-            config = self.add_missing_items(config)
+            path = os.path.abspath(i)
+            if not config.has_section('additional'):
+                config.add_section('additional')
+                pass
+
+            config.set('additional','resultsPath',path)
             key = self.get_result_key(config)
+            config.set('additional','key',key)
+            config = self.add_missing_items(config)
             if self.verbosity: print 'key',key,config.get('RunInfo','runno'),config.get('RunInfo','realRunNo')
             results[key] = config
+
+            with open(path, 'w') as configfile:
+                print 'write ',path
+                config.write(configfile)
         return results
 
     def getDiamond(self,runno,descr):
@@ -114,7 +131,20 @@ class result_reader:
         newRunNo = runno
         if isCorrected:
             newRunNo = int(newRunNo/10)
+
+        if self.map.has_key(newRunNo):
+            config.set('RunInfo','repeatercardno','%s'%self.map[newRunNo]['repeaterCard'])
+            config.set('RunInfo','voltage','%+4d'%self.map[newRunNo]['biasVoltage'])
+            config.set('RunInfo','currentbegin','%s'%(self.map[newRunNo]['currentBegin']))
+            config.set('RunInfo','currentend'  ,'%s'%(self.map[newRunNo]['currentEnd']))
+        else:
+            raw_input('cannot find %s'%newRunNo)
         config.set('RunInfo','runno','%d'%(newRunNo))
+        if config.has_option('TimeDependence','landauclusterfitoffsetsize10'):
+            if config.has_option('TimeDependence','landauclusterfitslopesize10'):
+                offset = config.getfloat('TimeDependence','landauclusterfitoffsetsize10')
+                slope  = config.getfloat('TimeDependence','landauclusterfitslopesize10')
+                config.set('TimeDependence','LinFitRelChange','%s'%(slope/offset*100.))
 
         m2 = float(config.get('Landau_normal','m2/2_normal',0))
         m4 = float(config.get('Landau_normal','m4/4_normal',-1))
@@ -127,6 +157,38 @@ class result_reader:
             config.set('RunInfo','dia','unknown')
         return config
         
+    def set_csv_mapping(self):
+        print 'set csv map'
+        mapping = OrderedDict()
+        headers = []
+        list = self.config.options('CSV-header')
+        for opt in list:
+            content = self.config.get('CSV-header',opt).split(';')
+            headers.append(content[0])
+            key = content[0]
+        
+            content = content[1:]
+            newcontent={}
+            keylist = -1
+            k=0
+            for i in content:
+                if i.startswith('<') and i.endswith('>'):
+                    k = i.strip('<>').strip().split(',')
+                    newcontent['key'] = [j.strip() for j in k]
+                    keylist = content.index(i)
+                elif content.index(i) == keylist+1 and keylist!=-1:
+                    newcontent['valueType'] = i
+                elif content.index(i) == keylist+2 and keylist!=-1:
+                    newcontent['default'] = i
+                elif i.startswith('TITLE[') and i.endswith(']'):
+                    newcontent['title'] = i.strip('TITLE[]').strip("'")
+                else:
+                    newcontent['info_%d'%k] = i
+                    k+=1
+            mapping[key] = newcontent
+            pass
+        self.csv_mapping = mapping
+    
     def set_header(self):
         headers =[]
         mapping = OrderedDict()
@@ -157,7 +219,7 @@ class result_reader:
                 else:
                     newcontent['info_%d'%k] = i
                     k+=1
-                mapping[key] = newcontent
+            mapping[key] = newcontent
 
         for i in headers:
             if  'href' in i: 
@@ -230,25 +292,77 @@ class result_reader:
             #print 'KEY' ,key
             #print self.map[int(key.split('-')[0])]            
             #print newResults[key].get('RunInfo','dia')
+            if '16005' in key and False:
+                print key
+                config = newResults[key]
+                print '\t',config.get('Noise','cmc_noise_dia')
+                if config.has_option('TransparentNoise','noisecmnvsclustersizeslope'):
+                    print '\t',config.get('TransparentNoise','noisecmnvsclustersizeslope')
+                print '\t',config.get('Landau_clustered','mean2outof10_clustered')
+                raw_input()
             rows.append(self.get_content(newResults[key]))
 
         return rows 
         
     def save_html_code(self,html_file_name,htmlcode):
 #       raw_input('html_file_name: %s'%html_file_name)
+        htmlcode += '\n<br>\ncreated on %s'%time.ctime()
+    
         f = open(html_file_name, "w")
         f.write('%s'%htmlcode)
         f.close()
         
-    def sort_results(self,newResults):
-        return newResults
         
-    def create_html_overview_table(self,newResults,html_file_name):
+    def sort_results(self,newResults):
+        f = lambda x: (self.results[x].getint('RunInfo','runno'),self.results[x].get('RunInfo','descr.'),self.results[x].getint('RunInfo','cor') )
+        return sorted(newResults,key=f)
+
+    def svn_version(self,x):
+        first_index = -1
+        svn = x.get('RunInfo','svn_rev')
+        match = re.search(r'[^0123456789]', svn)
+        if match:
+            first_index = match.start()
+            if first_index>0:
+                svn = int(svn[:first_index])
+            else:
+                svn = -1
+        else:
+            try:
+                svn = int(svn)
+            except:
+                svn = -1
+        return svn
+
+    def sort_results_svn(self,newResults):
+        g = lambda x: self.results[x]
+        f = lambda x: (self.svn_version(x),x.get('RunInfo','svn_rev'),x.getint('RunInfo','runno'),x.get('RunInfo','descr.'),x.getint('RunInfo','cor') )
+        h = lambda x: f(g(x))
+        return sorted(newResults,key=h)
+
+    def get_linFit_rel_change(self,config):
+        if config.has_option('TimeDependence','linfitrelchange'):
+            return config.getfloat('TimeDependence','linfitrelchange')
+        return 0
+    
+    def sort_results_time(self,newResults):
+        g = lambda x: self.results[x]
+        f = lambda x: (self.get_linFit_rel_change(x),x.get('RunInfo','svn_rev'),x.getint('RunInfo','runno'),x.get('RunInfo','descr.'),x.getint('RunInfo','cor') )
+        h = lambda x: f(g(x))
+        return sorted(newResults,key=h)
+        
+    def create_html_overview_table(self,newResults,html_file_name,sort='standard'):
         absolutePath = self.config.get('HTML','absolutePath')
         link = '%s/results_testBeams.html'%absolutePath
         htmlcode = HTML.link('Test Beam Overview',link)
         self.set_header()
-        rows= self.get_content_rows(newResults,sorted(newResults.keys()))
+        if sort == 'svn':
+            sortedKeys = self.sort_results_svn(newResults)
+        elif sort == 'time':
+            sortedKeys = self.sort_results_time(newResults)
+        else:
+            sortedKeys = self.sort_results(newResults)
+        rows= self.get_content_rows(newResults,sortedKeys)
         htmlcode += HTML.table(rows,header_row=self.headers)
 #       html_file_name = html_file_name.replace('/','_')
         if 'XX' in html_file_name :
@@ -293,7 +407,7 @@ class result_reader:
             irr = utilities.get_dict_from_file('%s/irradiationType.cfg'%self.configDir)
         allDiamonds = self.get_list_of_diamonds(self.results)
         allDiamonds = sorted(allDiamonds,key = lambda x:'%s-%s'%(irr.get(x,'unkown'),x))
-        allDiamondLinks = map(lambda x: HTML.link('%s (%s)'%(x,irr.get(x,'?')),'results_%s.html'%x),allDiamonds)
+        allDiamondLinks = map(lambda x: HTML.link('%s (%s)'%(x,irr.get(x,'unknown')),'results_%s.html'%x),allDiamonds)
         testBeamLinkTable= []
         header = [HTML.link('Test Beam','results.html')] + allDiamondLinks
         
@@ -315,9 +429,75 @@ class result_reader:
         fileName = '%s/results_testBeams.html'%self.config.get('HTML','outputDir')
         self.save_html_code(fileName,htmlcode)
 
+
+    def create_csv_file(self):
+        print 'Creating csv file'
+        sortedKeys = self.sort_results(self.results)
+            #data = ["value %d" % i for i in range(1,4)]
+        f = open("%s/results.csv"%self.config.get('HTML','outputDir'),"w")
+        writer = csv.writer(f, delimiter=';',quoting=csv.QUOTE_NONE)
+        for key in sortedKeys:
+            data = self.get_csv_row(self.results[key])
+            writer.writerow(data)
+        f.close()
+
+    def get_csv_row(self,config):
+        row = []
+        result=self.results
+        for key in self.csv_mapping:
+            result =config
+            if self.csv_mapping[key].has_key('key'):
+                default = self.csv_mapping[key]['default']
+                configKeys = self.csv_mapping[key]['key']
+                if result.has_section(configKeys[0]):
+                    if result.has_option(configKeys[0],configKeys[1]):
+                        value = result.get(configKeys[0],configKeys[1],0)
+                    else:
+                        value = default
+                else:
+                    value = default
+                type = self.csv_mapping[key]['valueType']
+                value = utilities.get_value(value,type,default)
+                #print key,configKeys,value
+            elif self.header_mapping[key].has_key('title'):
+                value = self.csv_mapping[key]['title']
+            else:
+                value = 'UNKOWN'
+            pass
+            format = self.config.get('FORMAT',key,'%s')
+            out = format%value
+            out = out.strip('"')
+            row.append(out)
+        return row
+        pass
+
+#NewRunKeys_Extended = [
+#"RunNumber",
+#"Diamond",
+#"Corrected",
+# "Voltage", 
+#"Repeater card",
+#"Current start", 
+#"Current end",
+#"irradiation",
+#"RunNumber_x",
+#"Descr",
+#                     "Noise", "Noise CMC","CMN", "Feed through SIL","sigma feed through Sil","Feed through DIA",
+#                     "Mean PH clustered","Most Probable PH clustered","width clustered","gs_clustered",
+#                     "Mean PH 2 out 10 transparent","Most Probable 2 out 10 transparent","width 2 out 10 transparent","sigma 2 out 10 transparent",
+#                     "Mean 2 channels transparent","Mean PH 4 channels transparent",
+#                     "Mean PH 2 out 10 transparent allign","Most Probable 2 out 10 transparent allign","width 2 out 10 transparent allign","sigma 2 out 10 transparent allign",
+#                     "Mean 2 channels transparent allign","Mean PH 4 channels transparent allign",
+#                     "Res_DG1n", "Res_DG2n", "Res_SGSn", "Res_SGNn", "Res_SGFn",
+#                     "Res_DG1t","Res_DG2t", "Res_SGSt", "Res_SGNt", "Res_SGFt",
+#                     "REV","REV"]
+#
         
     def create_all_html_tables(self):
+        self.create_csv_file()
         self.create_html_overview_table(self.results,'%s/results.html'%self.config.get('HTML','outputDir'))
+        self.create_html_overview_table(self.results,'%s/resultsSVN.html'%self.config.get('HTML','outputDir'),sort='svn')
+        self.create_html_overview_table(self.results,'%s/resultsTime.html'%self.config.get('HTML','outputDir'),sort='time')
         self.create_diamond_html_pages()
         self.create_testbeam_html_pages()
         
@@ -326,7 +506,7 @@ if __name__ == "__main__":
     directory = os.path.dirname(full_path)
 
     reader = result_reader('%s/config/'%directory)
-    reader.updateCrosstalkFactors = False
+    reader.updateCrosstalkFactors = True
     reader.create_tables()
     reader.create_all_html_tables()
 

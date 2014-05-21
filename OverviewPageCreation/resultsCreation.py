@@ -22,7 +22,7 @@ def is_corrected(config):
         
 def get_mainLink(result,absPath):
     desc = result.get('RunInfo','descr.')
-    realRunNo = result.get('RunInfo','runno')
+    realRunNo = result.get('RunInfo','realrunno')
     if desc =='0' or desc == 0:
         mainLink ='%s/%s'%(absPath,realRunNo)
     else:
@@ -51,7 +51,7 @@ def get_colored_cell(key,content,value,result):
         except:
             pass
     elif key == 'NoiseCMN Slope':
-        if value > 0.1:
+        if abs(value) > 0.1:
             color ='red'
 
     if color != 'white':
