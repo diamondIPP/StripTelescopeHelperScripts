@@ -17,6 +17,12 @@ def mkdir_p(path):
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             pass
         else: raise
+def uniq(input):
+  output = []
+  for x in input:
+    if x not in output:
+      output.append(x)
+  return output
         
 class RunListReader:
     def __init__(self,write_file,correctionMacro):
@@ -76,19 +82,10 @@ class RunListReader:
         for row in rows:
             writer.writerow(row)
         ofile.close()
-
-    def uniq(input):
-        output = []
-        for x in input:
-            if x not in output:
-                output.append(x)
-            else:
-                print 'dublicated entry: %s'%x
-        return output
         
     def check_run_list(self):
         for key in self.runList:
-            if not run in self.runListKeys:
+            if not key in self.runListKeys:
                 print 'cannot find run %s'%key
                 self.runListKeys.append(key)
 
@@ -117,7 +114,8 @@ class RunListReader:
                 run.status = 0
             key = (runNo,runDes)
             if self.runList.has_key(key):
-                print' %s already exists, skip'%key
+                print key
+                print' key already exists, skip',key
             else:
 #                     print 'add run %s %s'%(runNo, run.do_correction())
                 self.runList[key] = run
@@ -224,16 +222,17 @@ class RunListReader:
         if answer == 'y':
             retVal = ROOT.gROOT.ProcessLine(command)
     
-    def add_feed_through_corrected_run(self,runNo):
+    def add_feed_through_corrected_run(self,key):
         if not self.add_correction:
             return
-        print 'add correction'
+        runNo = key[0]
+        print 'add correction',runNo
         if runNo / 1e6 > 1:
             return
-        if not self.has_run(runNo):
-            print 'cannot find runNo:%s '%runNo
+        if not self.has_run(key):
+            print 'cannot find runNo:%s '%key
             return 
-        run = self.runList[runNo]
+        run = self.runList[key]
         if not run.do_correction():
             return
 #         print 'run %s/%s: %s'%(runNo,run.get_run_number(),run.do_correction())
