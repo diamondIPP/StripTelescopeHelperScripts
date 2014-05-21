@@ -1,20 +1,20 @@
 import ROOT
 from ROOT import TCanvas
 
-def get_file(config,runno,rundes):
+def get_file(config,section,runno,rundes):
     print 'get file ',runno,rundes
     path  = '.'
-    if config and config.has_option('Main','Path'):
-        path = config.get('Main','Path')
+    if config and config.has_option(section,'Path'):
+        path = config.get(section,'Path')
     path += '/%d/'%runno
     if any(x in rundes for x in ['left','right']):
         path+='%s/'%rundes
     
-    if config and config.has_option('Main','relPath'):
-        path += config.get('Main','relPath')+'/'
+    if config and config.has_option(section,'relPath'):
+        path += config.get(section,'relPath')+'/'
 
-    if config and config.has_option('Main','fileName'):
-        path += config.get('Main','fileName')
+    if config and config.has_option(section,'fileName'):
+        path += config.get(section,'fileName')
     else:
         path += 'histograms.root'
     print path
@@ -25,13 +25,12 @@ def get_file(config,runno,rundes):
 def get_color(index):
     return index+1
     
-def get_plot(config,runno,rundes,name):
-
-
+def get_plot(config,section,runno,rundes,name):
     newKey = ''
-    f = get_file(config,runno,rundes)
+    f = get_file(config,section,runno,rundes)
     for key in f.GetListOfKeys():
         c = f.FindObjectAny(key.GetName())
+        print c,name
         if c == None:
             continue
         if type(c) == ROOT.TCanvas:
@@ -44,6 +43,11 @@ def get_plot(config,runno,rundes,name):
             continue
         if h.GetName()==name:
             return h
+        elif name in h.GetName():
+            print name
+            retVal = raw_input()
+            if retVal == 'y':
+                return h
     return 0
 
 def convert_x_to_electrons(plot,conversion):
