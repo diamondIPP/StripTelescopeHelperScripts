@@ -134,7 +134,7 @@ def succeded(child,counter):
             logfile = open(name,'rb')
             for line in logfile.readlines():
                 if 'DONE_ALL' in line:
-                    print 'suceeded with child'
+                    print 'suceeded with child',runnumber
                     logfile.close()
                     return True
     #       print 'problem with child'
