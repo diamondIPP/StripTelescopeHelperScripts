@@ -1,4 +1,5 @@
 import time
+import pickle
 import csv
 import re
 import HTML
@@ -74,7 +75,7 @@ class result_reader:
             config.read(i)
             print config.sections()
             if not config.has_section('RunInfo'):
-                raw_input('section does not exist....')
+                print 'section "RunInfo" does not exist....'
                 continue
             config.set('RunInfo','realRunNo',runno)
             config.set('RunInfo','runno',runno)
@@ -137,6 +138,11 @@ class result_reader:
             config.set('RunInfo','voltage','%+4d'%self.map[newRunNo]['biasVoltage'])
             config.set('RunInfo','currentbegin','%s'%(self.map[newRunNo]['currentBegin']))
             config.set('RunInfo','currentend'  ,'%s'%(self.map[newRunNo]['currentEnd']))
+            try:
+                config.set('RunInfo','events'  ,'%s'%(self.map[newRunNo]['events']))
+            except:
+                print self.map[newRunNo].keys()
+                pass
         else:
             raw_input('cannot find %s'%newRunNo)
         config.set('RunInfo','runno','%d'%(newRunNo))
@@ -144,7 +150,10 @@ class result_reader:
             if config.has_option('TimeDependence','landauclusterfitslopesize10'):
                 offset = config.getfloat('TimeDependence','landauclusterfitoffsetsize10')
                 slope  = config.getfloat('TimeDependence','landauclusterfitslopesize10')
-                config.set('TimeDependence','LinFitRelChange','%s'%(slope/offset*100.))
+                try:
+                    config.set('TimeDependence','LinFitRelChange','%s'%(slope/offset*100.))
+                except:
+                    config.set('TimeDependence','LinFitRelChange','%s'%slope)
 
         m2 = float(config.get('Landau_normal','m2/2_normal',0))
         m4 = float(config.get('Landau_normal','m4/4_normal',-1))
@@ -247,9 +256,19 @@ class result_reader:
                 link = links[0].strip("'")%mainLink
             else:
                 link = haslink
-            output =  HTML.link(format%value,link)
+            try: 
+                website = format%value
+            except:
+                print 'ERROR could not convert "%s"'%format
+                website = format
+            output =  HTML.link(website,link)
             return output
-        return format%value
+        try: 
+            website = format%value
+        except:
+            print 'ERROR could not convert "%s"'%format
+            website = format
+        return website
         
     def get_cell(self,value,key,result):
         haslink = self.config.get('LINKS',key,'None')
@@ -447,7 +466,10 @@ class result_reader:
         for key in self.csv_mapping:
             result =config
             if self.csv_mapping[key].has_key('key'):
-                default = self.csv_mapping[key]['default']
+                try:
+                    default = self.csv_mapping[key]['default']
+                except:
+                    default = 'unknown'
                 configKeys = self.csv_mapping[key]['key']
                 if result.has_section(configKeys[0]):
                     if result.has_option(configKeys[0],configKeys[1]):
@@ -456,16 +478,35 @@ class result_reader:
                         value = default
                 else:
                     value = default
-                type = self.csv_mapping[key]['valueType']
+                try:
+                    type = self.csv_mapping[key]['valueType']
+                except:
+                    type = 'string'
                 value = utilities.get_value(value,type,default)
                 #print key,configKeys,value
-            elif self.header_mapping[key].has_key('title'):
-                value = self.csv_mapping[key]['title']
             else:
-                value = 'UNKOWN'
+                try:
+                    if self.header_mapping[key].has_key('title'):
+                        value = self.csv_mapping[key]['title']
+                except:
+                    value = 'UNKOWN'
             pass
-            format = self.config.get('FORMAT',key,'%s')
-            out = format%value
+            try:
+                format = self.config.get('FORMAT',key,'%s')
+            except:
+                print 'cannot find format for key',key
+                format = '%s'
+            try:
+                out = format%value
+            except:
+                print 'cannot format "%s"/"%s"'%(format,value)
+                out =None
+            if out == None:
+                try:
+                    out = value
+                except:
+                    out = 'UNKNOWN'
+
             out = out.strip('"')
             row.append(out)
         return row
@@ -509,4 +550,6 @@ if __name__ == "__main__":
     reader.updateCrosstalkFactors = True
     reader.create_tables()
     reader.create_all_html_tables()
+    with  open('data.pkl', 'wb') as output:
+        pickle.dump(reader.results,output)
 

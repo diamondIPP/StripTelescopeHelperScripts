@@ -1,10 +1,12 @@
 import utilities
 import ConfigParser
+import csv
 
 
 
 class dictCreater:
     def __init__(self,configDir):
+
         self.verbosity = 0
     	self.configDir = configDir
         self.configFileName = configDir+'/creation.ini'
@@ -16,13 +18,16 @@ class dictCreater:
         self.contentDescRepCard = [i.split('/') for i in contentDesc.strip('[]').split(',')]
         contentDesc = self.config.get('RunInfo','content')
         self.contentDescRunInfo = [i.split('/') for i in contentDesc.strip('[]').split(',')]
-        
+        contentDesc = self.config.get('RunList','content')
+        self.contentDescRunList = [i.split('/') for i in contentDesc.strip('[]').split(',')]
+
     def add_default(self,item,contentDesc):
         for i in contentDesc:
             item[i[0]] = utilities.get_value(i[2],i[1],i[2])
             pass
         return item
         
+    @property
     def getRunInfo(self):
         logfiles = self.config.get('RunInfo','fileName')
         logfiles = self.configDir+'/'+logfiles
@@ -49,6 +54,31 @@ class dictCreater:
                 if thisInfo.has_key(key):
                     runInfo[thisInfo[key]] = thisInfo
         return runInfo
+
+    def get_runlist_map(self):
+        fileName = self.config.get('RunList','fileName')
+        fileName = self.configDir+'/'+fileName
+        runList =  {}
+        contentDesc = self.contentDescRunList
+        key = self.config.get('RunList','key')
+        with open(fileName,'rb') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for row in reader:
+                thisRun = {}
+                for i in range(len(row)):
+                    if len(contentDesc[i])>2:
+                        thisRun[contentDesc[i][0]] = utilities.get_value(row[i],contentDesc[i][1],contentDesc[i][2])
+                    else:
+                        print row[i],type(row[i])
+                        thisRun[contentDesc[i][0]] = utilities.get_value(row[i],contentDesc[i][1])
+
+                if thisRun.has_key(key):
+                    runList[thisRun[key]] = thisRun
+                else:
+                    print 'cannot find key, ',key,'in thisRun',thisRun
+        return runList
+
+
 
     def get_repeaterCard_map(self):
         fileName =  self.config.get('RepeaterCards','fileName')
@@ -90,26 +120,33 @@ class dictCreater:
 
     def get_combined_list(self):
         repeaterCards = self.get_repeaterCard_map()
-        runInfos = self.getRunInfo()
+        runInfos = self.getRunInfo
+        runList = self.get_runlist_map()
         combinedList = {}
         missingRepeaterCards =[]
         missingRunInfo = []
-        for key in set().union(repeaterCards.keys(),runInfos.keys()):
+        for key in set().union(repeaterCards.keys(),runInfos.keys(),runList.keys()):
             item = {}
-            if repeaterCards.has_key(key) and runInfos.has_key(key):
-                item = dict(repeaterCards[key].items() + runInfos[key].items())
-            elif repeaterCards.has_key(key):
-                item = dict(repeaterCards[key].items())
-                item = self.add_default(item,self.contentDescRunInfo)
-                missingRunInfo.append(key)
-                if self.verbosity: print 'no key %s in runInfo'%key
-                if self.verbosity: print item
+            if repeaterCards.has_key(key) and runInfos.has_key(key) and runList.has_key(key):
+                item = dict(repeaterCards[key].items() + runInfos[key].items()+runList[key].items())
             else:
-                item = dict(runInfos[key])
-                item = self.add_default(item,self.contentDescRepCard)
-                missingRepeaterCards.append(key)
-                if self.verbosity: print 'no key %s in repeaterCards'%key
-                if self.verbosity: print item
+                print 'no key %s in runList'%key
+                if repeaterCards.has_key(key) and runInfos.has_key(key) :
+                    item = dict(repeaterCards[key].items() + runInfos[key].items())
+                elif repeaterCards.has_key(key):
+                    item = dict(repeaterCards[key].items())
+                    item = self.add_default(item,self.contentDescRunInfo)
+                    missingRunInfo.append(key)
+                    if self.verbosity: print 'no key %s in runInfo'%key
+                    if self.verbosity: print item
+                elif runInfos.has_key(key):
+                    item = dict(runInfos[key])
+                    item = self.add_default(item,self.contentDescRepCard)
+                    missingRepeaterCards.append(key)
+                    if self.verbosity: print 'no key %s in repeaterCards'%key
+                    if self.verbosity: print item
+                else:
+                    continue
             combinedList[key]=item
         if len(missingRepeaterCards):
             print 'There are %s runs with missing repeatercard information: \n\t %s'%(len(missingRepeaterCards),sorted(missingRepeaterCards))
@@ -119,7 +156,8 @@ class dictCreater:
         return combinedList
 
 if __name__ == "__main__":
-    r = dictCreater('creation.ini')
+    r = dictCreater('config/')
+    r.get_runlist_map()
     r.get_irradiation_map()
     r.get_repeaterCard_map()
     map = r.get_combined_list()

@@ -31,7 +31,16 @@ def get_mainLink(result,absPath):
 
 def get_colored_cell(key,content,value,result):
     color ='white'
-    if key =='rep. card' and int(value)<=0 :    
+    if key =='ADC steps':
+        try:
+            v = int(value)
+        except:
+            v= -1
+        if v ==0:
+            color ='green'
+        elif v>0:
+            color = 'red'
+    elif key =='rep. card' and int(value)<=0 :    
         color = 'pink'
     elif key =='feedthrough SIL' and abs(float(value))>10 : 
         color='red'

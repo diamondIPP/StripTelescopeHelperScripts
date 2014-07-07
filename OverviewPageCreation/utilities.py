@@ -66,13 +66,22 @@ def convertNumbers(input_list):
         a = convertNumber(s)
         output_list.append(a)
     return output_list
-    
-def get_value(input,convert,default=''):
+
+
+def get_value(input, convert, default=''):
+    """
+
+    :rtype : object
+    """
+
 #    print 'convert ' , input,convert
     if '/' in input:
-            input = input.split('/')
-            retVal = [get_value(i,convert,default) for i in input]
-    
+        input = input.split('/')
+        retVal = [get_value(i,convert,default) for i in input]
+    elif 'list' in convert:
+        input = input.split('/')
+        convert = convert.replace('list','')
+        retVal = [get_value(i,convert,default) for i in input]
     elif convert =='int':
         try:
             retVal = int(input)
