@@ -69,12 +69,14 @@ def get_colored_cell(key, content, value, result):
         cmn_pos = result.getfloat('Noise','cmn_pos')
         if cmn2 >= 0:
             color = 'green'
-            if abs(cmn1-cmn2)/cmn1 >.1:
+            frac1 = abs(cmn1-cmn2)/cmn1
+            frac2 = abs(cmn1-cmn2)/cmn2
+            if frac1 >.1 or frac2 >.2:
                 color ='red'
-            elif abs(cmn1-cmn2)/cmn1 >.05:
+            elif frac1 > .05 or frac2 > .05:
                 color = 'yellow'
         if abs(cmn_pos) >1:
-            color = 'yellow'
+            color = 'pink'
 
     elif key == 'NoiseCMN Slope':
         if abs(value) > 0.1:
