@@ -303,6 +303,8 @@ class ResultReader:
                         value = default
                 else:
                     value = default
+                if type(value) == list and len(value) == 1:
+                    value = value[0]
                 value_type = self.header_mapping[key]['valueType']
                 value = utilities.get_value(value, value_type, default)
                 # print key,configKeys,value
