@@ -63,6 +63,19 @@ def get_colored_cell(key, content, value, result):
                 color = 'yellow'
         except:
             pass
+    elif key == 'CMN':
+        cmn1 = result.getfloat('Noise','cm_noise_dia')
+        cmn2 = result.getfloat('Noise','cmn_sigma',-1)
+        cmn_pos = result.getfloat('Noise','cmn_pos',0)
+        if cmn2 >= 0:
+            color = 'green'
+            if abs(cmn1-cmn2)/cmn1 >.1:
+                color ='red'
+            elif abs(cmn1-cmn2)/cmn1 >.05:
+                color = 'yellow'
+        if abs(cmn_pos) >1:
+            color = 'yellow'
+
     elif key == 'NoiseCMN Slope':
         if abs(value) > 0.1:
             color = 'red'
