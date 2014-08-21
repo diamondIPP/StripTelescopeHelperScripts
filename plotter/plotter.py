@@ -18,15 +18,17 @@ class plotter(object) :
 
 	def plot(self, histo_type) :
 		rd42Style()
+#		ROOT.gStyle.SetDrawOption('colz')
+#		ROOT.gStyle.SetCanvasDefW(1200)
 		canvas = ROOT.TCanvas(self.config.get(histo_type, 'histo_name'), 'canvas')
 		histo = self.get_histo(histo_type)
 		canvas.cd()
-		histo.Draw()
+		histo.Draw(self.config.get(histo_type, 'draw_opt'))
 		histo.GetXaxis().SetTitle(self.config.get(histo_type, 'xTitle'))
 		histo.GetYaxis().SetTitle(self.config.get(histo_type, 'yTitle'))
 		self.draw_rd42Line()
 		canvas.Update()
-#		raw_input('ok?')
+		raw_input('ok?')
 		canvas.Print('%s.pdf' % self.config.get(histo_type, 'histo_name'))
 
 
@@ -76,8 +78,8 @@ if __name__ == '__main__' :
 	config = ConfigParser.ConfigParser()
 	config.read(config_file)
 	pl = plotter(config, path, run_no)
-	pl.plot('PulseHeight')
-	pl.plot('Noise')
+#	pl.plot('PulseHeight')
+#	pl.plot('Noise')
 	pl.plot('FidCut')
 
 ##	name = 'DiaTranspAnaPulseHeightOf2HighestIn10Strips'
