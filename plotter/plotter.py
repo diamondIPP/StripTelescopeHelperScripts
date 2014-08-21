@@ -10,10 +10,10 @@ class plotter(object) :
 
 	def __init__(selfi, config) :
 		print 'init'
+		rd42Style()
 
 
 	def plot(self) :
-		rd42Style()
 		canvas = ROOT.TCanvas('canvas', 'canvas')
 		histo = self.get_histo('DiaTranspAnaPulseHeightOf2HighestIn10Strips')
 		canvas.cd()
@@ -21,16 +21,14 @@ class plotter(object) :
 		self.draw_rd42Line()
 		raw_input('ok?')
 #		raw_input('ok?')
+		canvas.Update()
 		canvas.Print('test.pdf')
 
 
 	def get_histo(self, name) :
 #		histo_file = ROOT.TFile('histograms.root', 'READ')
 		histo_file = ROOT.TFile('cDiaTranspAnaPulseHeightOf2HighestIn10Strips.root', 'READ')
-		histo_file.Get('c%s' % name).ls()
 		histo = histo_file.Get('c%s' % name).GetPrimitive('h%s' % name)
-		histo.ls()
-		print histo.GetMean()
 		histo.GetFunction('Fitfcn_h%s' % name).SetBit(ROOT.TF1.kNotDraw)
 		histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
 		return histo

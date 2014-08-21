@@ -33,7 +33,7 @@ def rd42Style() :
 	rd42Style.SetFrameLineWidth(1) 
 
 	# histo
-	rd42Style.SetHistFillColor(63) 
+#	rd42Style.SetHistFillColor(63) 
 	# rd42Style.SetHistFillStyle(0) 
 	rd42Style.SetHistLineColor(1) 
 	rd42Style.SetHistLineStyle(0) 
@@ -139,5 +139,4 @@ def rd42Style() :
 #	rd42Style.SetTimeOffset(Double_t toffset) 
 #	rd42Style.SetHistMinimumZero(kTRUE) 
 
-	rd42Style.cd() 
-
+	rd42Style.cd()
