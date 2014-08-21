@@ -17,8 +17,8 @@ class plotter(object) :
 
 
 	def plot(self, histo_type) :
-		canvas = ROOT.TCanvas('canvas', 'canvas')
 		rd42Style()
+		canvas = ROOT.TCanvas(self.config.get(histo_type, 'histo_name'), 'canvas')
 		histo = self.get_histo(histo_type)
 		canvas.cd()
 		histo.Draw()
@@ -26,20 +26,22 @@ class plotter(object) :
 		histo.GetYaxis().SetTitle(self.config.get(histo_type, 'yTitle'))
 		self.draw_rd42Line()
 		canvas.Update()
-		raw_input('ok?')
+#		raw_input('ok?')
 		canvas.Print('%s.pdf' % self.config.get(histo_type, 'histo_name'))
 
 
 	def get_histo(self, histo_type) :
 		file_path  = self.path + self.config.get(histo_type, 'root_file')
 		histo_name = self.config.get(histo_type, 'histo_name')
-#		histo_file = ROOT.TFile('histograms.root', 'READ')
-#		histo_file = ROOT.TFile('cDiaTranspAnaPulseHeightOf2HighestIn10Strips.root', 'READ')
+		histo_prefix = self.config.get(histo_type, 'histo_prefix')
+		histo_suffix = self.config.get(histo_type, 'histo_suffix')
+		canvas_prefix = self.config.get(histo_type, 'canvas_prefix')
 		histo_file = ROOT.TFile(file_path, 'READ')
-		histo = histo_file.Get('c%s' % histo_name).GetPrimitive('h%s' % histo_name)
+		histo = histo_file.Get('%s%s' % (canvas_prefix, histo_name)).GetPrimitive('%s%s%s' % (histo_prefix, histo_name, histo_suffix))
 		if not self.config.getboolean(histo_type, 'fit') :
 			histo.GetFunction('Fitfcn_h%s' % histo_name).SetBit(ROOT.TF1.kNotDraw)
-		histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
+		if histo_type == 'PulseHeight' :
+			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
 		return histo
 
 
@@ -55,6 +57,7 @@ class plotter(object) :
 if __name__ == '__main__' :
 	args = sys.argv
 	run_no = -1
+	path = './'
 
 	if ('--help' in args) or ('-h' in args) :
 		print 'usage: ..'
@@ -63,15 +66,19 @@ if __name__ == '__main__' :
 	if ('-r' in args) :
 		run_no = args[args.index('-r')+1]
 
+	if ('-i' in args) :
+		path = args[args.index('-i')+1]
+
 	if ('-c' in args) and (args.index('-c')+1 < len(args)) and (not args[args.index('-c')+1].startswith('-')) :
 		config_file = args[args.index('-c')+1]
 	else :
 		config_file = '%s/config.cfg' % os.path.dirname(os.path.realpath(__file__))
 	config = ConfigParser.ConfigParser()
 	config.read(config_file)
-	pl = plotter(config, './', run_no)
+	pl = plotter(config, path, run_no)
 	pl.plot('PulseHeight')
-#	pl.plot('Noise')
+	pl.plot('Noise')
+	pl.plot('FidCut')
 
 ##	name = 'DiaTranspAnaPulseHeightOf2HighestIn10Strips'
 ##	file = ROOT.TFile('c%s.root' % name, 'READ')
