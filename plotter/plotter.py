@@ -8,28 +8,37 @@ from rd42Style import rd42Style
 
 class plotter(object) :
 
-	def __init__(selfi, config) :
-		print 'init'
+	def __init__(self, config, path, run_no) :
+		self.config = config
+		self.run_no = run_no
+		if not path.endswith('/') : path += '/'
+		self.path = path + self.run_no + '/'
 		rd42Style()
 
 
-	def plot(self) :
+	def plot(self, histo_type) :
 		canvas = ROOT.TCanvas('canvas', 'canvas')
-		histo = self.get_histo('DiaTranspAnaPulseHeightOf2HighestIn10Strips')
+		rd42Style()
+		histo = self.get_histo(histo_type)
 		canvas.cd()
 		histo.Draw()
+		histo.GetXaxis().SetTitle(self.config.get(histo_type, 'xTitle'))
+		histo.GetYaxis().SetTitle(self.config.get(histo_type, 'yTitle'))
 		self.draw_rd42Line()
-		raw_input('ok?')
-#		raw_input('ok?')
 		canvas.Update()
-		canvas.Print('test.pdf')
+		raw_input('ok?')
+		canvas.Print('%s.pdf' % self.config.get(histo_type, 'histo_name'))
 
 
-	def get_histo(self, name) :
+	def get_histo(self, histo_type) :
+		file_path  = self.path + self.config.get(histo_type, 'root_file')
+		histo_name = self.config.get(histo_type, 'histo_name')
 #		histo_file = ROOT.TFile('histograms.root', 'READ')
-		histo_file = ROOT.TFile('cDiaTranspAnaPulseHeightOf2HighestIn10Strips.root', 'READ')
-		histo = histo_file.Get('c%s' % name).GetPrimitive('h%s' % name)
-		histo.GetFunction('Fitfcn_h%s' % name).SetBit(ROOT.TF1.kNotDraw)
+#		histo_file = ROOT.TFile('cDiaTranspAnaPulseHeightOf2HighestIn10Strips.root', 'READ')
+		histo_file = ROOT.TFile(file_path, 'READ')
+		histo = histo_file.Get('c%s' % histo_name).GetPrimitive('h%s' % histo_name)
+		if not self.config.getboolean(histo_type, 'fit') :
+			histo.GetFunction('Fitfcn_h%s' % histo_name).SetBit(ROOT.TF1.kNotDraw)
 		histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
 		return histo
 
@@ -45,18 +54,24 @@ class plotter(object) :
 
 if __name__ == '__main__' :
 	args = sys.argv
+	run_no = -1
 
 	if ('--help' in args) or ('-h' in args) :
 		print 'usage: ..'
 		sys.exit(1)
 
-	if ('-c' in args) and (args.index('-c')+1 < len(args)) and (not args[args.index('--name')+1].startswith('-')) :
-		config_file = args[args.index('--name')+1]
+	if ('-r' in args) :
+		run_no = args[args.index('-r')+1]
+
+	if ('-c' in args) and (args.index('-c')+1 < len(args)) and (not args[args.index('-c')+1].startswith('-')) :
+		config_file = args[args.index('-c')+1]
 	else :
 		config_file = '%s/config.cfg' % os.path.dirname(os.path.realpath(__file__))
-
-	pl = plotter('bla')
-	pl.plot()
+	config = ConfigParser.ConfigParser()
+	config.read(config_file)
+	pl = plotter(config, './', run_no)
+	pl.plot('PulseHeight')
+#	pl.plot('Noise')
 
 ##	name = 'DiaTranspAnaPulseHeightOf2HighestIn10Strips'
 ##	file = ROOT.TFile('c%s.root' % name, 'READ')
