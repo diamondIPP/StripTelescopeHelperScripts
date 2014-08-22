@@ -40,7 +40,7 @@ class plotter(object) :
 			canvas.cd()
 			fid_cut.Draw('same')
 		canvas.Update()
-		canvas.Update()
+		canvas.Dump()
 		raw_input('ok?')
 		canvas.Print('%s.pdf' % self.histo_name)
 
