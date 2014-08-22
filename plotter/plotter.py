@@ -33,6 +33,13 @@ class plotter(object) :
 		histo.GetXaxis().SetTitle(self.xTitle)
 		histo.GetYaxis().SetTitle(self.yTitle)
 		self.draw_rd42Line()
+		if self.histo_type == 'FidCut' :
+			fid_cut = self.get_fidCut()
+			fid_cut.SetLineColor(ROOT.kRed)
+			fid_cut.Dump()
+			canvas.cd()
+			fid_cut.Draw('same')
+		canvas.Update()
 		canvas.Update()
 		raw_input('ok?')
 		canvas.Print('%s.pdf' % self.histo_name)
@@ -41,7 +48,7 @@ class plotter(object) :
 	def get_histo(self) :
 		histo_file = helper.open_rootFile(self.file_path, 'READ')
 		print   histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).ls()
-		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix))
+		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix)).Clone()
 
 		# remove functions
 		if not eval(self.fit) :
@@ -53,7 +60,7 @@ class plotter(object) :
 
 	def get_fidCut(self) :
 		histo_file = helper.open_rootFile(self.file_path, 'READ')
-		fid_cut = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('fidCut_0')
+		fid_cut = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('fidCut_0').Clone()
 		return fid_cut		
 
 
@@ -102,6 +109,7 @@ if __name__ == '__main__' :
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
 	for plot in plots :
+		if plot != 'FidCut' : continue
 		pl = plotter(config, path, run_no, plot)
 		pl.plot()
 
