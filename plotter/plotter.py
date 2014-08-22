@@ -4,6 +4,7 @@ import sys
 import os
 import ConfigParser
 from rd42Style import rd42Style
+import helper
 
 
 class plotter(object) :
@@ -33,12 +34,12 @@ class plotter(object) :
 
 
 	def get_histo(self, histo_type) :
-		file_path  = self.path + self.config.get(histo_type, 'root_file')
-		histo_name = self.config.get(histo_type, 'histo_name')
-		histo_prefix = self.config.get(histo_type, 'histo_prefix')
-		histo_suffix = self.config.get(histo_type, 'histo_suffix')
+		file_path     = self.path + self.config.get(histo_type, 'root_file')
+		histo_name    = self.config.get(histo_type, 'histo_name')
+		histo_prefix  = self.config.get(histo_type, 'histo_prefix')
+		histo_suffix  = self.config.get(histo_type, 'histo_suffix')
 		canvas_prefix = self.config.get(histo_type, 'canvas_prefix')
-		histo_file = ROOT.TFile(file_path, 'READ')
+		histo_file = helper.open_rootFile(file_path, 'READ')
 		histo = histo_file.Get('%s%s' % (canvas_prefix, histo_name)).GetPrimitive('%s%s%s' % (histo_prefix, histo_name, histo_suffix))
 		if not self.config.getboolean(histo_type, 'fit') :
 			histo.GetFunction('Fitfcn_%s%s' % (histo_prefix, histo_name)).SetBit(ROOT.TF1.kNotDraw)
