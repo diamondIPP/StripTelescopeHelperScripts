@@ -9,43 +9,52 @@ import helper
 
 class plotter(object) :
 
-	def __init__(self, config, path, run_no) :
+	def __init__(self, config, path, run_no, histo_type) :
 		self.config = config
 		self.run_no = run_no
+		self.histo_type = histo_type
 		if not path.endswith('/') : path += '/'
 		self.path = path + self.run_no + '/'
 		rd42Style()
 
+		for key, value in self.config.items(histo_type) :
+			setattr(self, key, value)
+		self.file_path = self.path + self.root_file
 
-	def plot(self, histo_type) :
+
+	def plot(self) :
 		rd42Style()
 #		ROOT.gStyle.SetDrawOption('colz')
 #		ROOT.gStyle.SetCanvasDefW(1200)
-		canvas = ROOT.TCanvas(self.config.get(histo_type, 'histo_name'), 'canvas')
-		histo = self.get_histo(histo_type)
+		canvas = ROOT.TCanvas(self.histo_name, 'canvas')
+		histo = self.get_histo()
 		canvas.cd()
-		histo.Draw(self.config.get(histo_type, 'draw_opt'))
-		histo.GetXaxis().SetTitle(self.config.get(histo_type, 'xTitle'))
-		histo.GetYaxis().SetTitle(self.config.get(histo_type, 'yTitle'))
+		histo.Draw(self.draw_opt)
+		histo.GetXaxis().SetTitle(self.xTitle)
+		histo.GetYaxis().SetTitle(self.yTitle)
 		self.draw_rd42Line()
 		canvas.Update()
 		raw_input('ok?')
-		canvas.Print('%s.pdf' % self.config.get(histo_type, 'histo_name'))
+		canvas.Print('%s.pdf' % self.histo_name)
 
 
-	def get_histo(self, histo_type) :
-		file_path     = self.path + self.config.get(histo_type, 'root_file')
-		histo_name    = self.config.get(histo_type, 'histo_name')
-		histo_prefix  = self.config.get(histo_type, 'histo_prefix')
-		histo_suffix  = self.config.get(histo_type, 'histo_suffix')
-		canvas_prefix = self.config.get(histo_type, 'canvas_prefix')
-		histo_file = helper.open_rootFile(file_path, 'READ')
-		histo = histo_file.Get('%s%s' % (canvas_prefix, histo_name)).GetPrimitive('%s%s%s' % (histo_prefix, histo_name, histo_suffix))
-		if not self.config.getboolean(histo_type, 'fit') :
-			histo.GetFunction('Fitfcn_%s%s' % (histo_prefix, histo_name)).SetBit(ROOT.TF1.kNotDraw)
-		if histo_type == 'PulseHeight' :
+	def get_histo(self) :
+		histo_file = helper.open_rootFile(self.file_path, 'READ')
+		print   histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).ls()
+		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix))
+
+		# remove functions
+		if not eval(self.fit) :
+			histo.GetFunction('Fitfcn_%s%s' % (self.histo_prefix, self.histo_name)).SetBit(ROOT.TF1.kNotDraw)
+		if self.histo_type == 'PulseHeight' :
 			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
 		return histo
+
+
+	def get_fidCut(self) :
+		histo_file = helper.open_rootFile(self.file_path, 'READ')
+		fid_cut = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('fidCut_0')
+		return fid_cut		
 
 
 	def draw_rd42Line(self) :
@@ -77,11 +86,24 @@ if __name__ == '__main__' :
 	else :
 		config_file = '%s/config.cfg' % os.path.dirname(os.path.realpath(__file__))
 	config = ConfigParser.ConfigParser()
+	config.optionxform = str # case sensitive options
 	config.read(config_file)
-	pl = plotter(config, path, run_no)
-#	pl.plot('PulseHeight')
-#	pl.plot('Noise')
-	pl.plot('FidCut')
+
+
+#	cfg = parse.samples(config_file)
+#
+#	print config_file
+#	print cfg['root_file']
+#
+#	print [plot.fit for plot in cfg]
+#	print cfg['FidCut'].draw_opt
+#
+#	sys.exit(0)
+
+	plots = ['FidCut', 'PulseHeight', 'Noise']
+	for plot in plots :
+		pl = plotter(config, path, run_no, plot)
+		pl.plot()
 
 ##	name = 'DiaTranspAnaPulseHeightOf2HighestIn10Strips'
 ##	file = ROOT.TFile('c%s.root' % name, 'READ')
