@@ -41,7 +41,7 @@ class plotter(object) :
 		histo_file = ROOT.TFile(file_path, 'READ')
 		histo = histo_file.Get('%s%s' % (canvas_prefix, histo_name)).GetPrimitive('%s%s%s' % (histo_prefix, histo_name, histo_suffix))
 		if not self.config.getboolean(histo_type, 'fit') :
-			histo.GetFunction('Fitfcn_h%s' % histo_name).SetBit(ROOT.TF1.kNotDraw)
+			histo.GetFunction('Fitfcn_%s%s' % (histo_prefix, histo_name)).SetBit(ROOT.TF1.kNotDraw)
 		if histo_type == 'PulseHeight' :
 			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
 		return histo
