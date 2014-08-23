@@ -32,6 +32,8 @@ class plotter(object) :
 		histo.Draw(self.draw_opt)
 		histo.GetXaxis().SetTitle(self.xTitle)
 		histo.GetYaxis().SetTitle(self.yTitle)
+		if self.histo_type != 'FidCut' :
+			histo.SetMaximum(1.4 * histo.GetMaximum())
 		self.draw_rd42Line()
 		canvas.UseCurrentStyle()
 		if self.histo_type == 'FidCut' :
@@ -110,7 +112,7 @@ if __name__ == '__main__' :
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
 	for plot in plots :
-		if plot != 'FidCut' : continue
+#		if plot != 'FidCut' : continue
 		pl = plotter(config, path, run_no, plot)
 		pl.plot()
 
