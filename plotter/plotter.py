@@ -39,6 +39,7 @@ class plotter(object) :
 			fid_cut.Dump()
 			canvas.cd()
 			fid_cut.Draw('same')
+		canvas.UseCurrentStyle()
 		canvas.Update()
 		canvas.Dump()
 		raw_input('ok?')
