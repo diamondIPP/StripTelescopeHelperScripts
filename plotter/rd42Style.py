@@ -3,7 +3,7 @@ import ROOT
 
 
 def rd42Style() :
-	rd42Style = ROOT.TStyle("rd42Style","RD42 Style")
+	rd42Style = ROOT.TStyle('rd42Style','RD42 Style')
 
 	# canvas
 	rd42Style.SetCanvasBorderMode(0)
@@ -51,7 +51,7 @@ def rd42Style() :
 #	# fit/function
 ##	rd42Style.SetOptFit(1)
 #	rd42Style.SetOptFit(0)
-#	rd42Style.SetFitFormat("5.4g")
+#	rd42Style.SetFitFormat('5.4g')
 #	rd42Style.SetFuncColor(2)
 #	rd42Style.SetFuncStyle(1)
 #	rd42Style.SetFuncWidth(1)
@@ -63,12 +63,12 @@ def rd42Style() :
 
 	# statistics box
 #	rd42Style.SetOptFile(0)
-	rd42Style.SetOptStat(0)  # To display the mean and RMS:   SetOptStat("mr")
+	rd42Style.SetOptStat(0)  # To display the mean and RMS:   SetOptStat('mr')
 #	rd42Style.SetStatColor(ROOT.kWhite)
 #	rd42Style.SetStatFont(42)
 #	rd42Style.SetStatFontSize(0.025)
 #	rd42Style.SetStatTextColor(1)
-#	rd42Style.SetStatFormat("6.4g")
+#	rd42Style.SetStatFormat('6.4g')
 #	rd42Style.SetStatBorderSize(1)
 #	rd42Style.SetStatH(0.1)
 #	rd42Style.SetStatW(0.15)
@@ -83,8 +83,8 @@ def rd42Style() :
 	rd42Style.SetPadRightMargin(0.04)
 
 	# global title
-	rd42Style.SetOptTitle(1)
-#	rd42Style.SetTitleFont(42)
+	rd42Style.SetOptTitle(0)
+	rd42Style.SetTitleFont(42)
 	rd42Style.SetTitleColor(1)
 #	rd42Style.SetTitleTextColor(1)
 	rd42Style.SetTitleFillColor(10)
@@ -97,28 +97,28 @@ def rd42Style() :
 #	# rd42Style.SetTitleBorderSize(2)
 #
 #	# axis titles
-#	rd42Style.SetTitleColor(1, "XYZ")
-##	rd42Style.SetTitleFont(12, "XYZ")
-##	rd42Style.SetTitleSize(0.005, "XYZ")
+#	rd42Style.SetTitleColor(1, 'XYZ')
+	rd42Style.SetTitleFont(42, 'XYZ')
+	rd42Style.SetTitleSize(0.046, 'XYZ')
 #	rd42Style.SetTitleXSize(0.02)  # Another way to set the size?
 #	rd42Style.SetTitleYSize(0.02)
 #	rd42Style.SetTitleXOffset(1.25)
 #	rd42Style.SetTitleYOffset(1.25)
-#	# rd42Style.SetTitleOffset(1.1, "Y")  # Another way to set the Offset
+	rd42Style.SetTitleOffset(1.25, 'XYZ')  # Another way to set the Offset
 #
 #	# axis labels
-#	rd42Style.SetLabelColor(1, "XYZ")
-#	rd42Style.SetLabelFont(42, "XYZ")
-#	rd42Style.SetLabelOffset(0.012, "XYZ")
-#	rd42Style.SetLabelSize(0.04, "XYZ")
+#	rd42Style.SetLabelColor(1, 'XYZ')
+	rd42Style.SetLabelFont(42, 'XYZ')
+	rd42Style.SetLabelOffset(0.012, 'XYZ')
+	rd42Style.SetLabelSize(0.04, 'XYZ')
 #
 #	# axis
-#	rd42Style.SetAxisColor(1, "XYZ")
+#	rd42Style.SetAxisColor(1, 'XYZ')
 #	rd42Style.SetStripDecimals(ROOT.kTRUE)
-#	rd42Style.SetTickLength(0.03, "XYZ")
-#	rd42Style.SetNdivisions(510, "XYZ")
-#	rd42Style.SetPadTickX(1)   # To get tick marks on the opposite side of the frame
-#	rd42Style.SetPadTickY(1)
+#	rd42Style.SetTickLength(0.03, 'XYZ')
+#	rd42Style.SetNdivisions(510, 'XYZ')
+	rd42Style.SetPadTickX(1)   # To get tick marks on the opposite side of the frame
+	rd42Style.SetPadTickY(1)
 #
 #	# Change for log plots:
 #	rd42Style.SetOptLogx(0)
@@ -126,7 +126,7 @@ def rd42Style() :
 #	rd42Style.SetOptLogz(0)
 #
 #	# colors
-#	rd42Style.SetPalette(1)
+	rd42Style.SetPalette(1)
 #
 #	# postscript options:
 #	#rd42Style.SetPaperSize(20.,20.)
@@ -137,7 +137,7 @@ def rd42Style() :
 #
 ##	rd42Style.SetBarOffset(Float_t baroff = 0.5)
 ##	rd42Style.SetBarWidth(Float_t barwidth = 0.5)
-##	rd42Style.SetPaintTextFormat(const char* format = "g")
+##	rd42Style.SetPaintTextFormat(const char* format = 'g')
 ##	rd42Style.SetPalette(Int_t ncolors = 0, Int_t* colors = 0)
 ##	rd42Style.SetTimeOffset(Double_t toffset)
 ##	rd42Style.SetHistMinimumZero(kTRUE)

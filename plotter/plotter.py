@@ -33,22 +33,22 @@ class plotter(object) :
 		histo.GetXaxis().SetTitle(self.xTitle)
 		histo.GetYaxis().SetTitle(self.yTitle)
 		self.draw_rd42Line()
+		canvas.UseCurrentStyle()
 		if self.histo_type == 'FidCut' :
 			fid_cut = self.get_fidCut()
 			fid_cut.SetLineColor(ROOT.kRed)
-			fid_cut.Dump()
+#			fid_cut.Dump()
 			canvas.cd()
 			fid_cut.Draw('same')
-		canvas.UseCurrentStyle()
 		canvas.Update()
-		canvas.Dump()
+#		canvas.Dump()
 		raw_input('ok?')
 		canvas.Print('%s.pdf' % self.histo_name)
 
 
 	def get_histo(self) :
 		histo_file = helper.open_rootFile(self.file_path, 'READ')
-		print   histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).ls()
+#		print   histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).ls()
 		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix)).Clone()
 
 		# remove functions
