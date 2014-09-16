@@ -51,9 +51,9 @@ def rd42Style() :
 #
 #	# fit/function
 ##	rd42Style.SetOptFit(1)
-#	rd42Style.SetOptFit(0)
+	rd42Style.SetOptFit(0)
 #	rd42Style.SetFitFormat('5.4g')
-#	rd42Style.SetFuncColor(2)
+	rd42Style.SetFuncColor(3)
 #	rd42Style.SetFuncStyle(1)
 #	rd42Style.SetFuncWidth(1)
 #
@@ -140,6 +140,10 @@ def rd42Style() :
 	npoints = len(s)
 	ROOT.TColor.CreateGradientColorTable(npoints, s, r, g, b, ncontours)
 	rd42Style.SetNumberContours(ncontours)
+
+	# text
+#	rd42Style.SetTextAlign(12)
+
 #
 #	# postscript options:
 #	#rd42Style.SetPaperSize(20.,20.)
