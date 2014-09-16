@@ -36,11 +36,11 @@ class plotter(object) :
 		histo.Draw(self.draw_opt)
 		histo.GetXaxis().SetTitle(self.xTitle)
 		histo.GetYaxis().SetTitle(self.yTitle)
-		if self.histo_type != 'FidCut' :
-			histo.SetMaximum(1.4 * histo.GetMaximum())
 		self.draw_rd42Line()
 		canvas.UseCurrentStyle()
-		if histo.GetListOfFunctions().FindObject('palette') != None :
+		if histo.GetListOfFunctions().FindObject('palette') == None :
+			histo.SetMaximum(1.4 * histo.GetMaximum())
+		else :
 #			canvas.SetWindowSize(1200, 600)
 			canvas.SetRightMargin(canvas.GetRightMargin() + 0.08)
 			pal = histo.GetListOfFunctions().FindObject('palette')
