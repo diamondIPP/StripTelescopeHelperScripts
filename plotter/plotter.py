@@ -24,6 +24,8 @@ class plotter(object) :
 
 	def plot(self) :
 		rd42Style()
+		if self.histo_type == 'PulseHeight' :
+			ROOT.gStyle.SetOptStat('m')
 #		ROOT.gStyle.SetDrawOption('colz')
 #		ROOT.gStyle.SetCanvasDefW(1200)
 		canvas = ROOT.TCanvas(self.histo_name, 'canvas')
@@ -52,6 +54,7 @@ class plotter(object) :
 			canvas.cd()
 			fid_cut.Draw('same')
 		canvas.Update()
+#		ROOT.gPad.Update()
 #		canvas.Dump()
 		raw_input('ok?')
 		canvas.Print('%s.pdf' % self.histo_name)
@@ -122,7 +125,7 @@ if __name__ == '__main__' :
 	plots = ['FidCut', 'PulseHeight', 'Noise']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
-#		if plot != 'PulseHeight' : continue
+		if plot != 'PulseHeight' : continue
 		pl = plotter(config, path, run_no, plot)
 		pl.plot()
 
