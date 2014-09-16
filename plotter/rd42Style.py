@@ -72,7 +72,7 @@ def rd42Style() :
 #	rd42Style.SetStatFormat('6.4g')
 	rd42Style.SetStatBorderSize(0)
 #	rd42Style.SetStatH(0.1)
-#	rd42Style.SetStatW(0.15)
+	rd42Style.SetStatW(0.35)
 	rd42Style.SetStatStyle(1001)
 	rd42Style.SetStatX(0.9)
 	rd42Style.SetStatY(0.9)
