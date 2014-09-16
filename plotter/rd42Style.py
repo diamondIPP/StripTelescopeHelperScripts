@@ -1,5 +1,6 @@
 #! /usr/bin/python
 import ROOT
+from array import array
 
 
 def rd42Style() :
@@ -127,6 +128,18 @@ def rd42Style() :
 #
 #	# colors
 	rd42Style.SetPalette(1)
+	stops = [0.00, 0.34, 0.61, 0.84, 1.00]
+	red   = [0.00, 0.00, 0.87, 1.00, 0.51]
+	green = [0.00, 0.81, 1.00, 0.20, 0.00]
+	blue  = [0.51, 1.00, 0.12, 0.00, 0.00]
+	s = array('d', stops)
+	r = array('d', red)
+	g = array('d', green)
+	b = array('d', blue)
+	ncontours = 999
+	npoints = len(s)
+	ROOT.TColor.CreateGradientColorTable(npoints, s, r, g, b, ncontours)
+	rd42Style.SetNumberContours(ncontours)
 #
 #	# postscript options:
 #	#rd42Style.SetPaperSize(20.,20.)
