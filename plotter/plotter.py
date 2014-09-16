@@ -36,7 +36,7 @@ class plotter(object) :
 			histo.SetMaximum(1.4 * histo.GetMaximum())
 		self.draw_rd42Line()
 		canvas.UseCurrentStyle()
-		if self.histo_type == 'FidCut' :
+		if histo.GetListOfFunctions().FindObject('palette') != None :
 #			canvas.SetWindowSize(1200, 600)
 			canvas.SetRightMargin(canvas.GetRightMargin() + 0.08)
 			pal = histo.GetListOfFunctions().FindObject('palette')
@@ -45,6 +45,7 @@ class plotter(object) :
 			pal.SetX2NDC(1. - canvas.GetRightMargin() + pal_offset + 0.82*histo.GetZaxis().GetTickLength())
 			pal.SetY1NDC(canvas.GetBottomMargin())
 			pal.SetY2NDC(1. - canvas.GetTopMargin())
+		if self.histo_type == 'FidCut' :
 			fid_cut = self.get_fidCut()
 			fid_cut.SetLineColor(ROOT.kRed)
 #			fid_cut.Dump()
@@ -120,7 +121,7 @@ if __name__ == '__main__' :
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
 	for plot in plots :
-		if plot != 'FidCut' : continue
+#		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
 		pl = plotter(config, path, run_no, plot)
 		pl.plot()
