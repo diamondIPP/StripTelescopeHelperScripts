@@ -87,7 +87,10 @@ class plotter(object) :
 		latex.SetTextFont(62)
 		latex.SetTextSize(0.04)
 		latex.SetTextAlign(13)
-		latex.DrawLatex(0.17, 0.93, 'RD42')
+		print ROOT.gStyle.GetPadLeftMargin()
+		x_pos = ROOT.gStyle.GetPadLeftMargin() + 0.03
+		y_pos = 1. - ROOT.gStyle.GetPadTopMargin() - 0.03
+		latex.DrawLatex(x_pos, y_pos, 'RD42')
 
 
 if __name__ == '__main__' :

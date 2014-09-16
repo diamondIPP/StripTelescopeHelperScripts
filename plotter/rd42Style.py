@@ -78,10 +78,10 @@ def rd42Style() :
 	rd42Style.SetStatY(0.9)
 
 	# margins
-	rd42Style.SetPadTopMargin   (0.04)
+	rd42Style.SetPadTopMargin   (0.06)
 	rd42Style.SetPadBottomMargin(0.14)
 	rd42Style.SetPadLeftMargin  (0.14)
-	rd42Style.SetPadRightMargin (0.04)
+	rd42Style.SetPadRightMargin (0.06)
 
 	# global title
 	rd42Style.SetOptTitle(0)
