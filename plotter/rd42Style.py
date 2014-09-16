@@ -77,10 +77,10 @@ def rd42Style() :
 #	# rd42Style.SetStatY(Float_t y = 0)
 
 	# margins
-	rd42Style.SetPadTopMargin(0.04)
-	rd42Style.SetPadBottomMargin(0.12)
-	rd42Style.SetPadLeftMargin(0.12)
-	rd42Style.SetPadRightMargin(0.04)
+	rd42Style.SetPadTopMargin   (0.04)
+	rd42Style.SetPadBottomMargin(0.14)
+	rd42Style.SetPadLeftMargin  (0.14)
+	rd42Style.SetPadRightMargin (0.04)
 
 	# global title
 	rd42Style.SetOptTitle(0)
@@ -104,7 +104,7 @@ def rd42Style() :
 #	rd42Style.SetTitleYSize(0.02)
 #	rd42Style.SetTitleXOffset(1.25)
 #	rd42Style.SetTitleYOffset(1.25)
-	rd42Style.SetTitleOffset(1.25, 'XYZ')  # Another way to set the Offset
+	rd42Style.SetTitleOffset(1.5, 'XYZ')  # Another way to set the Offset
 #
 #	# axis labels
 #	rd42Style.SetLabelColor(1, 'XYZ')
