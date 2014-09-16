@@ -9,12 +9,15 @@ import helper
 
 class plotter(object) :
 
-	def __init__(self, config, path, run_no, histo_type) :
+	def __init__(self, config, path, output_path, run_no, histo_type) :
 		self.config = config
 		self.run_no = run_no
 		self.histo_type = histo_type
 		if not path.endswith('/') : path += '/'
 		self.path = path + self.run_no + '/'
+		if not output_path.endswith('/') : output_path += '/'
+		self.output_path = output_path + self.run_no + '/'
+		helper.mkdir(self.output_path)
 		rd42Style()
 
 		for key, value in self.config.items(histo_type) :
@@ -59,7 +62,7 @@ class plotter(object) :
 #		ROOT.gPad.Update()
 #		canvas.Dump()
 		raw_input('ok?')
-		canvas.Print('%s.pdf' % self.histo_name)
+		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
 		if self.return_value == 'mean' :
 			mean = histo.GetMean()
 			print 'Mean: %f' % mean
@@ -126,6 +129,11 @@ if __name__ == '__main__' :
 	config.optionxform = str # case sensitive options
 	config.read(config_file)
 
+	if ('-o' in args) :
+		output_path = args[args.index('-o')+1]
+	else :
+		output_path = './'
+
 
 #	cfg = parse.samples(config_file)
 #
@@ -142,7 +150,7 @@ if __name__ == '__main__' :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
 #		if plot != 'Noise' : continue
-		pl = plotter(config, path, run_no, plot)
+		pl = plotter(config, path, output_path, run_no, plot)
 		pl.plot()
 
 ##	name = 'DiaTranspAnaPulseHeightOf2HighestIn10Strips'
