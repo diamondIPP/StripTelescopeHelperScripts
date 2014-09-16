@@ -60,6 +60,17 @@ class plotter(object) :
 #		canvas.Dump()
 		raw_input('ok?')
 		canvas.Print('%s.pdf' % self.histo_name)
+		if self.return_value == 'mean' :
+			mean = histo.GetMean()
+			print 'Mean: %f' % mean
+			return mean
+		elif self.return_value == 'sigma' :
+			fit = histo.GetListOfFunctions().FindObject('histofitx')
+			sigma = fit.GetParameter(2)
+			print 'Sigma: %f' % sigma
+			return sigma
+		else :
+			return
 
 
 	def get_histo(self) :
@@ -87,7 +98,6 @@ class plotter(object) :
 		latex.SetTextFont(62)
 		latex.SetTextSize(0.04)
 		latex.SetTextAlign(13)
-		print ROOT.gStyle.GetPadLeftMargin()
 		x_pos = ROOT.gStyle.GetPadLeftMargin() + 0.03
 		y_pos = 1. - ROOT.gStyle.GetPadTopMargin() - 0.03
 		latex.DrawLatex(x_pos, y_pos, 'RD42')
@@ -131,7 +141,7 @@ if __name__ == '__main__' :
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
-		if plot != 'Noise' : continue
+#		if plot != 'Noise' : continue
 		pl = plotter(config, path, run_no, plot)
 		pl.plot()
 
