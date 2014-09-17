@@ -9,8 +9,10 @@ import helper
 
 class plotter(object) :
 
-	def __init__(self, config, path, output_path, run_no, histo_type) :
-		self.config = config
+	def __init__(self, config_file, path, output_path, run_no, histo_type) :
+		self.config = ConfigParser.ConfigParser()
+		self.config.optionxform = str # case sensitive options
+		self.config.read(config_file)
 		self.run_no = run_no
 		self.histo_type = histo_type
 		if not path.endswith('/') : path += '/'
@@ -125,9 +127,6 @@ if __name__ == '__main__' :
 		config_file = args[args.index('-c')+1]
 	else :
 		config_file = '%s/config.cfg' % os.path.dirname(os.path.realpath(__file__))
-	config = ConfigParser.ConfigParser()
-	config.optionxform = str # case sensitive options
-	config.read(config_file)
 
 	if ('-o' in args) :
 		output_path = args[args.index('-o')+1]
@@ -150,7 +149,7 @@ if __name__ == '__main__' :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
 #		if plot != 'Noise' : continue
-		pl = plotter(config, path, output_path, run_no, plot)
+		pl = plotter(config_file, path, output_path, run_no, plot)
 		pl.plot()
 
 ##	name = 'DiaTranspAnaPulseHeightOf2HighestIn10Strips'
