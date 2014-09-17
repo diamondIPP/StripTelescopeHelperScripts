@@ -17,9 +17,9 @@ def make_NoisePulseHeightTable(path, results) :
 		file.write('Run   & Voltage (V) & Noise (ADC Counts) & Pulse Height Mean (ADC Counts) \\\\\n')
 		file.write('\\hline\n')
 		for run in results :
-			file.write('%5d & %4d & %5.1f & %6.1f \\\\\n' % (
+			file.write('%5d & $%5s$ & %5.1f & %6.1f \\\\\n' % (
 				run,
-				-1,
+				results[run]['Voltage'],
 				results[run]['Noise'],
 				results[run]['PulseHeight']))
 		file.write('\\hline\\hline\n')
