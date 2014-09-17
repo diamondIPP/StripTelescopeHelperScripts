@@ -133,17 +133,6 @@ if __name__ == '__main__' :
 	else :
 		output_path = './'
 
-
-#	cfg = parse.samples(config_file)
-#
-#	print config_file
-#	print cfg['root_file']
-#
-#	print [plot.fit for plot in cfg]
-#	print cfg['FidCut'].draw_opt
-#
-#	sys.exit(0)
-
 	plots = ['FidCut', 'PulseHeight', 'Noise']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
@@ -151,41 +140,3 @@ if __name__ == '__main__' :
 #		if plot != 'Noise' : continue
 		pl = plotter(config_file, path, output_path, run_no, plot)
 		pl.plot()
-
-##	name = 'DiaTranspAnaPulseHeightOf2HighestIn10Strips'
-##	file = ROOT.TFile('c%s.root' % name, 'READ')
-##	#TCanvas *can = (TCanvas*)file->Get('cDiaTranspAnaPulseHeightOf2HighestIn10Strips')
-##	#TH1F* histo = (TH1F*)can->GetPrimitive('hDiaTranspAnaPulseHeightOf2HighestIn10Strips')
-##	canvas = file.Get('c%s' % name)
-##	histo = canvas.GetPrimitive('h%s' % name)
-##	#TH1F* histo = (TH1F*)can->GetPrimitive('hDiaTranspAnaPulseHeightOf2HighestIn10Strips')
-##	canvas = ROOT.TCanvas('bla', 'bla', 600, 600)
-##	histo.GetFunction('Fitfcn_h%s' % name).SetBit(ROOT.TF1.kNotDraw)
-##	histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
-##	#histo->GetMaximum()
-##	#histo->SetMaximum(1.4*5.21000000000000000e+02)
-##	#histo->GetMaximum()
-##	canvas.SetLeftMargin(0.12)
-##	canvas.SetRightMargin(0.04)
-##	canvas.SetTopMargin(0.04)
-##	canvas.SetBottomMargin(0.12)
-##	ROOT.gPad.SetTicks(1,1)
-##	canvas.cd()
-##	histo.Draw()
-##	ROOT.gStyle.SetOptTitle(0)
-##	ROOT.gStyle.SetOptStat(0)
-##	ROOT.gStyle.SetOptFit(0)
-##	histo.SetXTitle('ADC Counts')
-##	histo.SetYTitle('Events')
-##	histo.GetXaxis().SetTitleOffset(1.25)
-##	histo.GetYaxis().SetTitleOffset(1.25)
-##	histo.GetXaxis().SetTitleSize(0.046)
-##	histo.GetYaxis().SetTitleSize(0.046)
-##	histo.GetXaxis().SetLabelSize(0.04)
-##	histo.GetYaxis().SetLabelSize(0.04)
-##	histo.GetXaxis().SetLabelOffset(0.012)
-##	histo.GetYaxis().SetLabelOffset(0.012)
-##	histo.Draw()
-##	canvas.Print('%s.pdf' % name)
-##	raw_input('ok?')
-##	raw_input('ok?')
