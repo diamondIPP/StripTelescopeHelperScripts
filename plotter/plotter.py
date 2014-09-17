@@ -25,6 +25,7 @@ class plotter(object) :
 		for key, value in self.config.items(histo_type) :
 			setattr(self, key, value)
 		self.file_path = self.path + self.root_file
+		self.rand = ROOT.TRandom3(0)
 
 
 	def plot(self) :
@@ -35,7 +36,7 @@ class plotter(object) :
 			ROOT.gStyle.SetOptFit(01111)
 #		ROOT.gStyle.SetDrawOption('colz')
 #		ROOT.gStyle.SetCanvasDefW(1200)
-		canvas = ROOT.TCanvas(self.histo_name, 'canvas')
+		canvas = ROOT.TCanvas('%s_%s' % (self.histo_name, self.rand.Integer(10000)), 'canvas')
 		histo = self.get_histo()
 		canvas.cd()
 		histo.Draw(self.draw_opt)
@@ -63,7 +64,7 @@ class plotter(object) :
 		canvas.Update()
 #		ROOT.gPad.Update()
 #		canvas.Dump()
-		raw_input('ok?')
+#		raw_input('ok?')
 		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
 		if self.return_value == 'mean' :
 			mean = histo.GetMean()
@@ -80,7 +81,6 @@ class plotter(object) :
 
 	def get_histo(self) :
 		histo_file = helper.open_rootFile(self.file_path, 'READ')
-#		print   histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).ls()
 		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix)).Clone()
 
 		# remove functions
@@ -88,12 +88,16 @@ class plotter(object) :
 			histo.GetFunction('Fitfcn_%s%s' % (self.histo_prefix, self.histo_name)).SetBit(ROOT.TF1.kNotDraw)
 		if self.histo_type == 'PulseHeight' :
 			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
+		histo.SetDirectory(0)
+		histo_file.Close()
 		return histo
 
 
 	def get_fidCut(self) :
 		histo_file = helper.open_rootFile(self.file_path, 'READ')
 		fid_cut = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('fidCut_0').Clone()
+		#fid_cut.SetDirectory(0)
+		histo_file.Close()
 		return fid_cut		
 
 
