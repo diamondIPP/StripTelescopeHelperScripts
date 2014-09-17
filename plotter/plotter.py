@@ -16,9 +16,9 @@ class plotter(object) :
 		self.run_no = run_no
 		self.histo_type = histo_type
 		if not path.endswith('/') : path += '/'
-		self.path = path + self.run_no + '/'
+		self.path = '%s%s/' % (path, self.run_no)
 		if not output_path.endswith('/') : output_path += '/'
-		self.output_path = output_path + self.run_no + '/'
+		self.output_path = '%s%s/' % (output_path, self.run_no)
 		helper.mkdir(self.output_path)
 		rd42Style()
 
@@ -75,7 +75,7 @@ class plotter(object) :
 			print 'Sigma: %f' % sigma
 			return sigma
 		else :
-			return
+			return -1.
 
 
 	def get_histo(self) :
