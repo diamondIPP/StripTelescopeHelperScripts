@@ -36,6 +36,7 @@ if __name__ == '__main__' :
 	path = './'
 	output_path = 'results/'
 	runlog_file = '../OverviewPageCreation/config/all_log.txt'
+	runs = [17100]
 
 	if ('--help' in args) or ('-h' in args) :
 		print 'usage: ..'
@@ -55,5 +56,16 @@ if __name__ == '__main__' :
 	if ('-r' in args) :
 		runlog_file = args[args.index('-r')+1]
 
+	if ('--runs' in args) :
+		runs_file = args[args.index('--runs')+1]
+		if not os.path.isfile(runs_file) :
+			print '[ERROR] %s does not exist' % runs_file
+			sys.exit(1)
+		with open(runs_file, 'r') as file :
+			runs = []
+			for line in file.readlines() :
+				if line[0] == '#' : continue
+				runs.append(line)
+
 	res = results(config_file, path, output_path, runlog_file)
-	res.get_results([17100, 17101])
+	res.get_results(runs)
