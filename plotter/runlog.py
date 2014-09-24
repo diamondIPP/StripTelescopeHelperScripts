@@ -24,7 +24,7 @@ class runlog(object) :
 
 	def get_voltage(self, run) :
 		if not run in self.runs :
-			print '[WARNING] run not found!'
+			print '[WARNING] run %s not found!' % run
 			return -1.
 		else :
 			return self.runs[run]['voltage']
