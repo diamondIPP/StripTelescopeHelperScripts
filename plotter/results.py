@@ -23,11 +23,11 @@ class results(object) :
 		plots = ['FidCut', 'PulseHeight', 'Noise']
 		results = {}
 		for run in runs :
-			results[run] = {}
+			results[run['number']] = {}
 			for plot in plots :
-				pl = plotter(self.config_file, self.path, self.output_path, run, plot)
-				results[run][plot] = pl.plot()
-				results[run]['Voltage'] = self.runlog.get_voltage(run)
+				pl = plotter(self.config_file, self.path, self.output_path, run['number'], run['position'], plot)
+				results[run['number']][plot] = pl.plot()
+				results[run['number']]['Voltage'] = self.runlog.get_voltage(run['number'])
 		tables.make_NoisePulseHeightTable(self.output_path, results)
 
 
@@ -36,7 +36,7 @@ if __name__ == '__main__' :
 	path = './'
 	output_path = 'results/'
 	runlog_file = '../OverviewPageCreation/config/all_log.txt'
-	runs = [17100]
+	runs = [{'number': 17100, 'position': ''}]
 
 	if ('--help' in args) or ('-h' in args) :
 		print 'usage: ..'
@@ -65,7 +65,17 @@ if __name__ == '__main__' :
 			runs = []
 			for line in file.readlines() :
 				if line[0] == '#' : continue
-				runs.append(line)
+				splitline = line.split()
+				number = splitline[0]
+				if len(splitline) < 2 :
+					position = ''
+				else :
+					position = splitline[1]
+				run = {}
+				run['number']   = int(number)
+				run['position'] = position
+				print run
+				runs.append(run)
 
 	res = results(config_file, path, output_path, runlog_file)
 	res.get_results(runs)

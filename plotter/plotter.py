@@ -9,14 +9,18 @@ import helper
 
 class plotter(object) :
 
-	def __init__(self, config_file, path, output_path, run_no, histo_type) :
+	def __init__(self, config_file, path, output_path, run_no, position, histo_type) :
 		self.config = ConfigParser.ConfigParser()
 		self.config.optionxform = str # case sensitive options
 		self.config.read(config_file)
 		self.run_no = run_no
+		self.position = position
 		self.histo_type = histo_type
 		if not path.endswith('/') : path += '/'
-		self.path = '%s%s/' % (path, self.run_no)
+		self.path = '%s%s' % (path, self.run_no)
+		if self.position != '' :
+			self.path += '/%s/' % self.position
+		else : self.path += '/'
 		if not output_path.endswith('/') : output_path += '/'
 		self.output_path = '%s%s/' % (output_path, self.run_no)
 		helper.mkdir(self.output_path)
@@ -116,6 +120,7 @@ if __name__ == '__main__' :
 	args = sys.argv
 	run_no = -1
 	path = './'
+	position = ''
 
 	if ('--help' in args) or ('-h' in args) :
 		print 'usage: ..'
@@ -126,6 +131,9 @@ if __name__ == '__main__' :
 
 	if ('-i' in args) :
 		path = args[args.index('-i')+1]
+
+	if ('-p' in args) :
+		position = args[args.index('-p')+1]
 
 	if ('-c' in args) and (args.index('-c')+1 < len(args)) and (not args[args.index('-c')+1].startswith('-')) :
 		config_file = args[args.index('-c')+1]
@@ -142,5 +150,5 @@ if __name__ == '__main__' :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
 #		if plot != 'Noise' : continue
-		pl = plotter(config_file, path, output_path, run_no, plot)
+		pl = plotter(config_file, path, output_path, run_no, position, plot)
 		pl.plot()
