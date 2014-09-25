@@ -74,7 +74,6 @@ if __name__ == '__main__' :
 				run = {}
 				run['number']   = int(number)
 				run['position'] = position
-				print run
 				runs.append(run)
 
 	res = results(config_file, path, output_path, runlog_file)
