@@ -12,9 +12,9 @@ def make_NoisePulseHeightTable(path, results) :
 		timestamp = time.asctime()
 		file.write('%!TEX root = ../../Dissertation.tex\n')
 		file.write('\n\n')
-		file.write('\\begin{tabular}{l|r|rr}\n')
+		file.write('\\begin{tabular}{l|r|S|S[table-number-alignment = center, table-figures-integer = 3, table-figures-decimal = 1]}\n')
 		file.write('\\hline\\hline\n')
-		file.write('Run   & Voltage (V) & Noise (ADC Counts) & Pulse Height Mean (ADC Counts) \\\\\n')
+		file.write('Run   & Voltage (V) & {Noise (ADC Counts)} & {Pulse Height Mean (ADC Counts)} \\\\\n')
 		file.write('\\hline\n')
 		for run in results :
 			file.write('%5d & $%5s$ & %5.1f & %6.1f \\\\\n' % (
