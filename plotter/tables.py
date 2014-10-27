@@ -12,15 +12,20 @@ def make_NoisePulseHeightTable(path, results) :
 		timestamp = time.asctime()
 		file.write('%!TEX root = ../../Dissertation.tex\n')
 		file.write('\n\n')
-		file.write('\\begin{tabular}{l|r|S|S[table-number-alignment = center, table-figures-integer = 3, table-figures-decimal = 1]}\n')
-		file.write('\\hline\\hline\n')
-		file.write('Run   & Voltage (V) & {Noise (ADC Counts)} & {Pulse Height Mean (ADC Counts)} \\\\\n')
-		file.write('\\hline\n')
+		file.write('\\begin{tabular}{\n')
+		file.write('\tl\n')
+		file.write('\tS[table-number-alignment = center, table-figures-integer = 5, table-figures-decimal = 0, retain-explicit-plus]\n')
+		file.write('\tS\n')
+		file.write('\tS[table-number-alignment = center, table-figures-integer = 3, table-figures-decimal = 1]\n')
+		file.write('}\n')
+		file.write('\t\\hline\\hline\n')
+		file.write('\tRun   & {Voltage (\\si{\\volt})} & {Noise (ADC Counts)} & {Pulse Height Mean (ADC Counts)} \\\\\n')
+		file.write('\t\\hline\n')
 		for run in results :
-			file.write('%5d & $%5s$ & %5.1f & %6.1f \\\\\n' % (
+			file.write('\t%5d & %5s & %5.1f & %6.1f \\\\\n' % (
 				run,
 				results[run]['Voltage'],
 				results[run]['Noise'],
 				results[run]['PulseHeight']))
-		file.write('\\hline\\hline\n')
+		file.write('\t\\hline\\hline\n')
 		file.write('\\end{tabular}')
