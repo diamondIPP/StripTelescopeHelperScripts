@@ -18,14 +18,14 @@ def make_NoisePulseHeightTable(path, results) :
 		file.write('\tS\n')
 		file.write('\tS[table-number-alignment = center, table-figures-integer = 3, table-figures-decimal = 1]\n')
 		file.write('}\n')
-		file.write('\t\\hline\\hline\n')
+		file.write('\t\\toprule\n')
 		file.write('\tRun   & {Voltage (\\si{\\volt})} & {Noise (ADC Counts)} & {Pulse Height Mean (ADC Counts)} \\\\\n')
-		file.write('\t\\hline\n')
+		file.write('\t\\midrule\n')
 		for run in results :
 			file.write('\t%5d & %5s & %5.1f & %6.1f \\\\\n' % (
 				run,
 				results[run]['Voltage'],
 				results[run]['Noise'],
 				results[run]['PulseHeight']))
-		file.write('\t\\hline\\hline\n')
+		file.write('\t\\bottomrule\n')
 		file.write('\\end{tabular}')
