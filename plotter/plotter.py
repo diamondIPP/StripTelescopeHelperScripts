@@ -70,6 +70,7 @@ class plotter(object) :
 #		canvas.Dump()
 #		raw_input('ok?')
 		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
+		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))
 		if self.return_value == 'mean' :
 			mean = histo.GetMean()
 			print 'Mean: %f' % mean
