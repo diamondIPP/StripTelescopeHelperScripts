@@ -30,7 +30,7 @@ def get_plot(config,section,runno,rundes,name):
     f = get_file(config,section,runno,rundes)
     for key in f.GetListOfKeys():
         c = f.FindObjectAny(key.GetName())
-        print c,name
+        # print c,name
         if c == None:
             continue
         if type(c) == ROOT.TCanvas:

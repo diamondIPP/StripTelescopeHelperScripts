@@ -71,7 +71,7 @@ def get_colored_cell(key, content, value, result):
             color = 'green'
             frac1 = abs(cmn1-cmn2)/cmn1
             frac2 = abs(cmn1-cmn2)/cmn2
-            if frac1 >.1 or frac2 >.2:
+            if frac1 >.1 or frac2 >.1:
                 color ='red'
             elif frac1 > .05 or frac2 > .05:
                 color = 'yellow'

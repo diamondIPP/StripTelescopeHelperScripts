@@ -203,13 +203,19 @@ class RunListReader:
         print 'create settings file: %s from %s, --> %s'%(dst,src,os.path.exists(dst))
         
     def calculateCorrection(self,run): 
+        print 'calculate Correction', run
         corRunNo = run.get_corrected_run_number()
         runNo = run.get_run_number()
         src =  self.outputDir+'/%s/rawData.%d.root'%(runNo,corRunNo)
         if os.path.exists(src):
             print 'correction already exists: %s'%src
             return
+        print ' do calculation'
         siliconCor,diamondCor = run.get_crosstalk_corrections(self.outputDir)
+        if siliconCor ==0 and diamondCor ==0:
+            print 'something is wrong',siliconCor,diamondCor
+            return -1
+
 #         print siliconCor,diamondCor
         ROOT.gSystem.cd('%s/%s/'%(self.outputDir,runNo))
 #         print'ROOT gSystem directory: %s'%ROOT.gSystem.pwd()
@@ -220,10 +226,15 @@ class RunListReader:
         answer = 'y'
         
         if answer == 'y':
+            print 'execute ',command
             retVal = ROOT.gROOT.ProcessLine(command)
+            return retVal
+        return -1
     
     def add_feed_through_corrected_run(self,key):
+        print 'add feed through corrected run',key
         if not self.add_correction:
+            print 'no correction',key
             return
         runNo = key[0]
         print 'add correction',runNo
@@ -242,19 +253,18 @@ class RunListReader:
             return
         if run.has_valid_crosstalk_corrections(self.outputDir):
             print 'add feed through corrected run: %s'%runNo
-            self.calculateCorrection(run)
-            self.createCorrectedRunDirectory(run)
-            self.create_raw_data_link(run)
-            self.create_corrected_settings_file(run)
-            newRun = copy.deepcopy(run)
-            newRun.runNo = corRunNo
-            newRun.correction = False
-            newRun.status = 0
-            newRun.tries = 0
-            key = newRun.get_key()
-            self.runList[key] = newRun
-            
-            self.runListKeys.append(key)
+            if self.calculateCorrection(run) != -1:
+                self.createCorrectedRunDirectory(run)
+                self.create_raw_data_link(run)
+                self.create_corrected_settings_file(run)
+                newRun = copy.deepcopy(run)
+                newRun.runNo = corRunNo
+                newRun.correction = False
+                newRun.status = 0
+                newRun.tries = 0
+                key = newRun.get_key()
+                self.runList[key] = newRun
+                self.runListKeys.append(key)
         else:
 #             print 'ERROR: INVALID CROSS TALK CORRECTION FILE!'
             pass

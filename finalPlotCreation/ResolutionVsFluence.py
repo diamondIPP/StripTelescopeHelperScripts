@@ -4,24 +4,35 @@ from ROOT import TCanvas
 import utilities
 
 class ResolutionVsFluence():
-    def __init__(self,config=None):
+    def __init__(self,config=None,mode='positive'):
         self.plots ={}
         self.canvas = None
         self.config = config
+        self.mode = mode
 
         self.set_runnos()
         self.set_conversions()
         self.set_irradiations()
         pass
+    def set_mode(self,mode):
+        self.mode = mode
+        self.set_runnos()
+        self.set_conversions()
+        self.set_irradiations()
+
     def set_runnos(self):
         self.rundes = {}
         self.runnos = []
         if not self.config:
             self.runnos = [172080]
             return
-        runs = sorted([int(i) for i in self.config.options('RunsResolutionSingle')])
+        if self.mode != 'negative':
+            key = 'RunsResolutionSingle'
+        else:
+            key = 'RunsResolutionSingle2'
+        runs = sorted([int(i) for i in self.config.options(key)])
         for x in runs:
-            run = self.config.get('RunsResolutionSingle','%d'%x).split()
+            run = self.config.get(key,'%d'%x).split()
             if len(run) == 1:
                 rundes = '0'
             else:
@@ -152,9 +163,9 @@ class ResolutionVsFluence():
             c1.Update()
             self.canvas = c1
             fileName = 'PW205B_resolution_%d'%stacks.index(stack)
-            c1.SaveAs('%s.png'%fileName)
-            c1.SaveAs('%s.pdf'%fileName)
-            c1.SaveAs('%s.root'%fileName)
+            c1.SaveAs('%s_%s.png'%(fileName,self.mode))
+            c1.SaveAs('%s_%s.pdf'%(fileName,self.mode))
+            c1.SaveAs('%s_%s.root'%(fileName,self.mode))
                 
 
 
@@ -167,4 +178,6 @@ if __name__ == "__main__":
 
 
     res = ResolutionVsFluence(config)
+    res.create_plot()
+    res.set_mode('negative')
     res.create_plot()

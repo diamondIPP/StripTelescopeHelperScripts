@@ -123,7 +123,10 @@ class RunList:
         return self.status >= 4
     
     def do_corrections(self):
-        return self.correction and self.status >= 2
+        
+        ret_val =  self.correction and self.status >= 2
+        print 'do_corrections', self.correction, self.status
+        return ret_val
     
     def needs_user_input(self):
         return self.status%2 ==1
@@ -183,13 +186,13 @@ class RunList:
         corrections = [float(cor) for cor in corrections]
         diamondCor = corrections[-1]
         siliconCor = corrections[:-1]
-#         print diamondCor
-#         print siliconCor
+        print diamondCor
+        print siliconCor
         meanSil = sum(siliconCor)/len(siliconCor)
         sigmaSil = math.sqrt(sum([x**2 for x in siliconCor])/len(siliconCor) - meanSil**2)
-#         print meanSil,sigmaSil
-#         print corrections
-#         print lines
+        print meanSil,sigmaSil
+        print corrections
+        print lines
         f.close()     
         return meanSil,diamondCor
      

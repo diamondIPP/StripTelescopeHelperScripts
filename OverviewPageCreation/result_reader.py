@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import time
 import pickle
 import csv
@@ -53,7 +54,6 @@ class ResultReader:
         self.set_csv_mapping()
 
     def get_result_key(self, config):
-        print config.options('RunInfo')
         key = ''
         keyNames = self.config.get('Results', 'key').split(';')
         for i in keyNames:
@@ -66,11 +66,19 @@ class ResultReader:
                 # if config.has_section(keyName[0]):
                 # print config.options(keyName[0])
                 if config.has_option(keyName[0], keyName[1]):
-                    key += config.get(keyName[0], keyName[1])
+                    value = config.get(keyName[0], keyName[1])
+                    key += value
                 else:
+                    print 'cannot finde key "%s"'%keyName[0],keyName[1]
+                    if config.has_section(keyName[0]):
+                        print 'options:',config.options(keyName[0])
+                    else:
+                        print 'sections',config.sections()
                     key += 'unnown'
             else:
                 key += i
+        #print'get result key', key
+        #print key
         return key
 
     def read_result_config(self):
@@ -78,15 +86,15 @@ class ResultReader:
         for i in self.file_list:
             runno = i.rsplit('_', 1)[1].split('.')[0]
             config = ConfigParser.ConfigParser()
-            if self.verbosity:
+            if self.verbosity or True:
                 print 'reading ', i
             config.read(i)
-            print config.sections()
+            #print config.sections()
             if not config.has_section('RunInfo'):
                 print 'section "RunInfo" does not exist....'
                 continue
             config.set('RunInfo', 'realRunNo', runno)
-            config.set('RunInfo', 'runno', runno)
+            #config.set('RunInfo', 'runno', runno)
             if self.verbosity:
                 for section_name in config.sections():
                     # print 'Section:', section_name
@@ -110,7 +118,7 @@ class ResultReader:
             results[key] = config
 
             with open(path, 'w') as configfile:
-                print 'write ', path
+                #print 'write ', path
                 config.write(configfile)
         return results
 
@@ -147,13 +155,15 @@ class ResultReader:
             config.set('RunInfo', 'voltage', '%+4d' % self.map[newRunNo]['biasVoltage'])
             config.set('RunInfo', 'currentbegin', '%s' % (self.map[newRunNo]['currentBegin']))
             config.set('RunInfo', 'currentend', '%s' % (self.map[newRunNo]['currentEnd']))
-            try:
-                config.set('RunInfo', 'events', '%s' % (self.map[newRunNo]['events']))
-            except:
-                print self.map[newRunNo].keys()
-                pass
+            if not config.has_option('RunInfo','events'):
+                try:
+                    config.set('RunInfo', 'events', '%s' % (self.map[newRunNo]['events']))
+                except:
+                    print 'cannot find events in map'
+                    print self.map[newRunNo].keys()
+                    pass
         else:
-            raw_input('cannot find %s' % newRunNo)
+            print 'cannot find %s' % newRunNo
         config.set('RunInfo', 'runno', '%d' % newRunNo)
         if config.has_option('TimeDependence', 'landauclusterfitoffsetsize10'):
             if config.has_option('TimeDependence', 'landauclusterfitslopesize10'):
@@ -176,7 +186,7 @@ class ResultReader:
         return config
 
     def set_csv_mapping(self):
-        print 'set csv map'
+        #print 'set csv map'
         mapping = OrderedDict()
         headers = []
         header_list = self.config.options('CSV-header')
@@ -429,7 +439,19 @@ class ResultReader:
 
     def get_list_of_diamonds(self, results):
         diamonds = [self.results[x].get('RunInfo', 'dia') for x in results]
-        diamonds = sorted(list(set(diamonds)))
+        dia = []
+        for x in diamonds:
+            if type(x) ==list:
+                for y in x:
+                    dia.append(y)
+            else:
+                dia.append(x)
+        try:
+            diamonds = sorted(list(set(dia)))
+        except:
+            print 'problem with sorting diamonds list...', 
+            print diamonds, type(diamonds)
+            raw_input('press a key')
         return diamonds
 
     def create_testbeam_html_pages(self):
@@ -483,8 +505,13 @@ class ResultReader:
         row = []
         # result = self.results
         for key in self.csv_mapping:
+
+            if 'event' in key:
+                print 'get csv row',key,self.csv_mapping.keys(),self.csv_mapping[key]
             result = config
             if 'key' in self.csv_mapping[key]:
+                if 'event' in key:
+                    print 'get csv row',self.csv_mapping[key]
                 try:
                     default = self.csv_mapping[key]['default']
                 except:
@@ -494,16 +521,23 @@ class ResultReader:
                     if result.has_option(configKeys[0], configKeys[1]):
                         value = result.get(configKeys[0], configKeys[1], 0)
                     else:
+                        if 'event' in key:
+                            print 'need to take default'
                         value = default
                 else:
+                    if 'event' in key:
+                        print 'need to take default'
                     value = default
                 try:
                     value_type = self.csv_mapping[key]['valueType']
                 except:
                     value_type = 'string'
                 value = utilities.get_value(value, value_type, default)
-                # print key,configKeys,value
+                if 'event' in key:
+                    print key,configKeys,value
             else:
+                if 'event' in key:
+                    print 'cannot find mapping',key
                 try:
                     if 'title' in self.header_mapping[key]:
                         value = self.csv_mapping[key]['title']
@@ -515,10 +549,12 @@ class ResultReader:
             except:
                 print 'cannot find format for key', key
                 string_format = '%s'
+            if 'event' in key:
+                print key,string_format, value,
             try:
                 out = string_format % value
             except:
-                print 'cannot format "%s"/"%s for key %s"' % (string_format, value, key)
+                print 'cannot format "%s"/"%s" for key %s"' % (string_format, value, key),default
                 out = None
             if out is None:
                 try:

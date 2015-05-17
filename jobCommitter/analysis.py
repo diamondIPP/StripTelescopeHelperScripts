@@ -169,7 +169,7 @@ def print_status():
     letters = ['|','/','-','\\']
     now = int(time.time()*2)
     letter = letters[now%len(letters)]
-    out = '\r%s running jobs: %s %s\t'%(time.strftime("%a, %d %b %Y %H:%M:%S"),[reader.get_run_number_of_count(i[1]) for i in runningJobs],letter)
+    out = '\r%s running jobs: %s %s\tleft Jobs: %s'%(time.strftime("%a, %d %b %Y %H:%M:%S"),[reader.get_run_number_of_count(i[1]) for i in runningJobs],letter, reader.get_left_runs())
     sys.stdout.write(out)
     sys.stdout.flush()
 

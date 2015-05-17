@@ -251,7 +251,7 @@ class CsvCreater:
     @property
     def create_list(self):
         print self.all_keys
-        raw_input()
+        #raw_input()
         runs = self.get_runs_to_rerun()
         print 'to be rerun: ', runs
         print 'create output list'

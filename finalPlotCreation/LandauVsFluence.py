@@ -2,26 +2,29 @@ import ConfigParser
 import ROOT
 from ROOT import TCanvas
 import utilities
+import argparse
 
 class LandauVsFluence():
     def __init__(self,config=None):
         self.plots ={}
         self.canvas = None
         self.config = config
-
         self.set_runnos()
         self.set_conversions()
         self.set_irradiations()
         pass
+
+
     def set_runnos(self):
         self.rundes = {}
         self.runnos = []
         if not self.config:
             self.runnos = [172080]
             return
-        runs = sorted([int(i) for i in self.config.options('RunsLandauSingle')])
+        key = 'RunsLandauSingle'
+        runs = sorted([int(i) for i in self.config.options(key)])
         for x in runs:
-            run = self.config.get('RunsLandauSingle','%d'%x).split()
+            run = self.config.get(key,'%d'%x).split()
             if len(run) == 1:
                 rundes = '0'
             else:
@@ -79,7 +82,11 @@ class LandauVsFluence():
         
         for runno in self.runnos:
             if self.config:
-                name = self.config.get('MainLandauSingle','histoName')
+                try:
+                    name = self.config.get('MainLandauSingle','histoName')
+                except Exception as e:
+                    print self.config.options('MainLandauSingle')
+                    raise e
             else:
                 name = 'hDiaTranspAnaPulseHeightOf2HighestIn10Strips'
 
@@ -126,19 +133,26 @@ class LandauVsFluence():
             leg.SetFillColor(ROOT.kWhite)
             c1.Update()
             self.canvas = c1
-            fileName = 'PW205B_irradiation_%d'%stacks.index(stack)
-            c1.SaveAs('%s.png'%fileName)
-            c1.SaveAs('%s.pdf'%fileName)
-                
+            dia_name = self.config.get('Main','diamond')
+            outputdir = './output/'
+            fileName = outputdir+'%s_irradiation_%d'%(dia_name,stacks.index(stack))
+
+            c1.SaveAs('%s.png'%(fileName))
+            c1.SaveAs('%s.pdf'%(fileName))
+            c1.SaveAs('%s.root'%(fileName))
 
 
         
 
 if __name__ == "__main__":
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--diamond', help='name of diamond which should be analyzed',default='PW205B')
+    args = parser.parse_args()
     config = ConfigParser.ConfigParser()
     config.read('config.cfg')
-
+    config_file = 'config_%s.cfg'%args.diamond
+    print config_file
+    config.read(config_file)
 
     landau = LandauVsFluence(config)
     landau.create_plot()

@@ -91,8 +91,11 @@ class dictCreater:
         runList = {}
         contentDesc = self.contentDescRunList
         key = self.config.get('RunList', 'key')
+        out = 'Reading RunListMap with the following keys '+str(key)+' and '+str(contentDesc)
+        raw_input(out)
         with open(fileName, 'rb') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
+            l = 0
             for row in reader:
                 thisRun = {}
                 for i in range(len(row)):
@@ -106,6 +109,10 @@ class dictCreater:
                     runList[thisRun[key]] = thisRun
                 else:
                     print 'cannot find key, ', key, 'in thisRun', thisRun
+                if l == 0:
+                    print thisRun
+                    raw_input('Row %s'%row)
+                    l+=1
         return runList
 
 
