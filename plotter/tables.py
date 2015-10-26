@@ -13,13 +13,13 @@ def make_NoisePulseHeightTable(path, results) :
 		file.write('%!TEX root = ../../Dissertation.tex\n')
 		file.write('\n\n')
 		file.write('\\begin{tabular}{\n')
-		file.write('\tl\n')
+		file.write('\tS[table-alignment = left, table-format = 5.0]\n')
 		file.write('\tS[table-number-alignment = center, table-format = -4.0, retain-explicit-plus]\n')
 		file.write('\tS\n')
 		file.write('\tS[table-number-alignment = center, table-format = 4.1]\n')
 		file.write('}\n')
 		file.write('\t\\toprule\n')
-		file.write('\tRun   & {Voltage (\\si{\\volt})} & {Noise (ADC Counts)} & {Pulse Height Mean (ADC Counts)} \\\\\n')
+		file.write('\t{Run} & {Voltage (\\si{\\volt})} & {Noise (ADC Counts)} & {Pulse Height Mean (ADC Counts)} \\\\\n')
 		file.write('\t\\midrule\n')
 		for run in results :
 			file.write('\t%5d & %5s & %5.1f & %6.1f \\\\\n' % (
