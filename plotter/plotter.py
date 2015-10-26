@@ -124,7 +124,7 @@ if __name__ == '__main__' :
 	position = ''
 
 	if ('--help' in args) or ('-h' in args) :
-		print 'usage: ..'
+		print 'usage: plotter.py -r <RUN_NO> -i <DATA_PATH> - p <POSITION> -c <CONFIG_FILE> -o <OUTPUT_PATH>'
 		sys.exit(1)
 
 	if ('-r' in args) :
