@@ -1,130 +1,11 @@
 #! /usr/bin/python
 import ROOT
 from array import array
+import ConfigParser
 
 
 def rd42Style() :
-	rd42Style = ROOT.TStyle('rd42Style','RD42 Style')
-
-	# canvas
-	rd42Style.SetCanvasBorderMode(0)
-	rd42Style.SetCanvasColor(ROOT.kWhite)
-	rd42Style.SetCanvasDefH(600)
-	rd42Style.SetCanvasDefW(600)
-	rd42Style.SetCanvasDefX(0)
-	rd42Style.SetCanvasDefY(0)
-
-	# pad
-#	rd42Style.SetPadBorderMode(0)
-#	# rd42Style.SetPadBorderSize(Width_t size = 1)
-#	rd42Style.SetPadColor(ROOT.kWhite)
-#	rd42Style.SetPadGridX(False)
-#	rd42Style.SetPadGridY(False)
-#	rd42Style.SetGridColor(0)
-#	rd42Style.SetGridStyle(3)
-#	rd42Style.SetGridWidth(1)
-
-	# frame
-	rd42Style.SetFrameBorderMode(0)
-	rd42Style.SetFrameBorderSize(1)
-	rd42Style.SetFrameFillColor(0)
-	rd42Style.SetFrameFillStyle(0)
-	rd42Style.SetFrameLineColor(1)
-	rd42Style.SetFrameLineStyle(1)
-	rd42Style.SetFrameLineWidth(1)
-
-	# histo
-##	rd42Style.SetHistFillColor(63)
-#	# rd42Style.SetHistFillStyle(0)
-#	rd42Style.SetHistLineColor(1)
-#	rd42Style.SetHistLineStyle(0)
-#	rd42Style.SetHistLineWidth(1)
-#	# rd42Style.SetLegoInnerR(Float_t rad = 0.5)
-#	# rd42Style.SetNumberContours(Int_t number = 20)
-#
-#	rd42Style.SetEndErrorSize(2)
-##	rd42Style.SetErrorMarker(20)
-#	#rd42Style.SetErrorX(0.)
-#	
-#	rd42Style.SetMarkerStyle(20)
-#	rd42Style.SetMarkerSize(1.2)
-#
-#	# fit/function
-##	rd42Style.SetOptFit(1)
-	rd42Style.SetOptFit(0)
-#	rd42Style.SetFitFormat('5.4g')
-	rd42Style.SetFuncColor(3)
-#	rd42Style.SetFuncStyle(1)
-#	rd42Style.SetFuncWidth(1)
-#
-#	# date
-#	rd42Style.SetOptDate(0)
-#	# rd42Style.SetDateX(Float_t x = 0.01)
-#	# rd42Style.SetDateY(Float_t y = 0.01)
-
-	# statistics box
-#	rd42Style.SetOptFile(0)
-	rd42Style.SetOptStat(0)  # To display the mean and RMS:   SetOptStat('mr')
-	rd42Style.SetStatColor(ROOT.kWhite)
-	rd42Style.SetStatFont(42)
-	rd42Style.SetStatFontSize(0.025)
-	rd42Style.SetStatTextColor(1)
-#	rd42Style.SetStatFormat('6.4g')
-	rd42Style.SetStatBorderSize(0)
-#	rd42Style.SetStatH(0.1)
-	rd42Style.SetStatW(0.35)
-	rd42Style.SetStatStyle(1001)
-	rd42Style.SetStatX(0.9)
-	rd42Style.SetStatY(0.9)
-
-	# margins
-	rd42Style.SetPadTopMargin   (0.06)
-	rd42Style.SetPadBottomMargin(0.14)
-	rd42Style.SetPadLeftMargin  (0.14)
-	rd42Style.SetPadRightMargin (0.06)
-
-	# global title
-	rd42Style.SetOptTitle(0)
-	rd42Style.SetTitleFont(42)
-	rd42Style.SetTitleColor(1)
-#	rd42Style.SetTitleTextColor(1)
-	rd42Style.SetTitleFillColor(10)
-#	rd42Style.SetTitleFontSize(0.05)
-#	# rd42Style.SetTitleH(0)  # Set the height of the title box
-#	# rd42Style.SetTitleW(0)  # Set the width of the title box
-#	# rd42Style.SetTitleX(0)  # Set the position of the title box
-#	# rd42Style.SetTitleY(0.985)  # Set the position of the title box
-#	# rd42Style.SetTitleStyle(Style_t style = 1001)
-#	# rd42Style.SetTitleBorderSize(2)
-#
-#	# axis titles
-#	rd42Style.SetTitleColor(1, 'XYZ')
-	rd42Style.SetTitleFont(42, 'XYZ')
-	rd42Style.SetTitleSize(0.046, 'XYZ')
-#	rd42Style.SetTitleXSize(0.02)  # Another way to set the size?
-#	rd42Style.SetTitleYSize(0.02)
-#	rd42Style.SetTitleXOffset(1.25)
-#	rd42Style.SetTitleYOffset(1.25)
-	rd42Style.SetTitleOffset(1.5, 'XYZ')  # Another way to set the Offset
-#
-#	# axis labels
-#	rd42Style.SetLabelColor(1, 'XYZ')
-	rd42Style.SetLabelFont(42, 'XYZ')
-	rd42Style.SetLabelOffset(0.012, 'XYZ')
-	rd42Style.SetLabelSize(0.04, 'XYZ')
-#
-#	# axis
-#	rd42Style.SetAxisColor(1, 'XYZ')
-#	rd42Style.SetStripDecimals(ROOT.kTRUE)
-#	rd42Style.SetTickLength(0.03, 'XYZ')
-#	rd42Style.SetNdivisions(510, 'XYZ')
-	rd42Style.SetPadTickX(1)   # To get tick marks on the opposite side of the frame
-	rd42Style.SetPadTickY(1)
-#
-#	# Change for log plots:
-#	rd42Style.SetOptLogx(0)
-#	rd42Style.SetOptLogy(0)
-#	rd42Style.SetOptLogz(0)
+	rd42Style = parse_styleSettings('rd42Style.cfg', 'rd42Style','RD42 Style')
 #
 #	# colors
 	rd42Style.SetPalette(1)
@@ -160,3 +41,18 @@ def rd42Style() :
 ##	rd42Style.SetHistMinimumZero(kTRUE)
 
 	rd42Style.cd()
+
+
+def parse_styleSettings(config_file, style_name = 'style', style_title = 'style') :
+	style = ROOT.TStyle(style_name, style_title)
+	config = ConfigParser.ConfigParser()
+	config.optionxform = str # case sensitive options
+	config.read(config_file)
+	for section in config.sections() :
+		for key, value_str in config.items(section) :
+			value = eval(value_str)
+			if type(value) is not tuple :
+				getattr(style, 'Set%s' % key)(value)
+			else :
+				getattr(style, 'Set%s' % key)(*value)
+	return style
