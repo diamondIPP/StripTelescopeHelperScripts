@@ -65,7 +65,7 @@ class plotter(object) :
 			fid_cut.SetLineColor(ROOT.kRed)
 #			fid_cut.Dump()
 			canvas.cd()
-#			fid_cut.Draw('same')
+			fid_cut.Draw('same')
 		canvas.Update()
 #		ROOT.gPad.Update()
 #		canvas.Dump()
