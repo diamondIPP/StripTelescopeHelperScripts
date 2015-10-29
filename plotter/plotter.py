@@ -5,6 +5,7 @@ import os
 import ConfigParser
 from rd42Style import rd42Style
 import helper
+import roundNumbers as rn
 
 
 class plotter(object) :
@@ -64,24 +65,30 @@ class plotter(object) :
 			fid_cut.SetLineColor(ROOT.kRed)
 #			fid_cut.Dump()
 			canvas.cd()
-			fid_cut.Draw('same')
+#			fid_cut.Draw('same')
 		canvas.Update()
 #		ROOT.gPad.Update()
 #		canvas.Dump()
 #		raw_input('ok?')
-		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
-		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))
 		if self.return_value == 'mean' :
 			mean = histo.GetMean()
 			print 'Mean: %f' % mean
-			return mean
 		elif self.return_value == 'sigma' :
 			fit = histo.GetListOfFunctions().FindObject('histofitx')
-			sigma = fit.GetParameter(2)
-			print 'Sigma: %f' % sigma
-			return sigma
-		else :
-			return -1.
+			mean  = (fit.GetParameter(1), fit.GetParError(1))
+			sigma = (fit.GetParameter(2), fit.GetParError(2))
+			print 'Mean : %s +- %s' % rn.get_roundedNumber(*mean )
+			print 'Sigma: %s +- %s' % rn.get_roundedNumber(*sigma)
+			entries = []
+			entries.append(('$\\chi^2 / \\ndof$', '{%.0f / %d}' % (fit.GetChisquare(), fit.GetNDF())))
+			entries.append(('Mean' , '%s +- %s' % rn.get_roundedNumber(fit.GetParameter(1), fit.GetParError(1))))
+			entries.append(('Sigma', '%s +- %s' % rn.get_roundedNumber(fit.GetParameter(2), fit.GetParError(2))))
+			print entries
+#			ROOT.gStyle.SetOptFit(0)
+#			self.draw_statbox(entries)
+		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
+		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))
+		return -1.
 
 
 	def get_histo(self) :
@@ -115,6 +122,31 @@ class plotter(object) :
 		x_pos = ROOT.gStyle.GetPadLeftMargin() + 0.03
 		y_pos = 1. - ROOT.gStyle.GetPadTopMargin() - 0.03
 		latex.DrawLatex(x_pos, y_pos, 'RD42')
+
+
+	def draw_statbox(self, entries) :
+#		table = '\\begin{tabular}{cc}bla & blup \\\\ \\end{tabular}'
+		table = '\\begin{tabular}{\n\tl\n\tS[table-alignment = center, table-format = -1.4(2)]\n}\n'
+		for item in entries :
+			print item
+			table += '\t%-5s & %s \\\\\n' % item
+		table += '\\end{tabular}\n'
+		print table
+		latex = ROOT.TLatex()
+		latex.SetNDC()
+		latex.SetTextFont(62)
+		latex.SetTextSize(0.04)
+		latex.SetTextAlign(33)
+		x_pos = ROOT.gStyle.GetPadLeftMargin() + 0.5
+		y_pos = 1. - ROOT.gStyle.GetPadTopMargin() - 0.03
+		
+		x_pos = ROOT.gStyle.GetStatX()
+		y_pos = ROOT.gStyle.GetStatY()
+		latex.DrawLatex(x_pos, y_pos, table)
+
+#		text = ROOT.TText()
+#		text.SetNDC()
+#		text.DrawText(0.5, 0.5, table)
 
 
 if __name__ == '__main__' :
