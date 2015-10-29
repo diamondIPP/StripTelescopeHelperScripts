@@ -6,6 +6,9 @@ import ConfigParser
 
 def rd42Style() :
 	rd42Style = parse_styleSettings('rd42Style.cfg', 'rd42Style','RD42 Style')
+
+	# PostScript output
+	rd42Style.SetPaperSize(15., 15.)
 #
 #	# colors
 	rd42Style.SetPalette(1)
