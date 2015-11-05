@@ -2,6 +2,7 @@
 import ROOT
 from array import array
 import ConfigParser
+import os
 
 
 def rd42Style() :
@@ -47,6 +48,9 @@ def rd42Style() :
 
 
 def parse_styleSettings(config_file, style_name = 'style', style_title = 'style') :
+	if not os.path.isfile(config_file) :
+		print '[WARNING] %s does not exist! Returning default root style..' % config_file
+		return ROOT.gStyle
 	style = ROOT.TStyle(style_name, style_title)
 	config = ConfigParser.ConfigParser()
 	config.optionxform = str # case sensitive options
