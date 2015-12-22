@@ -75,7 +75,18 @@ class ResultReader:
         if newRunNo in self.map:
             try:
                 config.set('RunInfo', 'repeatercardno', '%s' % self.map[newRunNo]['repeaterCard'])
+            except:
+                config.set('RunInfo', 'repeatercardno','unknown')
+            try:
                 config.set('RunInfo', 'voltage', '%+4d' % self.map[newRunNo]['biasVoltage'])
+            except:
+                voltage = None
+                while not type(voltage) == int:
+                    print 'Cannot Set Voltage for Run %d. Please enter by hand in Volt.'%newRunNo
+                    print 'possibilities are ',self.map[newRunNo]['biasVoltage']
+                    voltage = raw_input()
+                config.set('RunInfo', 'voltage','%+4d'%voltage)
+            try:
                 config.set('RunInfo', 'currentbegin', '%s' % (self.map[newRunNo]['currentBegin']))
                 config.set('RunInfo', 'currentend', '%s' % (self.map[newRunNo]['currentEnd']))
             except Exception as e:
