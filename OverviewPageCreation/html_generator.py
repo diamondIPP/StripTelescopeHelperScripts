@@ -10,18 +10,22 @@ import HTML
 
 # import math
 import utilities
+import results_utilities
 # from operator import itemgetter, attrgetter
 import os
 import dictCreater
 import correctionFactor
 import resultsCreation
 from collections import *
+import ResultReader
 # import re
 
 
-class ResultReader:
+class HTMLGenerator:
     def __init__(self, config_dir):
-        self.verbosity = 0
+        self.verbosity = 5
+        if self.verbosity:
+            print 'ResultReader - Initialisation'
         self.config_dir = config_dir
         self.config_file_name = config_dir + '/creation.ini'
         self.config = ConfigParser.ConfigParser()
@@ -35,22 +39,19 @@ class ResultReader:
         self.header_mapping = None
 
     def create_tables(self):
+        print 'Create Tables: '
         if self.update_crosstalk_factors:
-            print 'update correction factors'
+            print ' * update correction factors'
             correctionFactor.update_crosstalk_factors(self.config.get('Results', 'inputDir'))
 
-        print 'read dictionaries'
+        print ' * read dictionaries'
         mapper = dictCreater.dictCreater(self.config_dir)
         self.map = mapper.get_combined_list()
 
-        print 'get file list'
-        # get list of files wich starts with 'results'
-        file_list = utilities.list_files(self.config.get('Results', 'inputDir'), 'results')
-        if self.verbosity:
-            print 'staring list', file_list
-        self.file_list = [i for i in file_list if i.endswith('.res') and '_new' in i]
-        # print 'updated file list ', self.file_list
-        self.results = self.read_result_config()
+        print ' * get file list'
+        result_reader = ResultReader.ResultReader(self.config,self.map)
+        self.results = result_reader.GetResults()
+        raw_input(self.results)
         self.set_csv_mapping()
 
     def get_result_key(self, config):
@@ -83,6 +84,8 @@ class ResultReader:
 
     def read_result_config(self):
         results = {}
+        print self.file_list
+        raw_input()
         for i in self.file_list:
             runno = i.rsplit('_', 1)[1].split('.')[0]
             config = ConfigParser.ConfigParser()
@@ -122,24 +125,6 @@ class ResultReader:
                 config.write(configfile)
         return results
 
-    def getDiamond(self, runno, descr):
-        dia = 'unknown'
-        if runno in self.map:
-            dias = self.map[runno]['diamond']
-            if type(dias) == list:
-                if len(dias) > 1:
-                    if 'left' in descr or '1' in descr:
-                        dia = dias[0]
-                    elif 'right' in descr or '2' in descr:
-                        dia = dias[1]
-                    else:
-                        dia = dias[0]
-                    pass
-                else:
-                    dia = dias[0]
-            else:
-                dia = dias
-        return dia
 
     def add_missing_items(self, config):
         isCorrected = resultsCreation.is_corrected(config)
@@ -180,6 +165,13 @@ class ResultReader:
         config.set('Landau_normal', 'convergence', '%6.2f' % convergence)
         runDesc = config.get('RunInfo', 'descr.')
         dia = self.getDiamond(newRunNo, runDesc)
+        try:
+            dia = json.dumps(dia)
+            # dia = dia.split(dia[1:-1])
+        except:
+            pass
+        if type(dia)==list and len(dia) ==1:
+            dia = dia[0]
         config.set('RunInfo', 'dia', dia)
         if '?' in config.get('RunInfo', 'dia'):
             config.set('RunInfo', 'dia', 'unknown')
@@ -344,41 +336,15 @@ class ResultReader:
 
         return rows
 
-    @staticmethod
-    def save_html_code(html_file_name, htmlcode):
-        # raw_input('html_file_name: %s'%html_file_name)
-        htmlcode += '\n<br>\ncreated on %s' % time.ctime()
-
-        f = open(html_file_name, "w")
-        f.write('%s' % htmlcode)
-        f.close()
-
     def sort_results(self, newResults):
         f = lambda x: (self.results[x].getint('RunInfo', 'runno'), self.results[x].get('RunInfo', 'descr.'),
                        self.results[x].getint('RunInfo', 'cor') )
         return sorted(newResults, key=f)
 
-    @staticmethod
-    def svn_version(x):
-        svn = x.get('RunInfo', 'svn_rev')
-        match = re.search(r'[^0123456789]', svn)
-        if match:
-            first_index = match.start()
-            if first_index > 0:
-                svn = int(svn[:first_index])
-            else:
-                svn = -1
-        else:
-            try:
-                svn = int(svn)
-            except:
-                svn = -1
-        return svn
-
     def sort_results_svn(self, newResults):
         g = lambda x: self.results[x]
         f = lambda x: (
-            self.svn_version(x), x.get('RunInfo', 'svn_rev'), x.getint('RunInfo', 'runno'), x.get('RunInfo', 'descr.'),
+            results_utilities.svn_version(x), x.get('RunInfo', 'svn_rev'), x.getint('RunInfo', 'runno'), x.get('RunInfo', 'descr.'),
             x.getint('RunInfo', 'cor'))
         h = lambda x: f(g(x))
         return sorted(newResults, key=h)
@@ -418,7 +384,7 @@ class ResultReader:
                                       '%s/%s.txt' % (self.config.get('HTML', 'RunLog'), testBeam))
             except:
                 print 'could not create link for %s' % html_file_name
-        self.save_html_code(html_file_name, htmlcode)
+        utilities.save_html_code(html_file_name, htmlcode)
 
     def create_diamond_html_pages(self):
         diamonds = self.get_list_of_diamonds(self.results)
@@ -434,11 +400,12 @@ class ResultReader:
         fileName = '%s/results_diamonds.html' % self.config.get('HTML', 'outputDir')
         if self.verbosity:
             print 'save diamond file to: "%s"' % fileName
-        self.save_html_code(fileName, htmlcode)
+        utilities.save_html_code(fileName, htmlcode)
         pass
 
     def get_list_of_diamonds(self, results):
         diamonds = [self.results[x].get('RunInfo', 'dia') for x in results]
+        raw_input(diamonds)
         dia = []
         for x in diamonds:
             if type(x) ==list:
@@ -487,7 +454,7 @@ class ResultReader:
             testBeamLinkTable.append(row)
         htmlcode = HTML.table(testBeamLinkTable, header_row=header)
         fileName = '%s/results_testBeams.html' % self.config.get('HTML', 'outputDir')
-        self.save_html_code(fileName, htmlcode)
+        utilities.save_html_code(fileName, htmlcode)
 
 
     def create_csv_file(self):
@@ -592,7 +559,9 @@ class ResultReader:
     # "REV","REV"]
 
     def create_all_html_tables(self):
+        print 'RESULTS',self.results
         self.create_csv_file()
+        print 'RESULTS',self.results
         self.create_html_overview_table(self.results, '%s/results.html' % self.config.get('HTML', 'outputDir'))
         self.create_html_overview_table(self.results, '%s/resultsSVN.html' % self.config.get('HTML', 'outputDir'),
                                         sort='svn')
@@ -606,9 +575,9 @@ if __name__ == "__main__":
     full_path = os.path.realpath(__file__)
     directory = os.path.dirname(full_path)
 
-    reader = ResultReader('%s/config/' % directory)
-    reader.update_crosstalk_factors = True
-    reader.create_tables()
-    reader.create_all_html_tables()
+    generator = HTMLGenerator('%s/config/' % directory)
+    generator.update_crosstalk_factors = True
+    generator.create_tables()
+    generator.create_all_html_tables()
     with  open('data.pkl', 'wb') as output:
-        pickle.dump(reader.results, output)
+        pickle.dump(generator.results, output)
