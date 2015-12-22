@@ -73,10 +73,17 @@ class ResultReader:
             newRunNo = int(newRunNo / 10)
 
         if newRunNo in self.map:
-            config.set('RunInfo', 'repeatercardno', '%s' % self.map[newRunNo]['repeaterCard'])
-            config.set('RunInfo', 'voltage', '%+4d' % self.map[newRunNo]['biasVoltage'])
-            config.set('RunInfo', 'currentbegin', '%s' % (self.map[newRunNo]['currentBegin']))
-            config.set('RunInfo', 'currentend', '%s' % (self.map[newRunNo]['currentEnd']))
+            try:
+                config.set('RunInfo', 'repeatercardno', '%s' % self.map[newRunNo]['repeaterCard'])
+                config.set('RunInfo', 'voltage', '%+4d' % self.map[newRunNo]['biasVoltage'])
+                config.set('RunInfo', 'currentbegin', '%s' % (self.map[newRunNo]['currentBegin']))
+                config.set('RunInfo', 'currentend', '%s' % (self.map[newRunNo]['currentEnd']))
+            except Exception as e:
+                print 'repeatercardno',self.map[newRunNo]['repeaterCard']
+                print 'voltage',self.map[newRunNo]['biasVoltage']
+                print 'current',self.map[newRunNo]['currentBegin'],self.map[newRunNo]['currentEnd']
+                print self.map[newRunNo]
+                raise e
             if not config.has_option('RunInfo','events'):
                 try:
                     config.set('RunInfo', 'events', '%s' % (self.map[newRunNo]['events']))
