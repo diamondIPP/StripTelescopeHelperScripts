@@ -1,6 +1,6 @@
 import ConfigParser
 import math
-
+#from http://www.decalage.info/python/html#attachments
 import HTML
 
 import utilities

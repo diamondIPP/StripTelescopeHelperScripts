@@ -9,12 +9,12 @@ class dictCreater:
         self.verbosity = False
         self.configdir = configdir
         self.configFileName = configdir + '/creation.ini'
-        print 'read', self.configFileName
+        print '    - read', self.configFileName
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.configFileName)
         for i in self.config.sections():
             # if self.verbosity:
-            print i, self.config.options(i)
+            print '        - ',i, self.config.options(i)
         contentDesc = self.config.get('RepeaterCards', 'content')
         self.contentDescRepCard = [i.split('/') for i in contentDesc.strip('[]').split(',')]
         contentDesc = self.config.get('RunInfo', 'content')
@@ -91,8 +91,8 @@ class dictCreater:
         runList = {}
         contentDesc = self.contentDescRunList
         key = self.config.get('RunList', 'key')
-        out = 'Reading RunListMap with the following keys '+str(key)+' and '+str(contentDesc)
-        raw_input(out)
+        out = '    - Reading RunListMap with the following keys '+str(key)+' and '+str(contentDesc)
+        # raw_input(out)
         with open(fileName, 'rb') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             l = 0
@@ -102,7 +102,7 @@ class dictCreater:
                     if len(contentDesc[i]) > 2:
                         thisRun[contentDesc[i][0]] = utilities.get_value(row[i], contentDesc[i][1], contentDesc[i][2])
                     else:
-                        print row[i], type(row[i])
+                        print '    - ',row[i], type(row[i])
                         thisRun[contentDesc[i][0]] = utilities.get_value(row[i], contentDesc[i][1])
 
                 if thisRun.has_key(key):
@@ -110,8 +110,8 @@ class dictCreater:
                 else:
                     print 'cannot find key, ', key, 'in thisRun', thisRun
                 if l == 0:
-                    print thisRun
-                    raw_input('Row %s'%row)
+                    print '    - ',thisRun
+                    # raw_input('Row %s'%row)
                     l+=1
         return runList
 
@@ -162,12 +162,14 @@ class dictCreater:
         combinedList = {}
         missingRepeaterCards = []
         missingRunInfo = []
+        missingKeys = []
         for key in set().union(repeaterCards.keys(), runInfos.keys(), runList.keys()):
             item = {}
             if repeaterCards.has_key(key) and runInfos.has_key(key) and runList.has_key(key):
                 item = dict(repeaterCards[key].items() + runInfos[key].items() + runList[key].items())
             else:
-                print 'no key %s in runList' % key
+                missingKeys.append(key)
+                # print '    - no key %s in runList' % key
                 if repeaterCards.has_key(key) and runInfos.has_key(key):
                     item = dict(repeaterCards[key].items() + runInfos[key].items())
                 elif repeaterCards.has_key(key):
@@ -185,6 +187,8 @@ class dictCreater:
                 else:
                     continue
             combinedList[key] = item
+        if len(missingKeys):
+            print 'There are %s missing keys: \n\t%s'%(len(missingKeys),sorted(missingKeys))
         if len(missingRepeaterCards):
             print 'There are %s runs with missing repeatercard information: \n\t %s' % (
             len(missingRepeaterCards), sorted(missingRepeaterCards))

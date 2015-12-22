@@ -10,9 +10,9 @@ verbosity = 0
 
 def get_crosstalk_factor_map(dir):
     # crossTalkCorrectionFactors.17100.txt
-    print 'get crosstalk factor map,"%s"' % dir
-    fileList = utilities.list_files(dir, 'crossTalkCorrectionFactors')
-    print 'list: ', fileList
+    print '    - get crosstalk factor map,"%s"' % dir
+    fileList = utilities.list_files(dir, 'crossTalkCorrectionFactors',indentation=9)
+    print '    - list: ', fileList
     crosstalks = {}
     for fileName in fileList:
         f = open(fileName)
@@ -21,7 +21,7 @@ def get_crosstalk_factor_map(dir):
         runDes = '0'
         if '-' in runNo:
             runNo = runNo.split('-')
-            if verbosity: print runNo
+            if verbosity: print '    - ',runNo
             runDes = runNo[-1]
             runNo = runNo[0]
         runNo = int(runNo)
@@ -41,14 +41,14 @@ def get_crosstalk_factor_map(dir):
         key = "%s-%s" % (runNo, runDes)
         crosstalks[key] = {'meanSil': silCor, 'sigSil': sigSil, 'meanDia': diaCorrection, 'fileName': fileName,
                            'runDes': runDes}
-        if verbosity: print runNo, crosstalks[key]
+        if verbosity: print '    - ',runNo, crosstalks[key]
     return crosstalks
 
 
 def create_new_results_res_file(runNo, crosstalk):
-    if verbosity: print 'create new results res file for %s' % runNo
+    if verbosity: print '    - create new results res file for %s' % runNo
     fileName = crosstalk['fileName']
-    if verbosity:     print fileName
+    if verbosity:     print '    - ',fileName
     fileName = fileName.replace('crossTalkCorrectionFactors.', 'results_')
     if crosstalk['runDes'] != '0':
         fileName = fileName.replace('results', '%s/results' % crosstalk['runDes'])
@@ -56,12 +56,12 @@ def create_new_results_res_file(runNo, crosstalk):
         fileName = fileName.replace('-right', '')
     fileName = fileName.replace('.txt', '.res')
 
-    if verbosity: print fileName
+    if verbosity: print '    - ',fileName
     try:
         res = ConfigParser.ConfigParser()
         res.read(fileName)
     except:
-        print 'cannot find %s' % fileName
+        print '    - cannot find %s' % fileName
         return
     if 'Feed_Through_Correction' not in res.sections():
         res.add_section('Feed_Through_Correction')
@@ -75,9 +75,9 @@ def create_new_results_res_file(runNo, crosstalk):
 
 
 def create_new_results_text_file(runNo, crosstalk):
-    if verbosity: print 'create new results file for %s' % runNo
+    if verbosity: print '    - create new results file for %s' % runNo
     fileName = crosstalk['fileName']
-    if verbosity: print fileName
+    if verbosity: print '    - ',fileName
     fileName = fileName.replace('crossTalkCorrectionFactors.', 'results_')
 
     if crosstalk['runDes'] != '0':
@@ -85,11 +85,11 @@ def create_new_results_text_file(runNo, crosstalk):
         fileName = fileName.replace('-left', '')
         fileName = fileName.replace('-right', '')
 
-    if verbosity: print fileName
+    if verbosity: print'    - ', fileName
     try:
         resFile = open(fileName)
     except:
-        print 'cannot find %s' % fileName
+        print '    - cannot find %s' % fileName
         return
     lines = resFile.readlines()
     line = lines[-1].split()

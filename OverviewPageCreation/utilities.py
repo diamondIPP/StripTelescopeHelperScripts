@@ -1,8 +1,10 @@
+import json
 import scandir
+import time
 
-
-def list_files(dir, name, level=0):
-    print 'list_files in "%s" with name "%s"' % (dir, name)
+def list_files(dir, name, level=0, indentation=0):
+    str_ind = ' '*indentation
+    print str_ind+'list_files in "%s" with name "%s"' % (dir, name)
     r = []
     walk = scandir.walk(dir, followlinks=True)
     for root, dirs, files in walk:
@@ -12,7 +14,7 @@ def list_files(dir, name, level=0):
             for file in files:
                 if name in file:
                     r.append(root + "/" + file)
-    print 'found %d files' % len(r)
+    print str_ind+'found %d files' % len(r)
     return r
 
 
@@ -104,3 +106,63 @@ def get_value(input, convert, default=''):
 def analze_link(haslink):
     return
 				
+def getDiamond(map, runno, descr):
+    dia = 'unknown'
+    print 'getDiamond: ',runno,descr,'-->',
+    if runno in map:
+        dias = map[runno]['diamond']
+        print dias
+        if type(dias) == list:
+            if len(dias) > 1:
+                if 'left' in descr or '1' in descr:
+                    dia = dias[0]
+                elif 'right' in descr or '2' in descr:
+                    dia = dias[1]
+                else:
+                    dia = dias[0]
+                pass
+            else:
+                dia = dias[0]
+        else:
+            dia = dias
+    if type(dia) == list:
+        if len(dia) == 1:
+            dia = dia[0]
+        else:
+            raise Exception('invalid Diamond name')
+    dia = dia.strip('"')
+    return dia
+
+def get_result_key(main_config,config):
+        key = ''
+        keyNames = main_config.get('Results', 'key').split(';')
+        for i in keyNames:
+            if i.startswith('<') and i.endswith('>'):
+                i = i.strip('<>').strip()
+                keyName = i.split(',')
+                keyName = [i.strip() for i in keyName]
+                # print 'check for : ',keyName
+                # print config.sections()
+                # if config.has_section(keyName[0]):
+                # print config.options(keyName[0])
+                if config.has_option(keyName[0], keyName[1]):
+                    value = config.get(keyName[0], keyName[1])
+                    key += value
+                else:
+                    print 'cannot finde key "%s"'%keyName[0],keyName[1]
+                    if config.has_section(keyName[0]):
+                        print 'options:',config.options(keyName[0])
+                    else:
+                        print 'sections',config.sections()
+                    key += 'unknown'
+            else:
+                key += i
+        return key
+
+def save_html_code(html_file_name, htmlcode):
+    # raw_input('html_file_name: %s'%html_file_name)
+    htmlcode += '\n<br>\ncreated on %s' % time.ctime()
+
+    f = open(html_file_name, "w")
+    f.write('%s' % htmlcode)
+    f.close()
