@@ -130,7 +130,7 @@ void updateSilicon(){
 			Float_t real_adc = ((Float_t)measured_adc-(Float_t)adc*alpha)/(1-alpha);
 			UShort_t newADC;
 			adc = newADC;
-			if(newADC>255)
+			if(real_adc>255)
 				newADC = 255;
 			else
 			    newADC  = UShort_t(real_adc+.5);
