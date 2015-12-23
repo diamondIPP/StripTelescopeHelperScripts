@@ -115,6 +115,7 @@ void showStatusBar(int nEvent,int nEvents,int updateIntervall,bool show,bool mak
 	if(makeNewLine&&nEvent+1>=nEvents)cout<<endl;
 }
 void updateSilicon(){
+    UShort_t max = 256;
 	for (UInt_t det = 0; det < 8; det++){
 		UInt_t startChannel = 0;
 		UInt_t endChannel = 127;
@@ -130,8 +131,8 @@ void updateSilicon(){
 			Float_t real_adc = ((Float_t)measured_adc-(Float_t)adc*alpha)/(1-alpha);
 			UShort_t newADC;
 			adc = newADC;
-			if(real_adc>255)
-				newADC = 255;
+			if(real_adc> max -1)
+				newADC = max -1;
 			else
 			    newADC  = UShort_t(real_adc+.5);
 			Det_ADC[det][ch] = newADC;
@@ -147,13 +148,14 @@ void updateSilicon(){
 void updateDiamond(){
     Float_t alpha = chargeShareDia;
     UShort_t adc =  0;
+    UShort_t max = 4096;
 	for(UInt_t ch=0;ch<128;ch++){
 	    UShort_t measured_adc = Dia_ADC[ch];
 	    Float_t real_adc = ((Float_t)measured_adc-(Float_t)adc*alpha)/(1-alpha);
 	    UShort_t newADC;
 	    adc = newADC;
-	    if(newADC>255)
-	        newADC = 255;
+	    if(real_adc >= max-1)
+	        newADC = max-1;
 	    else
 	        newADC  = UShort_t(real_adc+.5);
 	    Dia_ADC[ch] = newADC;
