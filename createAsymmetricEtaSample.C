@@ -145,24 +145,19 @@ void updateSilicon(){
 }
 
 void updateDiamond(){
-	Float_t share =0;
+    Float_t alpha = chargeShareDia;
+    UShort_t adc =  0;
 	for(UInt_t ch=0;ch<128;ch++){
-		Float_t adc = Dia_ADC[ch];
-        Float_t alpha = chargeShareSil;
-        UShort_t adc = 0;
-        for(UInt_t ch=startChannel;!finished;){
-            UShort_t measured_adc = Det_ADC[det][ch];
-            Float_t real_adc = ((Float_t)measured_adc-(Float_t)adc*alpha)/(1-alpha);
-            UShort_t newADC;
-            adc = newADC;
-            if(newADC>255)
-                newADC = 255;
-            else
-                newADC  = UShort_t(real_adc+.5);
-            Dia_ADC[ch] = newADC;
-            finished = (ch==endChannel);
-            ch++;
-        }
+	    UShort_t measured_adc = Dia_ADC[ch];
+	    Float_t real_adc = ((Float_t)measured_adc-(Float_t)adc*alpha)/(1-alpha);
+	    UShort_t newADC;
+	    adc = newADC;
+	    if(newADC>255)
+	        newADC = 255;
+	    else
+	        newADC  = UShort_t(real_adc+.5);
+	    Dia_ADC[ch] = newADC;
+	}
 }
 
 void LoopOverTree(TTree* inputTree,TTree* outputTree){
