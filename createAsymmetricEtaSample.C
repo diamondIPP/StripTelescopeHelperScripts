@@ -22,7 +22,7 @@ using namespace std;
 UInt_t eventNumber;
 UInt_t runNumber;
 Float_t chargeShareDia;
-Float_t chargeShareSil;
+vector<Float_t> chargeShareSil;
 UChar_t Det_ADC[8][256];
 UShort_t Dia_ADC[128];
 int verbosity = 5;
@@ -182,7 +182,7 @@ bool is_file_exist(const char *fileName)
     return infile.good();
 }
 
-int createAsymmetricEtaSample(int runNo,float silCor,float diaCor,int corRunNo= -1){
+int createAsymmetricEtaSample(int runNo,vector<Float_t> silCor,float diaCor,int corRunNo= -1){
 	cout<<"Enter RunNumber: "<<flush;
 //#	cin>>runNumber;
     runNumber = runNo;
@@ -191,9 +191,11 @@ int createAsymmetricEtaSample(int runNo,float silCor,float diaCor,int corRunNo= 
 	cout<<"\nHow much charge sharing do you want to activate in the Silicon (in %): "<<flush;
 	//cin>>chargeShareSil;
     chargeShareSil = silCor;
-	chargeShareSil /=100;
-	cout<<"There is charge sharing of "<<chargeShareSil*100<<"%."<<endl;
-
+    cout<<"There is charge sharing of "<<endl;
+    for (UInt_t det = 0; det < chargeShareSil.size();i++){
+        cout<<<<" * "<<det<<": "<<chargeShareSil[det]<<" %%"<<endl;
+        chargeShareSil[det] /=100;
+    }
 	cout<<"\nHow much charge sharing do you want to activate in the Diamond (in %): "<<flush;
 	//cin>>chargeShareDia;
     chargeShareDia = diaCor;
