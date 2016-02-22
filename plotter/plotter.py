@@ -43,6 +43,8 @@ class plotter(object) :
 #		ROOT.gStyle.SetCanvasDefW(1200)
 		canvas = ROOT.TCanvas('%s_%s' % (self.histo_name, self.rand.Integer(10000)), 'canvas')
 		histo = self.get_histo()
+		histos = {}
+		histos['data'] = histo
 		canvas.cd()
 		histo.Draw(self.draw_opt)
 		histo.GetXaxis().SetTitle(self.xTitle)
@@ -61,6 +63,7 @@ class plotter(object) :
 			pal.SetY1NDC(canvas.GetBottomMargin())
 			pal.SetY2NDC(1. - canvas.GetTopMargin())
 		if self.histo_type == 'FidCut' :
+			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.histo_name))
 			fid_cut = self.get_fidCut()
 			fid_cut.SetLineColor(ROOT.kRed)
 #			fid_cut.Dump()
@@ -70,11 +73,17 @@ class plotter(object) :
 #		ROOT.gPad.Update()
 #		canvas.Dump()
 #		raw_input('ok?')
+		processes = ['data',]
 		if self.return_value == 'mean' :
 			mean = histo.GetMean()
 			print 'Mean: %f' % mean
 		elif self.return_value == 'sigma' :
 			fit = histo.GetListOfFunctions().FindObject('histofitx')
+			histos['fit'] = ROOT.TH1F('%s_fit' % self.histo_type, 'fit', histo.GetNbinsX(), 0., 1.)
+			for i in [0, 1, 2] :
+				histos['fit'].SetBinContent(i+1, fit.GetParameter(i))
+				histos['fit'].SetBinError  (i+1  , fit.GetParError(i))
+			processes.append('fit')
 			mean  = (fit.GetParameter(1), fit.GetParError(1))
 			sigma = (fit.GetParameter(2), fit.GetParError(2))
 			print 'Mean : %s +- %s' % rn.get_roundedNumber(*mean )
@@ -86,9 +95,140 @@ class plotter(object) :
 			print entries
 #			ROOT.gStyle.SetOptFit(0)
 #			self.draw_statbox(entries)
+		if self.histo_type != 'FidCut' :
+			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.histo_name), var = self.histo_type, bin_width = False)
 		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
 		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))
 		return -1.
+
+
+	def save_histo2table(self, histos, processes, path, var = 'bincentre', lumi = '', bin_width = True, last_bin = True, asymmErr = False) :
+		if lumi != '' :
+			lumi_str   = '\t%4.1f' % lumi
+			lumi_title = '\tlumi'
+		else :
+			lumi_str   = ''
+			lumi_title = ''
+		if asymmErr != False :
+			histos_tmp = {}
+			for process in asymmErr :
+				histos_tmp[process] = histos[process].Clone()
+				histos_tmp[process].SetBinErrorOption(ROOT.TH1.kPoisson)
+		nbins = histos[processes[0]].GetNbinsX()
+		with open(path, 'w') as file :
+			file.write('binlow\t%s\t%s\t%s_err' % (var, '\t'.join(processes), '_err\t'.join(processes)))
+			if asymmErr != False :
+				file.write('\t%s_uerr\t%s_derr' % ('\t_uerr'.join(asymmErr), '_derr\t'.join(asymmErr)))
+			if bin_width : file.write('\tbinwidth')
+			file.write('%s\n' % lumi_title)
+			for bin in range(1, nbins+1) :
+				file.write('%f\t%f' % (histos[processes[0]].GetXaxis().GetBinLowEdge(bin), histos[processes[0]].GetXaxis().GetBinCenter(bin)))
+				for process in processes :
+					file.write('\t%f' % histos[process].GetBinContent(bin))
+				for process in processes :
+					file.write('\t%f' % histos[process].GetBinError(bin))
+				if asymmErr != False :
+					for process in asymmErr :
+						file.write('\t%f' % histos_tmp[process].GetBinErrorUp(bin))
+					for process in asymmErr :
+						file.write('\t%f' % histos_tmp[process].GetBinErrorLow(bin))
+				if bin_width :
+					file.write('\t%f' % histos[processes[0]].GetBinWidth(bin))
+				file.write('%s\n' % lumi_str)
+			if last_bin :
+				file.write('%f\t%f' % (histos[processes[0]].GetXaxis().GetBinUpEdge(nbins), histos[processes[0]].GetXaxis().GetBinCenter(nbins)))
+				for process in processes :
+					file.write('\t%f' % histos[process].GetBinContent(nbins))
+				for process in processes :
+					file.write('\t%f' % histos[process].GetBinError(nbins))
+				if asymmErr != False :
+					for process in asymmErr :
+						file.write('\t%f' % histos_tmp[process].GetBinErrorUp(nbins))
+					for process in asymmErr :
+						file.write('\t%f' % histos_tmp[process].GetBinErrorLow(nbins))
+				if bin_width :
+					file.write('\t%f' % histos[processes[0]].GetBinWidth(nbins))
+				file.write('%s\n' % lumi_str)
+
+
+	def save_TH2histo2table(self, histo, path) :
+		nbinsx = histo.GetNbinsX()
+		nbinsy = histo.GetNbinsY()
+#		nbinsx = 51
+#		nbinsy = 101
+		xmin = histo.FindFirstBinAbove(0,1)
+		ymin = histo.FindFirstBinAbove(0,2)
+		xmax = histo.FindLastBinAbove(0,1)
+		ymax = histo.FindLastBinAbove(0,2)
+		
+		xmin = 180
+		xmax = 270
+		ymin = 130
+		ymax = 270
+		
+		xmin = 170
+		xmax = 270
+		ymin = 120
+		ymax = 220
+
+#		histo.Rebin2D()
+		xmin = 85
+		xmax = 150
+		ymin = 65
+		ymax = 200
+
+#		histo.Rebin2D(3,3)
+		xmin = 50
+		xmax = 130
+		ymin = 40
+		ymax = 130
+
+		xmin = 33
+		xmax = 133
+		ymin = 33
+		ymax = 133
+
+		histo.Rebin2D(4,4)
+		xmin = 25
+		xmax = 110
+		ymin = 25
+		ymax = 110
+
+#		histo.Rebin2D(2,2)
+#		xmin = 25  * 2
+#		xmin = 25  * 2
+#		xmax = 110 * 2
+#		ymin = 25  * 2
+#		ymax = 110 * 2
+		print '%d x %d = %d' % (xmax-xmin, ymax-ymin, (xmax-xmin)*(ymax-ymin))
+
+		switch = True
+		matrix = False
+
+		with open(path, 'w') as file :
+			file.write('x y data\n')
+			for ybin in range(ymin, ymax+1) :
+				ylow = histo.GetYaxis().GetBinLowEdge(ybin)
+				yup  = histo.GetYaxis().GetBinUpEdge(ybin)
+				if matrix :
+					ylow = histo.GetYaxis().GetBinCenter(ybin)
+				for xbin in range(xmin, xmax+1) :
+					xlow = histo.GetXaxis().GetBinLowEdge(xbin)
+					xup  = histo.GetXaxis().GetBinUpEdge(xbin)
+					if matrix :
+						xlow = histo.GetXaxis().GetBinCenter(xbin)
+					content = histo.GetBinContent(xbin, ybin)
+					if switch :
+						if content != 0. and (content > 17. or True) or True :
+							file.write('%f %f %f\n' % (xlow, ylow, content))
+						else :
+							file.write('%f %f %s\n' % (xlow, ylow, 'nan'))
+					else :
+						if content != 0. :
+							file.write('%f %f %f\n' % (xlow, ylow, content))
+							file.write('%f %f %f\n' % (xlow, yup , content))
+							file.write('%f %f %f\n' % (xup , yup , content))
+							file.write('%f %f %f\n' % (xup , ylow, content))
 
 
 	def get_histo(self) :
