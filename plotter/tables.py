@@ -3,10 +3,11 @@ import helper
 import time
 
 
-def make_NoisePulseHeightTable(path, results) :
+def make_NoisePulseHeightTable(path, results, suffix = '') :
 	if not path.endswith('/') : path += '/'
 	helper.mkdir(path)
-	table_name = 'NoisePulseHeightTable.tex'
+	if suffix != '' : suffix = '_' + suffix
+	table_name = 'NoisePulseHeightTable%s.tex' % suffix
 	print '[status] writing %s' % table_name
 	with open(path + table_name, 'w') as file :
 		timestamp = time.asctime()

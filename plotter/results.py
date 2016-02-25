@@ -7,7 +7,7 @@ import runlog
 
 class results(object) :
 
-	def __init__(self, config_file, path, output_path, runlog_file) :
+	def __init__(self, config_file, path, output_path, runlog_file, suffix = '') :
 		self.config_file = config_file
 		if not path.endswith('/') : path += '/'
 		self.path = path
@@ -15,6 +15,7 @@ class results(object) :
 		self.output_path = output_path
 		helper.mkdir(self.output_path)
 		self.runlog = runlog.runlog(runlog_file)
+		self.suffix = suffix
 
 
 	def get_results(self, runs) :
@@ -28,7 +29,7 @@ class results(object) :
 				pl = plotter(self.config_file, self.path, self.output_path, run['number'], run['position'], plot)
 				results[run['number']][plot] = pl.plot()
 				results[run['number']]['Voltage'] = self.runlog.get_voltage(run['number'])
-		tables.make_NoisePulseHeightTable(self.output_path, results)
+		tables.make_NoisePulseHeightTable(self.output_path, results, self.suffix)
 
 
 if __name__ == '__main__' :
@@ -37,9 +38,10 @@ if __name__ == '__main__' :
 	output_path = 'results/'
 	runlog_file = '../OverviewPageCreation/config/all_log.txt'
 	runs = [{'number': 17100, 'position': ''}]
+	suffix = ''
 
 	if ('--help' in args) or ('-h' in args) :
-		print 'usage: ..'
+		print 'usage: results.py -r <RUNLOG_FILE> -i <DATA_PATH> -c <CONFIG_FILE> -o <OUTPUT_PATH>, --runs <RUNS_FILE>'
 		sys.exit(1)
 
 	if ('-i' in args) :
@@ -76,5 +78,8 @@ if __name__ == '__main__' :
 				run['position'] = position
 				runs.append(run)
 
-	res = results(config_file, path, output_path, runlog_file)
+	if ('--suffix' in args) :
+		suffix = args[args.index('--suffix')+1]
+
+	res = results(config_file, path, output_path, runlog_file, suffix)
 	res.get_results(runs)
