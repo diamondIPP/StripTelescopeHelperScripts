@@ -266,11 +266,11 @@ class HTMLGenerator:
             elif '%mainLink' in haslink:
                 links = haslink.rsplit('%', 1)
                 # replace('%mainLink','')%mainLink
-                link = links[0].strip("'") % result.get('RunInfo','dia')
+                link = links[0].strip("'") % mainLink
             elif '%diamondName' in haslink:
                 links = haslink.rsplit('%', 1)
                 # replace('%mainLink','')%mainLink
-                link = links[0].strip("'") % mainLink
+                link = links[0].strip("'") % result.get('RunInfo','dia')
             else:
                 link = haslink
             try:
