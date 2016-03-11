@@ -37,6 +37,7 @@ class  runLogReader:
         path+=runlog
         print path
         f = open(path)
+        runs = []
         for line in f.readlines():
             if str(runlog_no) in line:
                 splitted = line.split()
@@ -47,11 +48,43 @@ class  runLogReader:
                             int(splitted[i])
                             splitted = splitted[i:]
                             valid = True
-                            break;
+                            break
                         except:
                             pass
                 if valid:
                     print splitted
+                    runs.append(splitted)
+        return self.analyze_runs(runs)
+    def analyze_runs(self,runs):
+        for i in range(0,len(runs)):
+            runs[i] = self.analyze_run(runs[i])
+        return runs
+    def analyze_run(self,rundata):
+        run = {}
+        run['number'] = int(rundata[0])
+        diamonds =  rundata[1]
+        if ',' in diamonds:
+            diamonds =  diamonds.split(',')
+        elif '/' in diamonds:
+            diamonds =  diamonds.split('/')
+        run['diamonds'] = diamonds
+        voltage = rundata[2]
+        if '/' in voltage:
+            voltage = voltage.split('/')
+            for v in voltage:
+                v = int(v)
+        else:
+            voltage = int(voltage)
+        run['voltage'] = voltage
+        run['filesize'] = rundata[7]
+        run['events'] = rundata[8]
+        run['current']= rundata[9]
+        print run
+        return run
+
+
+        run[0] = int()
+
 
 
 if __name__ == "__main__":
