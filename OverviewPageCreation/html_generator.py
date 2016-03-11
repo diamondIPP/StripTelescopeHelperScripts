@@ -51,7 +51,7 @@ class HTMLGenerator:
         print ' * get file list'
         result_reader = ResultReader.ResultReader(self.config,self.map)
         self.results = result_reader.GetResults()
-        raw_input(self.results)
+        #raw_input(self.results)
         self.set_csv_mapping()
 
     def get_result_key(self, config):
@@ -85,7 +85,7 @@ class HTMLGenerator:
     def read_result_config(self):
         results = {}
         print self.file_list
-        raw_input()
+        #raw_input()
         for i in self.file_list:
             runno = i.rsplit('_', 1)[1].split('.')[0]
             config = ConfigParser.ConfigParser()
@@ -337,7 +337,7 @@ class HTMLGenerator:
                 if config.has_option('TransparentNoise', 'noisecmnvsclustersizeslope'):
                     print '\t', config.get('TransparentNoise', 'noisecmnvsclustersizeslope')
                 print '\t', config.get('Landau_clustered', 'mean2outof10_clustered')
-                raw_input()
+                #raw_input()
             rows.append(self.get_content(newResults[key]))
 
         return rows
@@ -411,7 +411,7 @@ class HTMLGenerator:
 
     def get_list_of_diamonds(self, results):
         diamonds = [self.results[x].get('RunInfo', 'dia') for x in results]
-        raw_input(diamonds)
+        # raw_input(diamonds)
         dia = []
         for x in diamonds:
             if type(x) ==list:
@@ -422,7 +422,7 @@ class HTMLGenerator:
         try:
             diamonds = sorted(list(set(dia)))
         except:
-            print 'problem with sorting diamonds list...', 
+            print 'problem with sorting diamonds list...',
             print diamonds, type(diamonds)
             raw_input('press a key')
         return diamonds

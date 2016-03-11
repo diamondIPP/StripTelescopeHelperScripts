@@ -111,7 +111,10 @@ class ResultReader:
 
         m2 = float(config.get('Landau_normal', 'm2/2_normal', 0))
         m4 = float(config.get('Landau_normal', 'm4/4_normal', -1))
-        convergence = m2 / m4 * 100.
+        if m4 != 0:
+            convergence = m2 / m4 * 100.
+        else:
+            convergence = -1
         config.set('Landau_normal', 'convergence', '%6.2f' % convergence)
         runDesc = config.get('RunInfo', 'descr.')
         dia = utilities.getDiamond(self.map,newRunNo, runDesc)
