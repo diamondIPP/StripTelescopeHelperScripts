@@ -90,7 +90,7 @@ class  runLogReader:
                 if not rundata[9].startswith('I'):
                     print 'missing data for current in ',rundata
                 else:
-                run['current']= rundata[9]
+                    run['current']= rundata[9]
             except:
                 print 'missing current in ',rundata
                 pass
