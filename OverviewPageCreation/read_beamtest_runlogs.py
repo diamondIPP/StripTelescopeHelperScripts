@@ -1,6 +1,6 @@
 import ConfigParser
 import csv
-
+import os
 import utilities
 
 
@@ -21,8 +21,7 @@ class  runLogReader:
     def get_list_of_runlogs(self):
         dir = self.config.get('RunLogs','directory')
         print 'find all runlogs:'
-        runlogs = utilities.list_files(dir,'txt',0,1,False)
-        runlogs = filter(lambda x:x.endswith('.txt'),runlogs)
+        runlogs = filter(lambda x:x.endswith('.txt'),os.listdir(dir))
         for runlog in runlogs:
             print ' * ',runlog
 
