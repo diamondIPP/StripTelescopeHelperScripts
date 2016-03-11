@@ -53,7 +53,7 @@ outputDir: ./testing/
 RunNo: 				'%s/overview.html'%mainLink
 cor: 				None
 Descr.: 			None
-Diamond: 			None
+Diamond :           './results_%s.html'%diamondName
 Voltage: 			None
 rep. card:  		None
 cur. begin: 		None

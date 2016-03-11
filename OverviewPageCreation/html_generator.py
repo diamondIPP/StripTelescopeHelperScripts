@@ -218,6 +218,8 @@ class HTMLGenerator:
             content = self.config.get('HTML-header', i).split(';')
             if content[0] == 'RunNo':
                 headers.append(HTML.link('RunNo', 'results.html'))
+            if content[0] == 'Diamond':
+                headers.append(HTML.link('RunNo', 'results_diamonds.html'))
             else:
                 headers.append(content[0])
             key = content[0]
@@ -263,6 +265,10 @@ class HTMLGenerator:
                 # print entry
                 link = divided[0].strip("'") % (mainLink, result.get(entry[0], entry[1]))
             elif '%mainLink' in haslink:
+                links = haslink.rsplit('%', 1)
+                # replace('%mainLink','')%mainLink
+                link = links[0].strip("'") % result.get('RunInfo','dia')
+            elif '%diamondName' in haslink:
                 links = haslink.rsplit('%', 1)
                 # replace('%mainLink','')%mainLink
                 link = links[0].strip("'") % mainLink
