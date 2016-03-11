@@ -2,11 +2,11 @@ import json
 import scandir
 import time
 
-def list_files(dir, name, level=0, indentation=0):
+def list_files(dir, name, level=0, indentation=0,followlinks=True):
     str_ind = ' '*indentation
     print str_ind+'list_files in "%s" with name "%s"' % (dir, name)
     r = []
-    walk = scandir.walk(dir, followlinks=True)
+    walk = scandir.walk(dir, followlinks=followlinks)
     for root, dirs, files in walk:
         if '/root' in root:
             continue
