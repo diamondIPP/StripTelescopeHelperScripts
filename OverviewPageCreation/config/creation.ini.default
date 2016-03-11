@@ -1,3 +1,6 @@
+[RunLogs]
+directory:  /scratch/testbeams/RunLogs
+ending:     .txt
 
 [RunInfo]
 fileName:   all_log.txt

@@ -14,9 +14,11 @@ class ResultReader:
         # get list of files wich starts with 'results'
         inputDir = self.main_config.get('Results', 'inputDir')
         file_list = utilities.list_files(inputDir, 'results')
+        print 'found ',len(file_list), 'files'
         if self.verbosity:
             print ' *  staring list', file_list
         file_list = [i for i in file_list if i.endswith('.res') and '_new' in i]
+        print 'reduced to  ',len(file_list), 'files'
         # print 'updated file list ', self.file_list
         print ' * get result config'
         results = self.read_result_config(file_list)

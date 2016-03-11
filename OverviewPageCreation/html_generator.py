@@ -125,7 +125,6 @@ class HTMLGenerator:
                 config.write(configfile)
         return results
 
-
     def add_missing_items(self, config):
         isCorrected = resultsCreation.is_corrected(config)
         runno = config.getint('RunInfo', 'runno')
