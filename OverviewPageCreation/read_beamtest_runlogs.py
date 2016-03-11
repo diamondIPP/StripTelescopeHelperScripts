@@ -75,10 +75,13 @@ class  runLogReader:
                 v = int(v)
         else:
             voltage = int(voltage)
-        run['voltage'] = voltage
-        run['filesize'] = rundata[7]
-        run['events'] = rundata[8]
-        run['current']= rundata[9]
+        try:
+            run['voltage'] = voltage
+            run['filesize'] = rundata[7]
+            run['events'] = rundata[8]
+            run['current']= rundata[9]
+        except:
+            pass
         print run
         return run
 
