@@ -52,13 +52,13 @@ class  runLogReader:
                         except:
                             pass
                 if valid:
-                    print splitted
                     runs.append(splitted)
         return self.analyze_runs(runs)
     def analyze_runs(self,runs):
         for i in range(0,len(runs)):
             runs[i] = self.analyze_run(runs[i])
         return runs
+
     def analyze_run(self,rundata):
         run = {}
         try:
@@ -80,13 +80,19 @@ class  runLogReader:
                     v = int(v)
             else:
                 voltage = int(voltage)
-            try:
                 run['voltage'] = voltage
+            try:
                 run['filesize'] = rundata[7]
                 run['events'] = rundata[8]
-                run['current']= rundata[9]
             except:
                 print 'missing item in ',rundata
+            try:
+                if not rundata[9].startswith('I'):
+                    print 'missing data for current in ',rundata
+                else:
+                run['current']= rundata[9]
+            except:
+                print 'missing current in ',rundata
                 pass
             # print run
         except:
