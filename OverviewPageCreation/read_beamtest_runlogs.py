@@ -74,6 +74,10 @@ class  runLogReader:
                 voltage = voltage.split('/')
                 for v in voltage:
                     v = int(v)
+            elif ',' in voltage:
+                voltage = voltage.split(',')
+                for v in voltage:
+                    v = int(v)
             else:
                 voltage = int(voltage)
             try:
@@ -82,14 +86,12 @@ class  runLogReader:
                 run['events'] = rundata[8]
                 run['current']= rundata[9]
             except:
+                print 'missing item in ',rundata
                 pass
-            print run
+            # print run
         except:
             print 'cannot convert',rundata
         return run
-
-
-        run[0] = int()
 
 
 
