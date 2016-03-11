@@ -70,18 +70,18 @@ class  runLogReader:
             diamonds =  rundata[1]
             if ',' in diamonds:
                 diamonds =  diamonds.split(',')
-            elif '/' in diamonds:
-                diamonds =  diamonds.split('/')
+                diamonds = '/'.join(diamonds)
             run['diamond'] = diamonds
             voltage = rundata[2]
-            if '/' in voltage:
-                voltage = voltage.split('/')
-                for i in range(0,len(voltage)):
-                    voltage[i] = int(voltage[i])
-            elif ',' in voltage:
+            # if '/' in voltage:
+            #     voltage = voltage.split('/')
+            #     for i in range(0,len(voltage)):
+            #         voltage[i] = int(voltage[i])
+            if ',' in voltage:
                 voltage = voltage.split(',')
-                for i in range(0,len(voltage)):
-                    voltage[i] = int(voltage[i])
+                voltage = '/'.join(voltage)
+                # for i in range(0,len(voltage)):
+                #     voltage[i] = int(voltage[i])
             else:
                 voltage = int(voltage)
             run['biasVoltage'] = voltage

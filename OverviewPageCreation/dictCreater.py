@@ -57,15 +57,18 @@ class dictCreater:
                             thisInfo[contentDesc[i][0]] = utilities.get_value(content[i], contentDesc[i][1])
                     else:
                         thisInfo['unknown%s' % unknown] = content[i]
-                        unkown += 1
+                        unknown += 1
                 if self.verbosity: print thisInfo
                 if thisInfo.has_key(key):
                     runInfo[thisInfo[key]] = thisInfo
+        print 'Unknown items',unknown
         i =0
         for run in self.all_runlogs:
             if run['runNo'] not in runInfo:
                 print 'missing run',run['runNo']
                 i += 1
+                for i in contentDesc
+
         print 'Missing',i,'of',len(self.all_runlogs)
         raw_input()
         return runInfo
