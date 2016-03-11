@@ -61,28 +61,31 @@ class  runLogReader:
         return runs
     def analyze_run(self,rundata):
         run = {}
-        run['number'] = int(rundata[0])
-        diamonds =  rundata[1]
-        if ',' in diamonds:
-            diamonds =  diamonds.split(',')
-        elif '/' in diamonds:
-            diamonds =  diamonds.split('/')
-        run['diamonds'] = diamonds
-        voltage = rundata[2]
-        if '/' in voltage:
-            voltage = voltage.split('/')
-            for v in voltage:
-                v = int(v)
-        else:
-            voltage = int(voltage)
         try:
-            run['voltage'] = voltage
-            run['filesize'] = rundata[7]
-            run['events'] = rundata[8]
-            run['current']= rundata[9]
+            run['number'] = int(rundata[0])
+            diamonds =  rundata[1]
+            if ',' in diamonds:
+                diamonds =  diamonds.split(',')
+            elif '/' in diamonds:
+                diamonds =  diamonds.split('/')
+            run['diamonds'] = diamonds
+            voltage = rundata[2]
+            if '/' in voltage:
+                voltage = voltage.split('/')
+                for v in voltage:
+                    v = int(v)
+            else:
+                voltage = int(voltage)
+            try:
+                run['voltage'] = voltage
+                run['filesize'] = rundata[7]
+                run['events'] = rundata[8]
+                run['current']= rundata[9]
+            except:
+                pass
+            print run
         except:
-            pass
-        print run
+            print 'cannot convert',rundata
         return run
 
 
