@@ -21,6 +21,7 @@ class  runLogReader:
         all_runs = []
         for runlog in runlogs:
             all_runs.extend(self.read_runlog(runlog))
+        return all_runs
 
     def get_list_of_runlogs(self):
         dir = self.config.get('RunLogs','directory')
