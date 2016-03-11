@@ -198,8 +198,6 @@ class dictCreater:
             len(missingRunInfo), sorted(missingRunInfo))
         return combinedList
 
-    def get_all_analyzed_runs(self):
-
 
 if __name__ == "__main__":
     r = dictCreater('config/')
