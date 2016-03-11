@@ -5,7 +5,7 @@ import utilities
 
 
 class  runLogReader:
-    def __init__(self):
+    def __init__(self,configdir):
         self.verbosity = False
         self.configdir = configdir
         self.configFileName = configdir + '/creation.ini'
@@ -19,10 +19,12 @@ class  runLogReader:
         runlogs = self.get_list_of_runlogs()
 
     def get_list_of_runlogs(self):
-        dir = self.config.get('RunLogs','directory'])
+        dir = self.config.get('RunLogs','directory')
         print 'find all runlogs:'
-        runlogs = utilities.list_files(dir,'txt',0,1)
-        print runlogs
+        runlogs = utilities.list_files(dir,'txt',0,1,False)
+        runlogs = filter(lambda x:x.endswith('.txt'),runlogs)
+        for runlog in runlogs:
+            print ' * ',runlog
 
 
 if __name__ == "__main__":

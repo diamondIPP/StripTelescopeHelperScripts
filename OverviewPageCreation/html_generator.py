@@ -410,7 +410,7 @@ class HTMLGenerator:
 
     def get_list_of_diamonds(self, results):
         diamonds = [self.results[x].get('RunInfo', 'dia') for x in results]
-        # raw_input(diamonds)
+        #raw_input(diamonds)
         dia = []
         for x in diamonds:
             if type(x) ==list:
