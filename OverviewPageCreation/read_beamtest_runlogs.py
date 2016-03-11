@@ -2,6 +2,7 @@ import ConfigParser
 import csv
 import os
 import utilities
+import collections
 
 
 class  runLogReader:
@@ -61,9 +62,9 @@ class  runLogReader:
         return runs
 
     def analyze_run(self,rundata):
-        run = {}
+        run = collections.OrderedDict()
         try:
-            run['number'] = int(rundata[0])
+            run['runnumber'] = int(rundata[0])
             diamonds =  rundata[1]
             if ',' in diamonds:
                 diamonds =  diamonds.split(',')
