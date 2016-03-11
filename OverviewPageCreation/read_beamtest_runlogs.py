@@ -28,7 +28,8 @@ class  runLogReader:
             print ' * ',runlog
         return runlogs
     def read_runlog(self,runlog):
-        runlog_no = int(runlog[0:2])
+        runlog_str = runlog[0:2]
+        runlog_no = int(runlog_str)
         print 'runlog_no',runlog_no
         path = self.config.get('RunLogs','directory')
         if not path.endswith('/'):
@@ -40,19 +41,15 @@ class  runLogReader:
             if str(runlog_no) in line:
                 splitted = line.split()
                 valid = False
-                try:
-                    int(splitted[0])
-                    valid = True
-                except:
-                    pass
-                try:
-                    int(splitted[1])
-                    valid = True
-                    splitted = splitted[1:]
-                except
-                    pass
-                if valid:
-                    print splitted
+                for i in range(2):
+                    if splitted[i].startswith(runlog_str):
+                        try:
+                            int(splitted[i])
+                            splitted = splitted[i:]
+                            valid = True
+                            break;
+                        except:
+                            pass
 
 
 if __name__ == "__main__":
