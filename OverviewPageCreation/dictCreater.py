@@ -61,9 +61,13 @@ class dictCreater:
                 if self.verbosity: print thisInfo
                 if thisInfo.has_key(key):
                     runInfo[thisInfo[key]] = thisInfo
+        i =0
         for run in self.all_runlogs:
-            if run['runNo'] not runInfo:
-                print 'missing run',run
+            if run['runNo'] not in runInfo:
+                print 'missing run',run['runNo']
+                i += 1
+        print 'Missing',i,'of',len(self.all_runlogs)
+        raw_input()
         return runInfo
 
     def get_ignored_testbeams(self):
