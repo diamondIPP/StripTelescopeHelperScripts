@@ -581,7 +581,7 @@ if __name__ == "__main__":
     directory = os.path.dirname(full_path)
 
     generator = HTMLGenerator('%s/config/' % directory)
-    generator.update_crosstalk_factors = True
+    generator.update_crosstalk_factors = False
     generator.create_tables()
     generator.create_all_html_tables()
     with  open('data.pkl', 'wb') as output:

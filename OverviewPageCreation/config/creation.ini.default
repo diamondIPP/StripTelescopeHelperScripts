@@ -5,7 +5,7 @@ ending:     .txt
 [RunInfo]
 fileName:   all_log.txt
 type:       list
-content:    [runNo/int/-1, diamond/str/UNKNOWN,biasVoltage/int/0]
+content:    [RunInfo/int/-1, diamond/str/UNKNOWN,biasVoltage/int/0]
 key:        runNo
 
 [RepeaterCards]

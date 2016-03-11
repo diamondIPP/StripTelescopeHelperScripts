@@ -2,7 +2,7 @@ import ConfigParser
 import csv
 
 import utilities
-
+import read_beamtest_runlogs
 
 class dictCreater:
     def __init__(self, configdir):
@@ -21,6 +21,11 @@ class dictCreater:
         self.contentDescRunInfo = [i.split('/') for i in contentDesc.strip('[]').split(',')]
         contentDesc = self.config.get('RunList', 'content')
         self.contentDescRunList = [i.split('/') for i in contentDesc.strip('[]').split(',')]
+
+        r = read_beamtest_runlogs.runLogReader(configdir)
+        self.all_runlogs = r.update_runlogs()
+        print 'all_runlogs',len(all_runlogs)
+
 
 
     def add_default(self, item, contentDesc):

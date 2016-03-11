@@ -18,8 +18,9 @@ class  runLogReader:
             print '        - ',i, self.config.options(i)
     def update_runlogs(self):
         runlogs = self.get_list_of_runlogs()
+        all_runs = []
         for runlog in runlogs:
-            self.read_runlog(runlog)
+            all_runs.extend(self.read_runlog(runlog))
 
     def get_list_of_runlogs(self):
         dir = self.config.get('RunLogs','directory')
@@ -64,13 +65,13 @@ class  runLogReader:
     def analyze_run(self,rundata):
         run = collections.OrderedDict()
         try:
-            run['runnumber'] = int(rundata[0])
+            run['runNo'] = int(rundata[0])
             diamonds =  rundata[1]
             if ',' in diamonds:
                 diamonds =  diamonds.split(',')
             elif '/' in diamonds:
                 diamonds =  diamonds.split('/')
-            run['diamonds'] = diamonds
+            run['diamond'] = diamonds
             voltage = rundata[2]
             if '/' in voltage:
                 voltage = voltage.split('/')
@@ -82,7 +83,7 @@ class  runLogReader:
                     voltage[i] = int(voltage[i])
             else:
                 voltage = int(voltage)
-            run['voltage'] = voltage
+            run['biasVoltage'] = voltage
             try:
                 run['filesize'] = rundata[7]
                 run['events'] = rundata[8]
