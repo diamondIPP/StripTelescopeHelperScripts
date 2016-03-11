@@ -69,13 +69,18 @@ class dictCreater:
                 nMissing += 1
                 thisInfo = {}
                 for i  in range(0,len(contentDesc)):
-                    content = run[contentDesc[i][0]]
+                    content = str(run[contentDesc[i][0]])
                     if len(contentDesc[i]) > 2:
-                        thisInfo[contentDesc[i][0]] = utilities.get_value(content, contentDesc[i][1],
+                        try:
+                            thisInfo[contentDesc[i][0]] = utilities.get_value(content, contentDesc[i][1],
                                                                           contentDesc[i][2])
+                        except Exception as e:
+                            print 'cannot convert',content,contentDesc[i]
+                            raise e
                     else:
                         thisInfo[contentDesc[i][0]] = utilities.get_value(content, contentDesc[i][1])
-        print 'Missing',nMissing'of',len(self.all_runlogs)
+                runInfo[thisInfo[key]] = thisInfo
+        print 'Missing',nMissing,'of',len(self.all_runlogs)
         raw_input()
         return runInfo
 

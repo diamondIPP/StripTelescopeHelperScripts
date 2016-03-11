@@ -82,8 +82,8 @@ class  runLogReader:
                 voltage = '/'.join(voltage)
                 # for i in range(0,len(voltage)):
                 #     voltage[i] = int(voltage[i])
-            else:
-                voltage = int(voltage)
+            #else:
+            #    voltage = int(voltage)
             run['biasVoltage'] = voltage
             try:
                 run['filesize'] = rundata[7]

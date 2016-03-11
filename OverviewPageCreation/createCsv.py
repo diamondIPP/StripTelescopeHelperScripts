@@ -111,7 +111,7 @@ class CsvCreater:
                     key = '%s-0-left' % runno
                     self.runList[runno]['keys'].append(key)
                     self.keys.append(key)
-                    key = '%s-0-right' % runno
+                    key = '%s-0-right' % runn   o
                     self.runList[runno]['keys'].append(key)
                     self.keys.append(key)
                 else:
