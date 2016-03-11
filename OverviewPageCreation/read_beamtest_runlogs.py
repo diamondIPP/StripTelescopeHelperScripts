@@ -57,6 +57,7 @@ class  runLogReader:
     def analyze_runs(self,runs):
         for i in range(0,len(runs)):
             runs[i] = self.analyze_run(runs[i])
+            print runs[i]
         return runs
 
     def analyze_run(self,rundata):
@@ -72,12 +73,12 @@ class  runLogReader:
             voltage = rundata[2]
             if '/' in voltage:
                 voltage = voltage.split('/')
-                for v in voltage:
-                    v = int(v)
+                for i in range(0,len(voltage)):
+                    voltage[i] = int(voltage[i])
             elif ',' in voltage:
                 voltage = voltage.split(',')
-                for v in voltage:
-                    v = int(v)
+                for i in range(0,len(voltage)):
+                    voltage[i] = int(voltage[i])
             else:
                 voltage = int(voltage)
                 run['voltage'] = voltage
@@ -88,11 +89,11 @@ class  runLogReader:
                 print 'missing item in ',rundata
             try:
                 if not rundata[9].startswith('I'):
-                    print 'missing data for current in ',rundata
+                    print 'invalid  data for current in ',rundata
                 else:
                     run['current']= rundata[9]
             except:
-                print 'missing current in ',rundata
+                # print 'missing current in ',rundata
                 pass
             # print run
         except:
