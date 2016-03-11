@@ -24,7 +24,7 @@ class dictCreater:
 
         r = read_beamtest_runlogs.runLogReader(configdir)
         self.all_runlogs = r.update_runlogs()
-        print 'all_runlogs',len(all_runlogs)
+        print 'all_runlogs',len(self.all_runlogs)
 
 
 
