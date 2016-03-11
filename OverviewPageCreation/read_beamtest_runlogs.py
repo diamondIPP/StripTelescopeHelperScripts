@@ -41,7 +41,7 @@ class  runLogReader:
             if str(runlog_no) in line:
                 splitted = line.split()
                 valid = False
-                for i in range(2):
+                for i in range(0,2):
                     if len(splitted) >i and splitted[i].startswith(runlog_str):
                         try:
                             int(splitted[i])
