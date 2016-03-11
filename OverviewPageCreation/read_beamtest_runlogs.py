@@ -38,7 +38,21 @@ class  runLogReader:
         f = open(path)
         for line in f.readlines():
             if str(runlog_no) in line:
-                print line
+                splitted = line.split()
+                valid = False
+                try:
+                    int(splitted[0])
+                    valid = True
+                except:
+                    pass
+                try:
+                    int(splitted[1])
+                    valid = True
+                    splitted = splitted[1:]
+                except
+                    pass
+                if valid:
+                    print splitted
 
 
 if __name__ == "__main__":
