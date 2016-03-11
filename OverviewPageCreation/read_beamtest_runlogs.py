@@ -36,8 +36,9 @@ class  runLogReader:
         path+=runlog
         print path
         f = open(path)
-        for line in f.readline():
-            print line
+        for line in f.readlines():
+            if str(runlog_no) in line:
+                print line
 
 
 if __name__ == "__main__":
