@@ -108,6 +108,9 @@ class plotter(object) :
 			for i in [0, 1, 2] :
 				histos['fit'].SetBinContent(i+2, fit.GetParameter(i))
 				histos['fit'].SetBinError  (i+2  , fit.GetParError(i))
+			if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) :
+				histos['fit'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
+				histos['fit'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
 			processes.append('fit')
 			mean  = (fit.GetParameter(1), fit.GetParError(1))
 			sigma = (fit.GetParameter(2), fit.GetParError(2))
