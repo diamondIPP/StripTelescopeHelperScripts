@@ -80,6 +80,13 @@ class plotter(object) :
 			res['mean_err'] = histo.GetMeanError()
 			print 'Mean: %f' % res['mean']
 			helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, self.histo_name))
+			histos['stat'] = ROOT.TH1F('%s_stat' % self.histo_type, 'stat', histo.GetNbinsX(), 0., 1.)
+			histos['stat'].SetBinContent(1, res['mean'    ])
+			histos['stat'].SetBinError  (1, res['mean_err'])
+			histos['stat'].SetBinContent(2, histo.GetRMS     ())
+			histos['stat'].SetBinError  (2, histo.GetRMSError())
+			histos['stat'].SetBinContent(3, histo.GetIntegral())
+			processes.append('stat')
 		elif self.return_value == 'sigma' :
 			fit = histo.GetListOfFunctions().FindObject('histofitx')
 			histos['fit'] = ROOT.TH1F('%s_fit' % self.histo_type, 'fit', histo.GetNbinsX(), 0., 1.)
