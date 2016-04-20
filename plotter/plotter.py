@@ -62,7 +62,7 @@ class plotter(object) :
 			pal.SetX2NDC(1. - canvas.GetRightMargin() + pal_offset + 0.82*histo.GetZaxis().GetTickLength())
 			pal.SetY1NDC(canvas.GetBottomMargin())
 			pal.SetY2NDC(1. - canvas.GetTopMargin())
-		if self.histo_type == 'FidCut' :
+		if self.histo_type == 'FidCut' or self.histo_type == 'TrackPos' :
 			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.histo_name))
 			fid_cut = self.get_fidCut()
 			fid_cut.SetLineColor(ROOT.kRed)
@@ -98,7 +98,7 @@ class plotter(object) :
 			print entries
 #			ROOT.gStyle.SetOptFit(0)
 #			self.draw_statbox(entries)
-		if self.histo_type != 'FidCut' :
+		if self.histo_type != 'FidCut' and self.histo_type != 'TrackPos' :
 			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.histo_name), var = self.histo_type, bin_width = False)
 		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
 		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))

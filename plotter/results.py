@@ -21,7 +21,7 @@ class results(object) :
 	def get_results(self, runs) :
 		'''get plots and results for a list of runs'''
 
-		plots = ['FidCut', 'PulseHeight', 'Noise']
+		plots = ['TrackPos', 'FidCut', 'PulseHeight', 'Noise']
 		results = {}
 		for run in runs :
 			results[run['number']] = {}
