@@ -7,7 +7,7 @@ import runlog
 
 class results(object) :
 
-	def __init__(self, config_file, path, output_path, runlog_file, suffix = '') :
+	def __init__(self, config_file, path, output_path, runlog_file, suffix = '', run_config_file = '') :
 		self.config_file = config_file
 		if not path.endswith('/') : path += '/'
 		self.path = path
@@ -16,6 +16,7 @@ class results(object) :
 		helper.mkdir(self.output_path)
 		self.runlog = runlog.runlog(runlog_file)
 		self.suffix = suffix
+		self.run_config_file = run_config_file
 
 
 	def get_results(self, runs) :
@@ -26,7 +27,7 @@ class results(object) :
 		for run in runs :
 			results[run['number']] = {}
 			for plot in plots :
-				pl = plotter(self.config_file, self.path, self.output_path, run['number'], run['position'], plot)
+				pl = plotter(self.config_file, self.path, self.output_path, run['number'], run['position'], plot, self.run_config_file)
 				results[run['number']][plot] = pl.plot()
 				results[run['number']]['Voltage'] = self.runlog.get_voltage(run['number'])
 		tables.make_NoisePulseHeightTable(self.output_path, results, self.suffix)
@@ -41,7 +42,7 @@ if __name__ == '__main__' :
 	suffix = ''
 
 	if ('--help' in args) or ('-h' in args) :
-		print 'usage: results.py -r <RUNLOG_FILE> -i <DATA_PATH> -c <CONFIG_FILE> -o <OUTPUT_PATH>, --runs <RUNS_FILE>'
+		print 'usage: results.py -r <RUNLOG_FILE> -i <DATA_PATH> -c <CONFIG_FILE> -o <OUTPUT_PATH>, --runs <RUNS_FILE>, --runconfig <RUN_CONFIG>'
 		sys.exit(1)
 
 	if ('-i' in args) :
@@ -57,6 +58,11 @@ if __name__ == '__main__' :
 
 	if ('-r' in args) :
 		runlog_file = args[args.index('-r')+1]
+
+	if ('--runconfig' in args) :
+		runconfig = args[args.index('--runconfig')+1]
+	else :
+		runconfig = ''
 
 	if ('--runs' in args) :
 		runs_file = args[args.index('--runs')+1]
@@ -81,5 +87,5 @@ if __name__ == '__main__' :
 	if ('--suffix' in args) :
 		suffix = args[args.index('--suffix')+1]
 
-	res = results(config_file, path, output_path, runlog_file, suffix)
+	res = results(config_file, path, output_path, runlog_file, suffix, runconfig)
 	res.get_results(runs)

@@ -10,7 +10,7 @@ import roundNumbers as rn
 
 class plotter(object) :
 
-	def __init__(self, config_file, path, output_path, run_no, position, histo_type) :
+	def __init__(self, config_file, path, output_path, run_no, position, histo_type, run_config_file = '') :
 		self.config = ConfigParser.ConfigParser()
 		self.config.optionxform = str # case sensitive options
 		self.config.read(config_file)
@@ -31,6 +31,12 @@ class plotter(object) :
 			setattr(self, key, value)
 		self.file_path = self.path + self.root_file
 		self.rand = ROOT.TRandom3(0)
+
+		self.run_config_file = run_config_file
+		if self.run_config_file != '' :
+			self.run_config = ConfigParser.ConfigParser()
+			self.run_config.optionxform = str # case sensitive options
+			self.run_config.read(run_config_file)
 
 
 	def plot(self) :
@@ -85,7 +91,10 @@ class plotter(object) :
 			histos['stat'].SetBinError  (1, res['mean_err'])
 			histos['stat'].SetBinContent(2, histo.GetRMS     ())
 			histos['stat'].SetBinError  (2, histo.GetRMSError())
-			histos['stat'].SetBinContent(3, histo.GetIntegral())
+			histos['stat'].SetBinContent(3, histo.Integral())
+			if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) :
+				histos['stat'].SetBinContent(4, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
+				histos['stat'].SetBinError  (4, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
 			processes.append('stat')
 		elif self.return_value == 'sigma' :
 			fit = histo.GetListOfFunctions().FindObject('histofitx')
@@ -306,7 +315,7 @@ if __name__ == '__main__' :
 	position = ''
 
 	if ('--help' in args) or ('-h' in args) :
-		print 'usage: plotter.py -r <RUN_NO> -i <DATA_PATH> - p <POSITION> -c <CONFIG_FILE> -o <OUTPUT_PATH>'
+		print 'usage: plotter.py -r <RUN_NO> -i <DATA_PATH> - p <POSITION> -c <CONFIG_FILE> -o <OUTPUT_PATH>, --runconfig <RUN_CONFIG>'
 		sys.exit(1)
 
 	if ('-r' in args) :
@@ -328,10 +337,15 @@ if __name__ == '__main__' :
 	else :
 		output_path = './'
 
+	if ('--runconfig' in args) :
+		runconfig = args[args.index('--runconfig')+1]
+	else :
+		runconfig = ''
+
 	plots = ['FidCut', 'PulseHeight', 'Noise']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
 #		if plot != 'Noise' : continue
-		pl = plotter(config_file, path, output_path, run_no, position, plot)
+		pl = plotter(config_file, path, output_path, run_no, position, plot, runconfig)
 		pl.plot()
