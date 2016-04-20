@@ -75,8 +75,11 @@ class plotter(object) :
 #		raw_input('ok?')
 		processes = ['data',]
 		if self.return_value == 'mean' :
-			mean = histo.GetMean()
-			print 'Mean: %f' % mean
+			res = {}
+			res['mean'    ] = histo.GetMean()
+			res['mean_err'] = histo.GetMeanError()
+			print 'Mean: %f' % res['mean']
+			helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, self.histo_name))
 		elif self.return_value == 'sigma' :
 			fit = histo.GetListOfFunctions().FindObject('histofitx')
 			histos['fit'] = ROOT.TH1F('%s_fit' % self.histo_type, 'fit', histo.GetNbinsX(), 0., 1.)
