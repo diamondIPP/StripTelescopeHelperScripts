@@ -80,8 +80,7 @@ class dictCreater:
                     else:
                         thisInfo[contentDesc[i][0]] = utilities.get_value(content, contentDesc[i][1])
                 runInfo[thisInfo[key]] = thisInfo
-        print 'Missing',nMissing,'of',len(self.all_runlogs)
-        raw_input()
+        print 'Added ',nMissing,' runs which were missing, total runs read from test beam logs:',len(self.all_runlogs)
         return runInfo
 
     def get_ignored_testbeams(self):
@@ -139,6 +138,28 @@ class dictCreater:
                     print '    - ',thisRun
                     # raw_input('Row %s'%row)
                     l+=1
+        nMissing = []
+        for run in self.all_runlogs:
+            if run['runNo'] not in runList:
+                print 'missing run',run['runNo']
+                nMissing.append(run['runNo'])
+                thisInfo = {}
+                for i  in range(0,len(contentDesc)):
+                    try:
+                        content = str(run[contentDesc[i][0]])
+                    except Exception as e:
+                        content = 'nan'
+                    if len(contentDesc[i]) > 2:
+                        try:
+                            thisInfo[contentDesc[i][0]] = utilities.get_value(content, contentDesc[i][1],
+                                                                          contentDesc[i][2])
+                        except Exception as e:
+                            print 'cannot convert',content,contentDesc[i]
+                            raise e
+                    else:
+                        thisInfo[contentDesc[i][0]] = utilities.get_value(content, contentDesc[i][1])
+                runList[run['runNo']] = thisRun
+        print 'Added ',nMissing,' runs to runList which were missing, total runs read from test beam logs:',len(self.all_runlogs)
         return runList
 
 
@@ -188,13 +209,18 @@ class dictCreater:
         combinedList = {}
         missingRepeaterCards = []
         missingRunInfo = []
+        missingRunList = []
         missingKeys = []
         for key in set().union(repeaterCards.keys(), runInfos.keys(), runList.keys()):
+            if key in [190080,190100]:
+                print key,':',
             item = {}
             if repeaterCards.has_key(key) and runInfos.has_key(key) and runList.has_key(key):
                 item = dict(repeaterCards[key].items() + runInfos[key].items() + runList[key].items())
             else:
                 missingKeys.append(key)
+                if not  runList.has_key(key):
+                    missingRunList.append(key)
                 # print '    - no key %s in runList' % key
                 if repeaterCards.has_key(key) and runInfos.has_key(key):
                     item = dict(repeaterCards[key].items() + runInfos[key].items())
@@ -213,12 +239,17 @@ class dictCreater:
                 else:
                     continue
             combinedList[key] = item
+            if key in [190080,190100]:
+                print item
+                raw_input()
         if len(missingKeys):
             print 'There are %s missing keys: \n\t%s'%(len(missingKeys),sorted(missingKeys))
         if len(missingRepeaterCards):
             print 'There are %s runs with missing repeatercard information: \n\t %s' % (
             len(missingRepeaterCards), sorted(missingRepeaterCards))
-
+        if len(missingRunList):
+            print 'There are %s runs with missing runlist information: \n\t %s' % (
+                len(missingRunList),sorted(missingRunList))
         if len(missingRunInfo):
             print 'There are %s runs with missing missing RunInfo: \n\t %s' % (
             len(missingRunInfo), sorted(missingRunInfo))

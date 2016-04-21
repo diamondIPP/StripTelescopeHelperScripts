@@ -54,127 +54,134 @@ class HTMLGenerator:
         #raw_input(self.results)
         self.set_csv_mapping()
 
-    def get_result_key(self, config):
-        key = ''
-        keyNames = self.config.get('Results', 'key').split(';')
-        for i in keyNames:
-            if i.startswith('<') and i.endswith('>'):
-                i = i.strip('<>').strip()
-                keyName = i.split(',')
-                keyName = [i.strip() for i in keyName]
-                # print 'check for : ',keyName
-                # print config.sections()
-                # if config.has_section(keyName[0]):
-                # print config.options(keyName[0])
-                if config.has_option(keyName[0], keyName[1]):
-                    value = config.get(keyName[0], keyName[1])
-                    key += value
-                else:
-                    print 'cannot finde key "%s"'%keyName[0],keyName[1]
-                    if config.has_section(keyName[0]):
-                        print 'options:',config.options(keyName[0])
-                    else:
-                        print 'sections',config.sections()
-                    key += 'unnown'
-            else:
-                key += i
-        #print'get result key', key
-        #print key
-        return key
+    # def get_result_key(self, config):
+    #     key = ''
+    #     keyNames = self.config.get('Results', 'key').split(';')
+    #     for i in keyNames:
+    #         if i.startswith('<') and i.endswith('>'):
+    #             i = i.strip('<>').strip()
+    #             keyName = i.split(',')
+    #             keyName = [i.strip() for i in keyName]
+    #             # print 'check for : ',keyName
+    #             # print config.sections()
+    #             # if config.has_section(keyName[0]):
+    #             # print config.options(keyName[0])
+    #             if config.has_option(keyName[0], keyName[1]):
+    #                 value = config.get(keyName[0], keyName[1])
+    #                 key += value
+    #             else:
+    #                 print 'cannot finde key "%s"'%keyName[0],keyName[1]
+    #                 if config.has_section(keyName[0]):
+    #                     print 'options:',config.options(keyName[0])
+    #                 else:
+    #                     print 'sections',config.sections()
+    #                 key += 'unnown'
+    #         else:
+    #             key += i
+    #     #print'get result kediay', key
+    #     #print key
+    #     return key
 
-    def read_result_config(self):
-        results = {}
-        print self.file_list
-        #raw_input()
-        for i in self.file_list:
-            runno = i.rsplit('_', 1)[1].split('.')[0]
-            config = ConfigParser.ConfigParser()
-            if self.verbosity or True:
-                print 'reading ', i
-            config.read(i)
-            #print config.sections()
-            if not config.has_section('RunInfo'):
-                print 'section "RunInfo" does not exist....'
-                continue
-            config.set('RunInfo', 'realRunNo', runno)
-            #config.set('RunInfo', 'runno', runno)
-            if self.verbosity:
-                for section_name in config.sections():
-                    # print 'Section:', section_name
-                    # print '  Options:', config.options(section_name)
-                    for name, value in config.items(section_name):
-                        print '  %s = %s' % (name, value)
-                        pass
-                    # print
-                    pass
-            path = os.path.abspath(i)
-            if not config.has_section('additional'):
-                config.add_section('additional')
-                pass
-
-            config.set('additional', 'resultsPath', path)
-            key = self.get_result_key(config)
-            config.set('additional', 'key', key)
-            config = self.add_missing_items(config)
-            if self.verbosity:
-                print 'key', key, config.get('RunInfo', 'runno'), config.get('RunInfo', 'realRunNo')
-            results[key] = config
-
-            with open(path, 'w') as configfile:
-                #print 'write ', path
-                config.write(configfile)
-        return results
-
-    def add_missing_items(self, config):
-        isCorrected = resultsCreation.is_corrected(config)
-        runno = config.getint('RunInfo', 'runno')
-        config.set('RunInfo', 'realRunNo', '%d' % runno)
-        config.set('RunInfo', 'cor', '%s' % isCorrected)
-        newRunNo = runno
-        if isCorrected:
-            newRunNo = int(newRunNo / 10)
-
-        if newRunNo in self.map:
-            config.set('RunInfo', 'repeatercardno', '%s' % self.map[newRunNo]['repeaterCard'])
-            config.set('RunInfo', 'voltage', '%+4d' % self.map[newRunNo]['biasVoltage'])
-            config.set('RunInfo', 'currentbegin', '%s' % (self.map[newRunNo]['currentBegin']))
-            config.set('RunInfo', 'currentend', '%s' % (self.map[newRunNo]['currentEnd']))
-            if not config.has_option('RunInfo','events'):
-                try:
-                    config.set('RunInfo', 'events', '%s' % (self.map[newRunNo]['events']))
-                except:
-                    print 'cannot find events in map'
-                    print self.map[newRunNo].keys()
-                    pass
-        else:
-            print 'cannot find %s' % newRunNo
-        config.set('RunInfo', 'runno', '%d' % newRunNo)
-        if config.has_option('TimeDependence', 'landauclusterfitoffsetsize10'):
-            if config.has_option('TimeDependence', 'landauclusterfitslopesize10'):
-                offset = config.getfloat('TimeDependence', 'landauclusterfitoffsetsize10')
-                slope = config.getfloat('TimeDependence', 'landauclusterfitslopesize10')
-                try:
-                    config.set('TimeDependence', 'LinFitRelChange', '%s' % (slope / offset * 100.))
-                except:
-                    config.set('TimeDependence', 'LinFitRelChange', '%s' % slope)
-
-        m2 = float(config.get('Landau_normal', 'm2/2_normal', 0))
-        m4 = float(config.get('Landau_normal', 'm4/4_normal', -1))
-        convergence = m2 / m4 * 100.
-        config.set('Landau_normal', 'convergence', '%6.2f' % convergence)
-        runDesc = config.get('RunInfo', 'descr.')
-        dia = self.getDiamond(newRunNo, runDesc)
-        try:
-            dia = json.dumps(dia)
-            # dia = dia.split(dia[1:-1])
-        except:
-            pass
-        if type(dia)==list and len(dia) ==1:
-            dia = dia[0]
-        config.set('RunInfo', 'dia', dia)
-        if '?' in config.get('RunInfo', 'dia'):
-            config.set('RunInfo', 'dia', 'unknown')
-        return config
+    # def read_result_config(self):
+    #     results = {}
+    #     print self.file_list
+    #     #raw_input()
+    #     for i in self.file_list:
+    #         runno = i.rsplit('_', 1)[1].split('.')[0]
+    #         config = ConfigParser.ConfigParser()
+    #         if self.verbosity or True:
+    #             print 'reading ', runno,'i: ', i
+    #         config.read(i)
+    #         #print config.sections()
+    #         if not config.has_section('RunInfo'):
+    #             print 'section "RunInfo" does not exist....'
+    #             continue
+    #         config.set('RunInfo', 'realRunNo', runno)
+    #         print config.get('RunInfo', 'realRunNo')
+    #         #config.set('RunInfo', 'runno', runno)
+    #         if self.verbosity:
+    #             for section_name in config.sections():
+    #                 # print 'Section:', section_name
+    #                 # print '  Options:', config.options(section_name)
+    #                 for name, value in config.items(section_name):
+    #                     print '  %s = %s' % (name, value)
+    #                     pass
+    #                 # print
+    #                 pass
+    #         path = os.path.abspath(i)
+    #         if not config.has_section('additional'):
+    #             config.add_section('additional')
+    #             pass
+    #
+    #         config.set('additional', 'resultsPath', path)
+    #         key = self.get_result_key(config)
+    #         config.set('additional', 'key', key)
+    #         config = self.add_missing_items(config)
+    #         if self.verbosity or True:
+    #             print 'key', key, config.get('RunInfo', 'runno'), \
+    #                 config.get('RunInfo', 'realRunNo'),\
+    #                 config.get('RunInfo', 'cor') , config.get('RunInfo', 'realrunno')
+    #         results[key] = config
+    #
+    #         with open(path, 'w') as configfile:
+    #             #print 'write ', path
+    #             config.write(configfile)
+    #     return results
+    #
+    # def add_missing_items(self, config):
+    #     print 'HTML GEN: addMissing items to config'
+    #     isCorrected = resultsCreation.is_corrected(config)
+    #     runno = config.getint('RunInfo', 'runno')
+    #     config.set('RunInfo', 'realRunNo', '%d' % runno)
+    #     config.set('RunInfo', 'cor', '%s' % isCorrected)
+    #     newRunNo = runno
+    #     print ' * runno ',config.get('RunInfo', 'runno')
+    #     print ' * realRunNo ',config.get('RunInfo', 'realRunNo')
+    #     print ' * cor',config.get('RunInfo', 'cor')
+    #     if isCorrected:
+    #         newRunNo = int(newRunNo / 10)
+    #
+    #     if newRunNo in self.map:
+    #         config.set('RunInfo', 'repeatercardno', '%s' % self.map[newRunNo]['repeaterCard'])
+    #         config.set('RunInfo', 'voltage', '%+4d' % self.map[newRunNo]['biasVoltage'])
+    #         config.set('RunInfo', 'currentbegin', '%s' % (self.map[newRunNo]['currentBegin']))
+    #         config.set('RunInfo', 'currentend', '%s' % (self.map[newRunNo]['currentEnd']))
+    #         if not config.has_option('RunInfo','events'):
+    #             try:
+    #                 config.set('RunInfo', 'events', '%s' % (self.map[newRunNo]['events']))
+    #             except:
+    #                 print 'cannot find events in map'
+    #                 print self.map[newRunNo].keys()
+    #                 pass
+    #     else:
+    #         print 'cannot find %s' % newRunNo
+    #     config.set('RunInfo', 'runno', '%d' % newRunNo)
+    #     if config.has_option('TimeDependence', 'landauclusterfitoffsetsize10'):
+    #         if config.has_option('TimeDependence', 'landauclusterfitslopesize10'):
+    #             offset = config.getfloat('TimeDependence', 'landauclusterfitoffsetsize10')
+    #             slope = config.getfloat('TimeDependence', 'landauclusterfitslopesize10')
+    #             try:
+    #                 config.set('TimeDependence', 'LinFitRelChange', '%s' % (slope / offset * 100.))
+    #             except:
+    #                 config.set('TimeDependence', 'LinFitRelChange', '%s' % slope)
+    #
+    #     m2 = float(config.get('Landau_normal', 'm2/2_normal', 0))
+    #     m4 = float(config.get('Landau_normal', 'm4/4_normal', -1))
+    #     convergence = m2 / m4 * 100.
+    #     config.set('Landau_normal', 'convergence', '%6.2f' % convergence)
+    #     runDesc = config.get('RunInfo', 'descr.')
+    #     dia = self.geth(newRunNo, runDesc)
+    #     try:
+    #         dia = json.dumps(dia)
+    #         # dia = dia.split(dia[1:-1])
+    #     except:
+    #         pass
+    #     if type(dia)==list and len(dia) ==1:
+    #         dia = dia[0]
+    #     config.set('RunInfo', 'dia', dia)
+    #     if '?' in config.get('RunInfo', 'dia'):
+    #         config.set('RunInfo', 'dia', 'unknown')
+    #     return config
 
     def set_csv_mapping(self):
         #print 'set csv map'
@@ -210,15 +217,17 @@ class HTMLGenerator:
 
     def set_header(self):
         headers = []
+        header_keys = []
         mapping = OrderedDict()
         header_list = self.config.options('HTML-header')
         # print list
         for i in header_list:
             content = self.config.get('HTML-header', i).split(';')
+            header_keys.append(content[0])
             if content[0] == 'RunNo':
                 headers.append(HTML.link('RunNo', 'results.html'))
-            if content[0] == 'Diamond':
-                headers.append(HTML.link('RunNo', 'results_diamonds.html'))
+            elif content[0] == 'Diamond':
+                headers.append(HTML.link('Diamond', 'results_diamonds.html'))
             else:
                 headers.append(content[0])
             key = content[0]
@@ -249,6 +258,10 @@ class HTMLGenerator:
                 pass
         self.headers = headers
         self.header_mapping = mapping
+        self.header_keys = header_keys
+        # print header_keys
+        # print mapping
+        # raw_input('Headers: %s'%headers)
 
     @staticmethod
     def get_link(value, string_format, haslink, result):
@@ -296,8 +309,12 @@ class HTMLGenerator:
 
     def get_content(self, result):
         row = []
+        verbosity = False
+        if verbosity:
+            print self.header_keys
         for key in self.header_mapping:
-            # print key
+            if verbosity:
+                print ' ',key,
             mainLink = resultsCreation.get_mainLink(result, self.config.get('HTML', 'absolutePath'))
             result.set('RunInfo', 'mainLink', mainLink)
             if self.header_mapping[key].has_key('key'):
@@ -314,13 +331,20 @@ class HTMLGenerator:
                     value = value[0]
                 value_type = self.header_mapping[key]['valueType']
                 value = utilities.get_value(value, value_type, default)
-                # print key,configKeys,value
+                if verbosity:
+                    print key,configKeys,value
             elif self.header_mapping[key].has_key('title'):
                 value = self.header_mapping[key]['title']
+                if verbosity:
+                    print key,configKeys,value,'TITLE'
             else:
-                value = 'UNKOWN'
+                value = 'UNKNOWN'
+                if verbosity:
+                    print key,configKeys,value,'UNKNOWN'
             pass
             row.append(self.get_cell(value, key, result))
+        if verbosity:
+            raw_input()
         return row
 
     def get_content_rows(self, newResults, sorted_keys):
@@ -329,6 +353,7 @@ class HTMLGenerator:
             # print 'KEY' ,key
             # print self.map[int(key.split('-')[0])]
             # print newResults[key].get('RunInfo','dia')
+            content = self.get_content(newResults[key])
             if '16005' in key and False:
                 print key
                 config = newResults[key]
@@ -336,9 +361,12 @@ class HTMLGenerator:
                 if config.has_option('TransparentNoise', 'noisecmnvsclustersizeslope'):
                     print '\t', config.get('TransparentNoise', 'noisecmnvsclustersizeslope')
                 print '\t', config.get('Landau_clustered', 'mean2outof10_clustered')
-                #raw_input()
-            rows.append(self.get_content(newResults[key]))
-
+            if key.startswith('19') and False:
+                print key
+                print self.map[int(key.split('-')[0])]
+                print newResults[key].get('RunInfo','dia')
+                # raw_input()
+            rows.append(content)
         return rows
 
     def sort_results(self, newResults):
@@ -477,9 +505,9 @@ class HTMLGenerator:
         row = []
         # result = self.results
         for key in self.csv_mapping:
-
             if 'event' in key:
-                print 'get csv row',key,self.csv_mapping.keys(),self.csv_mapping[key]
+                pass
+                #print 'get csv row',key,self.csv_mapping.keys(),self.csv_mapping[key]
             result = config
             if 'key' in self.csv_mapping[key]:
                 if 'event' in key:
@@ -509,7 +537,8 @@ class HTMLGenerator:
                     print key,configKeys,value
             else:
                 if 'event' in key:
-                    print 'cannot find mapping',key
+                    # print 'cannot find mapping',key
+                    pass
                 try:
                     if 'title' in self.header_mapping[key]:
                         value = self.csv_mapping[key]['title']
@@ -564,9 +593,7 @@ class HTMLGenerator:
     # "REV","REV"]
 
     def create_all_html_tables(self):
-        print 'RESULTS',self.results
-        self.create_csv_file()
-        print 'RESULTS',self.results
+        # print 'RESULTS',self.results
         self.create_html_overview_table(self.results, '%s/results.html' % self.config.get('HTML', 'outputDir'))
         self.create_html_overview_table(self.results, '%s/resultsSVN.html' % self.config.get('HTML', 'outputDir'),
                                         sort='svn')
@@ -574,7 +601,9 @@ class HTMLGenerator:
                                         sort='time')
         self.create_diamond_html_pages()
         self.create_testbeam_html_pages()
-
+        # print 'RESULTS',self.results
+        # self.create_csv_file()
+        #
 
 if __name__ == "__main__":
     full_path = os.path.realpath(__file__)

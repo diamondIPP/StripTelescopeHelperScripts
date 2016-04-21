@@ -7,6 +7,7 @@ import utilities
 
 
 def is_corrected(config):
+    # config.get('RunInfo','cor')
     input1 = config.get('RunInfo', 'realRunNo')
     input2 = config.get('RunInfo', 'runno')
     runNo = utilities.get_value(input2, 'int', '-1')
@@ -16,10 +17,19 @@ def is_corrected(config):
         retVal = 0
     else:
         retVal = 1
-    if int(runNo / 1e5) == 0:
-        retVal = 0
-    else:
+    if int(runNo / 1e5) > 0:
         retVal = 1
+    # else:
+    #     retVal = 1
+    # print 'is_corrected:'
+    # print ' * Input1',input1
+    # print ' * Input1',input2
+    # print ' * realRunNo',realRunNo
+    # print ' * runNo',runNo
+    # print ' * 1e5:',(int(runNo / 1e5) > 0),int(runNo / 1e5)
+    # print ' * realrunno:',config.get('RunInfo', 'realrunno')
+    # print ' => ',retVal
+    # raw_input()
     return retVal
 
 

@@ -64,6 +64,7 @@ class  runLogReader:
         return runs
 
     def analyze_run(self,rundata):
+        print rundata
         run = collections.OrderedDict()
         try:
             run['runNo'] = int(rundata[0])
@@ -87,9 +88,15 @@ class  runLogReader:
             run['biasVoltage'] = voltage
             try:
                 run['filesize'] = rundata[7]
-                run['events'] = rundata[8]
             except:
-                print 'missing item in ',rundata
+                pass
+            try:
+                run['events'] = self.convert_events(rundata[8])
+            except Exception as e:
+                print 'missing events item in ',rundata, rundata[8]
+                print run
+                print e
+                raw_input()
             try:
                 if not rundata[9].startswith('I'):
                     print 'invalid  data for current in ',rundata
@@ -103,6 +110,25 @@ class  runLogReader:
             print 'cannot convert',rundata
         return run
 
+    def convert_events(self,events):
+        print 'convert_events()',events
+        events = events.lower()
+        print events,
+        if events.endswith('k'):
+            events = events[:-1]
+            print events,'k',
+            events = int(events)*1000
+        elif events.endswith('m'):
+            events = int(events[:-1])*1e6
+        else:
+            try:
+                events = int(events)
+            except Exception as e:
+                raise e
+                print 'cannot convert events: ',events
+                events = int(raw_input('Please Enter events'))
+        print events
+        return events
 
 
 if __name__ == "__main__":

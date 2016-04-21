@@ -1,17 +1,35 @@
 import json
-import scandir
+
+try:
+    from os import scandir
+    print 'use os scandir'
+except ImportError:
+    import scandir  # use scandir PyPI module on Python < 3.5
+    print 'use scandir.scandir'
 import time
+import os
+import glob
+
+
+def ls_files(pathname):
+    return glob.glob(pathname)
 
 def list_files(dir, name, level=0, indentation=0,followlinks=True):
     str_ind = ' '*indentation
     print str_ind+'list_files in "%s" with name "%s"' % (dir, name)
     r = []
     walk = scandir.walk(dir, followlinks=followlinks)
+    print
     for root, dirs, files in walk:
         if '/root' in root:
             continue
+        if '/eps' in root:
+            continue
         if (len(files) > 0):
             for file in files:
+                if file.endswith('png'):
+                    print 'continue in',root
+                    break
                 if name in file:
                     r.append(root + "/" + file)
     print str_ind+'found %d files' % len(r)
@@ -108,10 +126,10 @@ def analze_link(haslink):
 				
 def getDiamond(map, runno, descr):
     dia = 'unknown'
-    print 'getDiamond: ',runno,descr,'-->',
+    #print 'getDiamond: ',runno,descr,'-->',
     if runno in map:
         dias = map[runno]['diamond']
-        print dias
+        # print dias
         if type(dias) == list:
             if len(dias) > 1:
                 if 'left' in descr or '1' in descr:
@@ -162,7 +180,7 @@ def get_result_key(main_config,config):
 def save_html_code(html_file_name, htmlcode):
     # raw_input('html_file_name: %s'%html_file_name)
     htmlcode += '\n<br>\ncreated on %s' % time.ctime()
-
+    print 'save html file:',html_file_name,'on %s' % time.ctime()
     f = open(html_file_name, "w")
     f.write('%s' % htmlcode)
     f.close()
