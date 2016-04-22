@@ -5,6 +5,7 @@ import numpy as np
 import os
 import ConfigParser
 import dictCreater
+import radiations
 from collections import OrderedDict
 from math import copysign
 
@@ -22,39 +23,15 @@ class ResidualTable:
         self.result_reader = ResultReader.ResultReader(self.config,self.beam_infos)
         self.results = self.result_reader.GetResults()
         try:
-            pickle_file = open('data.pkl', 'wb')
+            pickle_file = open('results.pkl', 'wb')
             print pickle_file,self.results
             pickle.dump(self.results, pickle_file)
+            pickle_file = open('beam_infos.pkl', 'wb')
+            pickle.dump(self.beam_infos, pickle_file)
         except Exception as e:
             print e
         self.ignore_runs = [19008,19010]
-        self.radiations = {}
-        self.radiations['PW205B'] = { 16000: 0.00,
-                                      16001: 0.00,
-                                      16004: 0.00,
-                                      16005: 0.00,
-                                      16302: 0.78,
-                                      16303: 0.78,
-                                      16306: 0.78,
-                                      16307: 0.78,
-                                      17100: 2.39,
-                                      17101: 2.39,
-                                      17103: 2.39,
-                                      17104: 2.39,
-                                      17207: 3.05,
-                                      17208: 3.05,
-                                      17210: 3.05,
-                                      17211: 3.05,
-                                      18001: 7.82,
-                                      18003: 7.82,
-                                      18006: 7.82,
-                                      18007: 7.82,
-                                      18008: 7.82,
-                                      19008: 7.82,
-                                      19010: 7.82,
-                                      19109: 7.82,
-                                      19113: 7.82
-                                      }
+        self.radiations=radiations.radiations()
 
     def get_runs(self,diamond='PW205B',corrected=True,min_bias=0,polarity=+1,max_bias = 0):
         runs = {}
