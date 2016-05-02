@@ -14,7 +14,7 @@ class plotter(object) :
 		self.config = ConfigParser.ConfigParser()
 		self.config.optionxform = str # case sensitive options
 		self.config.read(config_file)
-		self.run_no = run_no
+		self.run_no = int(run_no)
 		self.position = position
 		self.histo_type = histo_type
 		if not path.endswith('/') : path += '/'
