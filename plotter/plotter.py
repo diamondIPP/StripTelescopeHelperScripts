@@ -31,6 +31,7 @@ class plotter(object) :
 			setattr(self, key, value)
 		if not hasattr(self, 'name') :
 			self.name = histo_type
+		self.nstrips = 0
 		self.file_path = self.path + self.root_file
 		self.rand = ROOT.TRandom3(0)
 
@@ -96,6 +97,7 @@ class plotter(object) :
 			histos['stat'].SetBinContent(3, histo.GetRMS     ())
 			histos['stat'].SetBinError  (3, histo.GetRMSError())
 			histos['stat'].SetBinContent(4, histo.Integral())
+			histos['stat'].SetBinContent(7, self.nstrips)
 			if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) :
 				histos['stat'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
 				histos['stat'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
@@ -354,11 +356,16 @@ if __name__ == '__main__' :
 		runconfig = ''
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
+	nstrips = {}
 	for cluster_size in range(1, 11) :
-		plots.append('PulseHeight_%dStrips' % cluster_size)
+		plot_name = 'PulseHeight_%dStrips' % cluster_size
+		plots.append(plot_name)
+		nstrips[plot_name] = cluster_size
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
 #		if plot != 'Noise' : continue
 		pl = plotter(config_file, path, output_path, run_no, position, plot, runconfig)
+		if plot in nstrips :
+			pl.nstrips = nstrips[plot]
 		pl.plot()
