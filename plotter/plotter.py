@@ -29,6 +29,8 @@ class plotter(object) :
 
 		for key, value in self.config.items(histo_type) :
 			setattr(self, key, value)
+		if not hasattr(self, 'name') :
+			self.name = histo_type
 		self.file_path = self.path + self.root_file
 		self.rand = ROOT.TRandom3(0)
 
@@ -124,7 +126,7 @@ class plotter(object) :
 #			ROOT.gStyle.SetOptFit(0)
 #			self.draw_statbox(entries)
 		if self.histo_type != 'FidCut' and self.histo_type != 'TrackPos' :
-			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.histo_name), var = self.histo_type, bin_width = False)
+			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.histo_name), var = self.name, bin_width = False)
 		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
 		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))
 		return -1.
@@ -264,7 +266,7 @@ class plotter(object) :
 		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix)).Clone()
 
 		# remove functions
-		if not eval(self.fit) :
+		if not eval(self.fit) and self.histo_type == 'PulseHeight' :
 			histo.GetFunction('Fitfcn_%s%s' % (self.histo_prefix, self.histo_name)).SetBit(ROOT.TF1.kNotDraw)
 		if self.histo_type == 'PulseHeight' :
 			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
@@ -352,6 +354,8 @@ if __name__ == '__main__' :
 		runconfig = ''
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
+	for cluster_size in range(1, 11) :
+		plots.append('PulseHeight_%dStrips' % cluster_size)
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
