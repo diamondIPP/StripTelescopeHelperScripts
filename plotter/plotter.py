@@ -356,6 +356,14 @@ if __name__ == '__main__' :
 		runconfig = ''
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
+	plots.append('PulseHeight_BiggestSignalSNRDia')
+	plots.append('PulseHeight_BiggestAdjacentSNRDia')
+	for plane in range(1, 2) :
+		for coord in ['X',] :# 'Y']
+			histo_name = 'PulseHeight_BiggestSignalSNRD%d%s'  % (plane, coord)
+			plots.append(histo_name)
+			histo_name = 'PulseHeight_BiggestAdjacentSNRD%d%s' % (plane, coord)
+			plots.append(histo_name)
 	nstrips = {}
 	for cluster_size in range(1, 11) :
 		plot_name = 'PulseHeight_%dStrips' % cluster_size
