@@ -94,14 +94,10 @@ class irr_results :
 					self.runs[run].pulse_height_err,
 					self.runs[run].fluence,
 					self.runs[run].fluence_err,
-					self.get_ccd(run)[0],
-					self.get_ccd(run)[1]))
+					self.runs[run].ccd,
+					self.runs[run].ccd_err))
 
 
-	def get_ccd(self, run) :
-		ccd     = self.runs[run].ccd
-		ccd_err = self.runs[run].ccd_err
-		return (ccd, ccd_err)
 
 
 if __name__ == '__main__' :
