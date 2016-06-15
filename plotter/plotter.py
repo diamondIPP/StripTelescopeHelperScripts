@@ -76,6 +76,18 @@ class plotter(object) :
 #			fid_cut.Dump()
 			canvas.cd()
 			fid_cut.Draw('same')
+		if self.histo_type == 'PulseHeight_ClusterSize' :
+			processes = ['data', 'stat']
+			slices = self.get_histoSlices(histo, path = self.output_path)
+			for projection in slices :
+				if '-' in projection :
+					self.nstrips = int(projection.lstrip('1-'))
+				else :
+					self.nstrips = int(projection)
+				print self.nstrips
+				histos = self.add_statistics(slices[projection])
+				self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, slices[projection].GetName()), var = self.name, bin_width = False)
+			return
 		canvas.Update()
 #		ROOT.gPad.Update()
 #		canvas.Dump()
@@ -245,6 +257,17 @@ class plotter(object) :
 							file.write('%f %f %f\n' % (xup , ylow, content))
 
 
+	def get_histoSlices(self, histo, path) :
+		nybins = histo.GetNbinsY()
+		profiles = {}
+		for i in range(1, nybins+1) :
+			cluster_size = histo.GetYaxis().GetBinCenter(i)
+			profiles['%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_%.0f' % cluster_size, i, i)
+			if cluster_size > 1 :
+				profiles['1-%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_1-%.0f' % cluster_size, histo.GetYaxis().FindBin(1), i)
+		return profiles
+
+
 	def add_statistics(self, histo) :
 		histos = {}
 		histos['data'] = histo
@@ -376,6 +399,7 @@ if __name__ == '__main__' :
 		plot_name = 'PulseHeight_%dStrips' % cluster_size
 		plots.append(plot_name)
 		nstrips[plot_name] = cluster_size
+	plots.append('PulseHeight_ClusterSize')
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
