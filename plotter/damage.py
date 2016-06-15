@@ -45,6 +45,7 @@ class irr_results :
 		if not input_path.endswith('/') : input_path += '/'
 		self.input_path = input_path
 		self.runs = self.read_runs(run_config)
+		self.runs_list = sorted(self.runs.keys())
 
 
 	def read_runs(self, path) :
@@ -78,13 +79,20 @@ class irr_results :
 
 
 	def write_table(self) :
+		ccd_fit = self.fit()
 		with open('%sdamage.dat' % self.path, 'w') as file :
-			file.write('  run, polarity, voltage, calibration, calibration_err, pulse_height, pulse_height_err,   fluence, fluence_err,        ccd,  ccd_err\n')
+			file.write('  run, polarity, voltage, calibration, calibration_err, pulse_height, pulse_height_err,   fluence, fluence_err,        ccd,  ccd_err,          fit,      fit_err\n')
 #			for run in ['16001', '16005', '16303', '16307', '17101', '17104', '17208', '17211'] :
-			for run in sorted(self.runs.keys()) :
+			for i, run in enumerate(self.runs_list) :
 				if   self.runs[run].voltage > 0. : polarity = 'positive'
 				elif self.runs[run].voltage < 0. : polarity = 'negative'
-				file.write('%s, %s, %+7d, %11.2f, %15.2f, %12f, %16f, %9.3e, %11.3e, %f, %f\n' % (
+				if i < ccd_fit.GetNpar() :
+					fit     = ccd_fit.GetParameter(i)
+					fit_err = ccd_fit.GetParError (i)
+				else :
+					fit     = 0.
+					fit_err = 0.
+				file.write('%s, %s, %+7d, %11.2f, %15.2f, %12f, %16f, %9.3e, %11.3e, %f, %f, %e, %e\n' % (
 					run,
 					polarity,
 					self.runs[run].voltage,
@@ -95,9 +103,36 @@ class irr_results :
 					self.runs[run].fluence,
 					self.runs[run].fluence_err,
 					self.runs[run].ccd,
-					self.runs[run].ccd_err))
+					self.runs[run].ccd_err,
+					fit,
+					fit_err))
 
 
+	def get_array(self, attr, runs) :
+		tmp_array = []
+		for run in runs :
+			tmp_array.append(getattr(self.runs[run], attr))
+		return np.array(tmp_array)
+
+
+	def fit(self) :
+		fluence     = self.get_array('fluence'    , self.runs_list)
+		fluence_err = self.get_array('fluence_err', self.runs_list)
+		ccd         = self.get_array('ccd'        , self.runs_list)
+		ccd_err     = self.get_array('ccd_err'    , self.runs_list)
+
+		# error graph
+		gr = ROOT.TGraphErrors(len(ccd), fluence, ccd, fluence_err, ccd_err)
+
+		# fit function
+		ccd_fit = ROOT.TF1('ccd_fit', '[0]/(1+[1]*[0]*x)', 0, 8e15)
+		ccd_fit.FixParameter(0, ccd[0])
+		ccd_fit.SetParLimits(1, 1e-19, 1e-17)
+
+		# fit
+		gr.Fit('ccd_fit')
+
+		return ccd_fit
 
 
 if __name__ == '__main__' :
