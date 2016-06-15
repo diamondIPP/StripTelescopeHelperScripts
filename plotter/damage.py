@@ -25,6 +25,18 @@ class result :
 		self.fluence_err = 0.
 
 
+	@property
+	def ccd(self) :
+		ccd = self.pulse_height * 100. / self.calibration / 36.
+		return ccd
+
+
+	@property
+	def ccd_err(self) :
+		ccd_err = self.ccd * math.sqrt(self.pulse_height_err**2/self.pulse_height**2 + self.calibration_err**2/self.calibration**2)
+		return ccd_err
+
+
 class irr_results :
 	def __init__(self, path, input_path, run_config) :
 		if not path.endswith('/') : path += '/'
@@ -87,8 +99,8 @@ class irr_results :
 
 
 	def get_ccd(self, run) :
-		ccd = self.runs[run].pulse_height * 100. / self.runs[run].calibration / 36.
-		ccd_err = ccd * math.sqrt(self.runs[run].pulse_height_err**2/self.runs[run].pulse_height**2 + self.runs[run].calibration_err**2/self.runs[run].calibration**2)
+		ccd     = self.runs[run].ccd
+		ccd_err = self.runs[run].ccd_err
 		return (ccd, ccd_err)
 
 
