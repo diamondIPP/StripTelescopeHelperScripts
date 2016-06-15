@@ -52,8 +52,6 @@ class plotter(object) :
 #		ROOT.gStyle.SetCanvasDefW(1200)
 		canvas = ROOT.TCanvas('%s_%s' % (self.histo_name, self.rand.Integer(10000)), 'canvas')
 		histo = self.get_histo()
-		histos = {}
-		histos['data'] = histo
 		canvas.cd()
 		histo.Draw(self.draw_opt)
 		histo.GetXaxis().SetTitle(self.xTitle)
@@ -84,27 +82,11 @@ class plotter(object) :
 #		raw_input('ok?')
 		processes = ['data',]
 		if self.return_value == 'mean' :
-			res = {}
-			res['mean'    ] = histo.GetMean()
-			res['mean_err'] = histo.GetMeanError()
-			print 'Mean: %f' % res['mean']
-			helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, self.histo_name))
-			histos['stat'] = ROOT.TH1F('%s_stat' % self.histo_type, 'stat', histo.GetNbinsX(), 0., 1.)
-			histos['stat'].SetBinContent(1, self.run_no    )
-			histos['stat'].SetBinError  (1, 0              )
-			histos['stat'].SetBinContent(2, res['mean'    ])
-			histos['stat'].SetBinError  (2, res['mean_err'])
-			histos['stat'].SetBinContent(3, histo.GetRMS     ())
-			histos['stat'].SetBinError  (3, histo.GetRMSError())
-			histos['stat'].SetBinContent(4, histo.Integral())
-			histos['stat'].SetBinContent(7, self.nstrips)
-			if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) :
-				histos['stat'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
-				histos['stat'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
-				histos['stat'].SetBinContent(6, eval(self.run_config.get('%d' % self.run_no, 'fluence'    )))
-				histos['stat'].SetBinError  (6, eval(self.run_config.get('%d' % self.run_no, 'fluence_err')))
+			histos = self.add_statistics(histo)
 			processes.append('stat')
 		elif self.return_value == 'sigma' :
+			histos = {}
+			histos['data'] = histo
 			fit = histo.GetListOfFunctions().FindObject('histofitx')
 			histos['fit'] = ROOT.TH1F('%s_fit' % self.histo_type, 'fit', histo.GetNbinsX(), 0., 1.)
 			histos['fit'].SetBinContent(1, self.run_no)
@@ -261,6 +243,31 @@ class plotter(object) :
 							file.write('%f %f %f\n' % (xlow, yup , content))
 							file.write('%f %f %f\n' % (xup , yup , content))
 							file.write('%f %f %f\n' % (xup , ylow, content))
+
+
+	def add_statistics(self, histo) :
+		histos = {}
+		histos['data'] = histo
+		res = {}
+		res['mean'    ] = histo.GetMean()
+		res['mean_err'] = histo.GetMeanError()
+		print 'Mean: %f' % res['mean']
+		helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, self.histo_name))
+		histos['stat'] = ROOT.TH1F('%s_stat' % self.histo_type, 'stat', histo.GetNbinsX(), 0., 1.)
+		histos['stat'].SetBinContent(1, self.run_no    )
+		histos['stat'].SetBinError  (1, 0              )
+		histos['stat'].SetBinContent(2, res['mean'    ])
+		histos['stat'].SetBinError  (2, res['mean_err'])
+		histos['stat'].SetBinContent(3, histo.GetRMS     ())
+		histos['stat'].SetBinError  (3, histo.GetRMSError())
+		histos['stat'].SetBinContent(4, histo.Integral())
+		histos['stat'].SetBinContent(7, self.nstrips)
+		if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) :
+			histos['stat'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
+			histos['stat'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
+			histos['stat'].SetBinContent(6, eval(self.run_config.get('%d' % self.run_no, 'fluence'    )))
+			histos['stat'].SetBinError  (6, eval(self.run_config.get('%d' % self.run_no, 'fluence_err')))
+		return histos
 
 
 	def get_histo(self) :
