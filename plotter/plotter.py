@@ -400,6 +400,7 @@ if __name__ == '__main__' :
 		plots.append(plot_name)
 		nstrips[plot_name] = cluster_size
 	plots.append('PulseHeight_ClusterSize')
+	plots.append('ClusterSize')
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
