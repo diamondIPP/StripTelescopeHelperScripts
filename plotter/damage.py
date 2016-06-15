@@ -81,7 +81,7 @@ class irr_results :
 		with open('%sdamage.dat' % self.path, 'w') as file :
 			file.write('  run, polarity, voltage, calibration, calibration_err, pulse_height, pulse_height_err, fluence, fluence_err,        ccd,  ccd_err\n')
 #			for run in ['16001', '16005', '16303', '16307', '17101', '17104', '17208', '17211'] :
-			for run in self.runs :
+			for run in sorted(self.runs.keys()) :
 				if   self.runs[run].voltage > 0. : polarity = 'positive'
 				elif self.runs[run].voltage < 0. : polarity = 'negative'
 				file.write('%s, %s, %+7d, %11.2f, %15.2f, %12f, %16f, %7.3f, %11.3f, %f, %f\n' % (
