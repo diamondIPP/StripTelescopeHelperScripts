@@ -23,6 +23,7 @@ class result :
 		self.noise_err = 0.
 		self.fluence = 0.
 		self.fluence_err = 0.
+		self.ccd_systerr = 0.
 
 
 	@property
@@ -34,6 +35,7 @@ class result :
 	@property
 	def ccd_err(self) :
 		ccd_err = self.ccd * math.sqrt(self.pulse_height_err**2/self.pulse_height**2 + self.calibration_err**2/self.calibration**2)
+		ccd_err = math.sqrt(ccd_err**2 + self.ccd_systerr**2)
 		return ccd_err
 
 
