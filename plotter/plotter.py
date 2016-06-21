@@ -31,6 +31,7 @@ class plotter(object) :
 			setattr(self, key, value)
 		if not hasattr(self, 'name') :
 			self.name = histo_type
+		self.root_file = self.root_file.replace('RUNNUMBER', '.%d' % self.run_no)
 		self.nstrips = 0
 		self.file_path = self.path + self.root_file
 		self.rand = ROOT.TRandom3(0)
