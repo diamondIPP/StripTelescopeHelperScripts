@@ -197,7 +197,7 @@ class plotter(object) :
 		matrix = False
 
 		with open(path, 'w') as file :
-			file.write('x y data\n')
+			file.write('%s %s data\n' % (self.xTitle, self.yTitle))
 			for ybin in range(yminbin, ymaxbin+1) :
 				ylow = histo.GetYaxis().GetBinLowEdge(ybin)
 				yup  = histo.GetYaxis().GetBinUpEdge(ybin)
