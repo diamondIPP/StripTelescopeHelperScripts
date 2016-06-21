@@ -247,15 +247,15 @@ class plotter(object) :
 					content = histo.GetBinContent(xbin, ybin)
 					if switch :
 						if content != 0. and (content > 17. or True) or True :
-							file.write('%f %f %f\n' % (xlow, ylow, content))
+							file.write('%f %f %f\n' % (xlow * 50./1000., ylow * 50./1000., content))
 						else :
-							file.write('%f %f %s\n' % (xlow, ylow, 'nan'))
+							file.write('%f %f %s\n' % (xlow * 50./1000., ylow * 50./1000., 'nan'))
 					else :
 						if content != 0. :
-							file.write('%f %f %f\n' % (xlow, ylow, content))
-							file.write('%f %f %f\n' % (xlow, yup , content))
-							file.write('%f %f %f\n' % (xup , yup , content))
-							file.write('%f %f %f\n' % (xup , ylow, content))
+							file.write('%f %f %f\n' % (xlow * 50./1000., ylow * 50./1000., content))
+							file.write('%f %f %f\n' % (xlow * 50./1000., yup  * 50./1000., content))
+							file.write('%f %f %f\n' % (xup  * 50./1000., yup  * 50./1000., content))
+							file.write('%f %f %f\n' % (xup  * 50./1000., ylow * 50./1000., content))
 
 
 	def get_histoSlices(self, histo, path) :
