@@ -288,9 +288,9 @@ class plotter(object) :
 		profiles = {}
 		for i in range(1, nybins+1) :
 			cluster_size = histo.GetYaxis().GetBinCenter(i)
-			profiles['%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_%.0f' % cluster_size, i, i, 'o')
+			profiles['%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_%.0f_Dia' % cluster_size, i, i, 'o')
 			if cluster_size > 1 :
-				profiles['1-%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_1-%.0f' % cluster_size, histo.GetYaxis().FindBin(1), i, 'o')
+				profiles['1-%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_1-%.0f_Dia' % cluster_size, histo.GetYaxis().FindBin(1), i, 'o')
 		return profiles
 
 
