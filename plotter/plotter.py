@@ -271,7 +271,7 @@ class plotter(object) :
 			histo.GetFunction('Fitfcn_%s%s' % (self.histo_prefix, self.histo_name)).SetBit(ROOT.TF1.kNotDraw)
 		if self.histo_type == 'PulseHeight' :
 			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
-#		histo.SetDirectory(0)
+		histo.SetDirectory(0)
 		histo_file.Close()
 		return histo
 
