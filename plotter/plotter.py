@@ -29,8 +29,8 @@ class plotter(object) :
 
 		for key, value in self.config.items(histo_type) :
 			setattr(self, key, value)
-		if not hasattr(self, 'name') :
-			self.name = histo_type
+		if not hasattr(self, 'variable') :
+			self.variable = histo_type
 		self.root_file = self.root_file.replace('RUNNUMBER', '.%d' % self.run_no)
 		self.nstrips = 0
 		self.file_path = self.path + self.root_file
@@ -87,7 +87,7 @@ class plotter(object) :
 					self.nstrips = int(projection)
 				print self.nstrips
 				histos = self.add_statistics(slices[projection])
-				self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, slices[projection].GetName()), var = self.name, bin_width = False)
+				self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, slices[projection].GetName()), var = self.variable, bin_width = False)
 			return
 		canvas.Update()
 #		ROOT.gPad.Update()
@@ -123,7 +123,7 @@ class plotter(object) :
 #			ROOT.gStyle.SetOptFit(0)
 #			self.draw_statbox(entries)
 		if self.histo_type != 'FidCut' and self.histo_type != 'TrackPos' :
-			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.histo_name), var = self.name, bin_width = False)
+			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.histo_name), var = self.variable, bin_width = False)
 		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
 		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))
 		return -1.
