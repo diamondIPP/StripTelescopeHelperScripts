@@ -404,6 +404,7 @@ if __name__ == '__main__' :
 		runconfig = ''
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
+	plots.append('PulseHeight_allCluster')
 	plots.append('PulseHeight_BiggestSignalSNRDia')
 	plots.append('PulseHeight_BiggestAdjacentSNRDia')
 	for plane in range(1, 2) :
