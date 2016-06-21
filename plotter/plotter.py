@@ -80,6 +80,18 @@ class plotter(object) :
 #			fid_cut.Dump()
 			canvas.cd()
 			fid_cut.Draw('same')
+		if 'Alignment_Plane2_YPred_DeltaX' in self.histo_type :
+			if 'Post' in self.histo_type :
+				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 3, rebiny = 5, xmin = 3000., ymin = -15., nxbins = 30, nybins = 96, sfx = 0.001, sfy = 1.)
+			else :
+				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 2, xmin = 3000., ymin = -260., nxbins = 32, nybins = 148, sfx = 0.001, sfy = 1.)
+			return
+		if 'Alignment_Plane2_XPred_DeltaY' in self.histo_type :
+			if 'Post' in self.histo_type :
+				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 13, xmin = 3000., ymin = -6.2, nxbins = 30, nybins = 37, sfx = 0.001, sfy = 1.)
+			else :
+				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 2, xmin = 3000., ymin = -540., nxbins = 32, nybins = 148, sfx = 0.001, sfy = 1.)
+			return
 		if self.histo_type == 'PulseHeight_ClusterSize' :
 			processes = ['data', 'stat']
 			slices = self.get_histoSlices(histo, path = self.output_path)
@@ -182,19 +194,32 @@ class plotter(object) :
 
 
 	def save_TH2histo2table(self, histo, path, rebinx = 1, rebiny = 1, xmin = 0., ymin = 0., nxbins = 85, nybins = 85, sfx = 1., sfy = 1.) :
+		print 'x bin width:', histo.GetXaxis().GetBinWidth(1)
+		print 'y bin width:', histo.GetYaxis().GetBinWidth(1)
+		print histo.Integral()
+		print 'max:', histo.GetBinContent(histo.GetMaximumBin())
+		histo.Rebin2D(rebinx, rebiny)
 		nbinsx = histo.GetNbinsX()
 		nbinsy = histo.GetNbinsY()
 		print 'n x bins:', nbinsx
 		print 'n y bins:', nbinsy
-
-		histo.Rebin2D(rebinx, rebiny)
 		print 'x bin min', histo.GetXaxis().FindBin(xmin)
 		print 'y bin min', histo.GetYaxis().FindBin(ymin)
+		print 'x bin width:', histo.GetXaxis().GetBinWidth(1)
+		print 'y bin width:', histo.GetYaxis().GetBinWidth(1)
 		xminbin = histo.GetXaxis().FindBin(xmin)
 		xmaxbin = xminbin + nxbins
 		yminbin = histo.GetYaxis().FindBin(ymin)
 		ymaxbin = yminbin + nybins
+		print 'xbins: %d .. %d' % (xminbin, xmaxbin)
+		print 'ybins: %d .. %d' % (yminbin, ymaxbin)
+		print 'x: %f .. %f' % (histo.GetXaxis().GetBinLowEdge(xminbin), histo.GetXaxis().GetBinUpEdge(xmaxbin))
+		print 'y: %f .. %f' % (histo.GetYaxis().GetBinLowEdge(yminbin), histo.GetYaxis().GetBinUpEdge(ymaxbin))
 		print '%d x %d = %d' % (xmaxbin-xminbin, ymaxbin-yminbin, (xmaxbin-xminbin)*(ymaxbin-yminbin))
+		print 'max:', histo.GetBinContent(histo.GetMaximumBin())
+		if xmaxbin > nbinsx or ymaxbin > nbinsy :
+			print '[ERROR] Check bin settings!'
+			sys.exit(1)
 
 		switch = True
 		matrix = False
@@ -391,6 +416,7 @@ if __name__ == '__main__' :
 		nstrips[plot_name] = cluster_size
 	plots.append('PulseHeight_ClusterSize')
 	plots.append('ClusterSize')
+	plots += ['PreAlignment_Plane2_YPred_DeltaX', 'PostAlignment_Plane2_YPred_DeltaX', 'PreAlignment_Plane2_XPred_DeltaY', 'PostAlignment_Plane2_XPred_DeltaY']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
