@@ -71,7 +71,7 @@ class plotter(object) :
 			pal.SetY1NDC(canvas.GetBottomMargin())
 			pal.SetY2NDC(1. - canvas.GetTopMargin())
 		if self.histo_type == 'FidCut' or self.histo_type == 'TrackPos' :
-			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.histo_name))
+			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.histo_name), rebinx = 4, rebiny = 4, xmin = 48., ymin = 48.)
 			fid_cut = self.get_fidCut()
 			fid_cut.SetLineColor(ROOT.kRed)
 #			fid_cut.Dump()
@@ -178,68 +178,32 @@ class plotter(object) :
 				file.write('%s\n' % lumi_str)
 
 
-	def save_TH2histo2table(self, histo, path) :
+	def save_TH2histo2table(self, histo, path, rebinx = 1, rebiny = 1, xmin = 0., ymin = 0., nxbins = 85, nybins = 85) :
 		nbinsx = histo.GetNbinsX()
 		nbinsy = histo.GetNbinsY()
-#		nbinsx = 51
-#		nbinsy = 101
-		xmin = histo.FindFirstBinAbove(0,1)
-		ymin = histo.FindFirstBinAbove(0,2)
-		xmax = histo.FindLastBinAbove(0,1)
-		ymax = histo.FindLastBinAbove(0,2)
-		
-		xmin = 180
-		xmax = 270
-		ymin = 130
-		ymax = 270
-		
-		xmin = 170
-		xmax = 270
-		ymin = 120
-		ymax = 220
+		print 'n x bins:', nbinsx
+		print 'n y bins:', nbinsy
 
-#		histo.Rebin2D()
-		xmin = 85
-		xmax = 150
-		ymin = 65
-		ymax = 200
-
-#		histo.Rebin2D(3,3)
-		xmin = 50
-		xmax = 130
-		ymin = 40
-		ymax = 130
-
-		xmin = 33
-		xmax = 133
-		ymin = 33
-		ymax = 133
-
-		histo.Rebin2D(4,4)
-		xmin = 25
-		xmax = 110
-		ymin = 25
-		ymax = 110
-
-#		histo.Rebin2D(2,2)
-#		xmin = 25  * 2
-#		xmin = 25  * 2
-#		xmax = 110 * 2
-#		ymin = 25  * 2
-#		ymax = 110 * 2
-		print '%d x %d = %d' % (xmax-xmin, ymax-ymin, (xmax-xmin)*(ymax-ymin))
+		histo.Rebin2D(rebinx, rebiny)
+		print 'x bin min', histo.GetXaxis().FindBin(xmin)
+		print 'y bin min', histo.GetYaxis().FindBin(ymin)
+		xminbin = histo.GetXaxis().FindBin(xmin)
+		xmaxbin = xminbin + nxbins
+		yminbin = histo.GetYaxis().FindBin(ymin)
+		ymaxbin = yminbin + nybins
+		print '%d x %d = %d' % (xmaxbin-xminbin, ymaxbin-yminbin, (xmaxbin-xminbin)*(ymaxbin-yminbin))
 
 		switch = True
 		matrix = False
 
 		with open(path, 'w') as file :
 			file.write('x y data\n')
-			for ybin in range(ymin, ymax+1) :
+			for ybin in range(yminbin, ymaxbin+1) :
 				ylow = histo.GetYaxis().GetBinLowEdge(ybin)
 				yup  = histo.GetYaxis().GetBinUpEdge(ybin)
 				if matrix :
 					ylow = histo.GetYaxis().GetBinCenter(ybin)
-				for xbin in range(xmin, xmax+1) :
+				for xbin in range(xminbin, xmaxbin+1) :
 					xlow = histo.GetXaxis().GetBinLowEdge(xbin)
 					xup  = histo.GetXaxis().GetBinUpEdge(xbin)
 					if matrix :
