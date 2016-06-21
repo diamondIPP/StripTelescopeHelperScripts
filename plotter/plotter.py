@@ -296,14 +296,18 @@ class plotter(object) :
 
 	def get_histo(self) :
 		histo_file = helper.open_rootFile(self.file_path, 'READ')
-		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive('%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix)).Clone()
+		if hasattr(self, 'primitive') :
+			primitive = self.primitive
+		else :
+			primitive = '%s%s%s' % (self.histo_prefix, self.histo_name, self.histo_suffix)
+		histo = histo_file.Get('%s%s' % (self.canvas_prefix, self.histo_name)).GetPrimitive(primitive).Clone()
 
 		# remove functions
 		if not eval(self.fit) and self.histo_type == 'PulseHeight' :
 			histo.GetFunction('Fitfcn_%s%s' % (self.histo_prefix, self.histo_name)).SetBit(ROOT.TF1.kNotDraw)
 		if self.histo_type == 'PulseHeight' :
 			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
-		histo.SetDirectory(0)
+#		histo.SetDirectory(0)
 		histo_file.Close()
 		return histo
 
