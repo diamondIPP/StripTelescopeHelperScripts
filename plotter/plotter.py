@@ -25,7 +25,6 @@ class plotter(object) :
 		else : self.path += '/'
 		if not output_path.endswith('/') : output_path += '/'
 		self.output_path = '%s%s/' % (output_path, self.run_no)
-		helper.mkdir(self.output_path)
 		rd42Style()
 
 		for key, value in self.config.items(histo_type) :
@@ -34,6 +33,10 @@ class plotter(object) :
 			self.name = self.histo_name
 		if not hasattr(self, 'variable') :
 			self.variable = histo_type
+		if hasattr(self, 'output_dir') :
+			self.output_path += self.output_dir
+			if not self.output_path.endswith('/') : self.output_path += '/'
+		helper.mkdir(self.output_path)
 		self.root_file = self.root_file.replace('RUNNUMBER', '.%d' % self.run_no)
 		self.nstrips = 0
 		self.file_path = self.path + self.root_file
