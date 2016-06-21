@@ -405,6 +405,8 @@ if __name__ == '__main__' :
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
 	plots.append('PulseHeight_allCluster')
+
+	# signal-to-noise plots
 	plots.append('PulseHeight_BiggestSignalSNRDia')
 	plots.append('PulseHeight_BiggestAdjacentSNRDia')
 	for plane in range(1, 2) :
@@ -413,6 +415,7 @@ if __name__ == '__main__' :
 			plots.append(histo_name)
 			histo_name = 'PulseHeight_BiggestAdjacentSNRD%d%s' % (plane, coord)
 			plots.append(histo_name)
+
 	nstrips = {}
 
 	# clustering pulse height plots silicon
@@ -424,12 +427,18 @@ if __name__ == '__main__' :
 			plot_name = 'PulseHeight_Cluster1-%d_D1X' % cluster_size
 			plots.append(plot_name)
 			nstrips[plot_name] = cluster_size
+
+	# transparent pulse height plots
 	for cluster_size in range(1, 11) :
 		plot_name = 'PulseHeight_%dStrips' % cluster_size
 		plots.append(plot_name)
 		nstrips[plot_name] = cluster_size
+
+	# clustering pulse height plots
 	plots.append('PulseHeight_ClusterSize')
 	plots.append('ClusterSize')
+
+	# alignment plots
 	plots += ['PreAlignment_Plane2_YPred_DeltaX', 'PostAlignment_Plane2_YPred_DeltaX', 'PreAlignment_Plane2_XPred_DeltaY', 'PostAlignment_Plane2_XPred_DeltaY']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
