@@ -137,7 +137,7 @@ class plotter(object) :
 			for i in [0, 1, 2] :
 				histos['fit'].SetBinContent(i+2, fit.GetParameter(i))
 				histos['fit'].SetBinError  (i+2  , fit.GetParError(i))
-			if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) :
+			if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) and self.det_type == 'Dia' :
 				histos['fit'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
 				histos['fit'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
 			processes.append('fit')
@@ -312,7 +312,7 @@ class plotter(object) :
 		histos['stat'].SetBinError  (3, histo.GetRMSError())
 		histos['stat'].SetBinContent(4, histo.Integral())
 		histos['stat'].SetBinContent(7, self.nstrips)
-		if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) :
+		if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) and self.det_type == 'Dia' :
 			histos['stat'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
 			histos['stat'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
 			histos['stat'].SetBinContent(6, eval(self.run_config.get('%d' % self.run_no, 'fluence'    )))
