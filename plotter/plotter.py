@@ -53,6 +53,7 @@ class plotter(object) :
 
 
 	def plot(self) :
+		print '[status] plotting %s..' % self.name
 		rd42Style()
 		if self.histo_type == 'PulseHeight' :
 			ROOT.gStyle.SetOptStat('m')
