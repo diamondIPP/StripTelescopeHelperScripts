@@ -404,7 +404,7 @@ if __name__ == '__main__' :
 		runconfig = ''
 
 	plots = ['FidCut', 'PulseHeight', 'Noise']
-	plots.append('PulseHeight_allCluster')
+#	plots.append('PulseHeight_allCluster')
 
 	# signal-to-noise plots
 	plots.append('PulseHeight_BiggestSignalSNRDia')
@@ -423,10 +423,10 @@ if __name__ == '__main__' :
 		plot_name = 'PulseHeight_Cluster%d_D1X' % cluster_size
 		plots.append(plot_name)
 		nstrips[plot_name] = cluster_size
-		if cluster_size > 1 :
-			plot_name = 'PulseHeight_Cluster1-%d_D1X' % cluster_size
-			plots.append(plot_name)
-			nstrips[plot_name] = cluster_size
+#		if cluster_size > 1 :
+#			plot_name = 'PulseHeight_Cluster1-%d_D1X' % cluster_size
+#			plots.append(plot_name)
+#			nstrips[plot_name] = cluster_size
 
 	# transparent pulse height plots
 	for cluster_size in range(1, 11) :
