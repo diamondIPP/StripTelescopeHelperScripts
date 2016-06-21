@@ -414,6 +414,16 @@ if __name__ == '__main__' :
 			histo_name = 'PulseHeight_BiggestAdjacentSNRD%d%s' % (plane, coord)
 			plots.append(histo_name)
 	nstrips = {}
+
+	# clustering pulse height plots silicon
+	for cluster_size in range(1, 4) :
+		plot_name = 'PulseHeight_Cluster%d_D1X' % cluster_size
+		plots.append(plot_name)
+		nstrips[plot_name] = cluster_size
+		if cluster_size > 1 :
+			plot_name = 'PulseHeight_Cluster1-%d_D1X' % cluster_size
+			plots.append(plot_name)
+			nstrips[plot_name] = cluster_size
 	for cluster_size in range(1, 11) :
 		plot_name = 'PulseHeight_%dStrips' % cluster_size
 		plots.append(plot_name)
