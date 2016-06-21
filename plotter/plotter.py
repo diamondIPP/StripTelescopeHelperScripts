@@ -6,6 +6,7 @@ import ConfigParser
 from rd42Style import rd42Style
 import helper
 import roundNumbers as rn
+import numpy as np
 
 
 class plotter(object) :
@@ -222,6 +223,24 @@ class plotter(object) :
 							file.write('%f %f %f\n' % (xlow * sfx, yup  * sfy, content))
 							file.write('%f %f %f\n' % (xup  * sfx, yup  * sfy, content))
 							file.write('%f %f %f\n' % (xup  * sfx, ylow * sfy, content))
+
+
+	def save_graph2table(self, graph, path) :
+		nentries = graph.GetN()
+		print nentries
+		x_tmp = np.zeros(1, dtype=float)
+		y_tmp = np.zeros(1, dtype=float)
+		x = []
+		y = []
+		for i in range(nentries) :
+			graph.GetPoint(i, x_tmp, y_tmp)
+			x.append(x_tmp[0])
+			y.append(y_tmp[0])
+
+		with open(path, 'w') as file :
+			file.write('x, y\n')
+			for i in range(nentries) :
+				file.write('%f, %f\n' % (x[i], y[i]))
 
 
 	def get_histoSlices(self, histo, path) :
