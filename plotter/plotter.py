@@ -12,6 +12,7 @@ import numpy as np
 class plotter(object) :
 
 	def __init__(self, config_file, path, output_path, run_no, position, histo_type, run_config_file = '') :
+		self.config_file = config_file
 		self.config = ConfigParser.ConfigParser()
 		self.config.optionxform = str # case sensitive options
 		self.config.read(config_file)
@@ -36,6 +37,8 @@ class plotter(object) :
 		if hasattr(self, 'output_dir') :
 			self.output_path += self.output_dir
 			if not self.output_path.endswith('/') : self.output_path += '/'
+		if hasattr(self, 'rebin') :
+			self.rebin = int(self.rebin)
 		helper.mkdir(self.output_path)
 		self.root_file = self.root_file.replace('RUNNUMBER', '.%d' % self.run_no)
 		self.nstrips = 0
@@ -59,6 +62,15 @@ class plotter(object) :
 #		ROOT.gStyle.SetCanvasDefW(1200)
 		canvas = ROOT.TCanvas('%s_%s' % (self.name, self.rand.Integer(10000)), 'canvas')
 		histo = self.get_histo()
+		if 'PulseHeight_Cluster1-' in self.histo_type :
+			for i in range(1, self.nstrips) :
+				if self.position != '' :
+					path_tmp = self.path.rstrip('%d/%s/' % (self.run_no, self.position))
+				else :
+					path_tmp = self.path.rstrip('%d/' % self.run_no)
+				pl = plotter(self.config_file, path_tmp, self.output_path.rstrip('%d' % self.run_no), self.run_no, self.position, 'PulseHeight_Cluster%d_%s' % (i, self.histo_type.split('_')[-1]), self.run_config_file)
+				histo_tmp = pl.get_histo()
+				histo.Add(histo_tmp)
 		canvas.cd()
 		histo.Draw(self.draw_opt)
 		histo.GetXaxis().SetTitle(self.xTitle)
@@ -283,6 +295,7 @@ class plotter(object) :
 
 
 	def add_statistics(self, histo) :
+		print 'histo %f .. %f with %d bins' % (histo.GetBinLowEdge(1), histo.GetXaxis().GetBinUpEdge(histo.GetNbinsX()), histo.GetNbinsX())
 		histos = {}
 		histos['data'] = histo
 		res = {}
@@ -321,6 +334,8 @@ class plotter(object) :
 		if self.histo_type == 'PulseHeight' :
 			histo.GetFunction('fMeanCalculationArea').SetBit(ROOT.TF1.kNotDraw)
 		histo.SetDirectory(0)
+		if hasattr(self, 'rebin') :
+			histo.Rebin(self.rebin)
 		histo_file.Close()
 		return histo
 
@@ -423,8 +438,10 @@ if __name__ == '__main__' :
 		plot_name = 'PulseHeight_Cluster%d_D1X' % cluster_size
 		plots.append(plot_name)
 		nstrips[plot_name] = cluster_size
-#		if cluster_size > 1 :
-#			plot_name = 'PulseHeight_Cluster1-%d_D1X' % cluster_size
+		if cluster_size > 1 :
+			plot_name = 'PulseHeight_Cluster1-%d_D1X' % cluster_size
+			plots.append(plot_name)
+			nstrips[plot_name] = cluster_size
 #			plots.append(plot_name)
 #			nstrips[plot_name] = cluster_size
 
