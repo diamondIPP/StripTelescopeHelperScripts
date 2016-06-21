@@ -29,6 +29,8 @@ class plotter(object) :
 
 		for key, value in self.config.items(histo_type) :
 			setattr(self, key, value)
+		if not hasattr(self, 'name') :
+			self.name = self.histo_name
 		if not hasattr(self, 'variable') :
 			self.variable = histo_type
 		self.root_file = self.root_file.replace('RUNNUMBER', '.%d' % self.run_no)
@@ -51,7 +53,7 @@ class plotter(object) :
 			ROOT.gStyle.SetOptFit(01111)
 #		ROOT.gStyle.SetDrawOption('colz')
 #		ROOT.gStyle.SetCanvasDefW(1200)
-		canvas = ROOT.TCanvas('%s_%s' % (self.histo_name, self.rand.Integer(10000)), 'canvas')
+		canvas = ROOT.TCanvas('%s_%s' % (self.name, self.rand.Integer(10000)), 'canvas')
 		histo = self.get_histo()
 		canvas.cd()
 		histo.Draw(self.draw_opt)
@@ -71,7 +73,7 @@ class plotter(object) :
 			pal.SetY1NDC(canvas.GetBottomMargin())
 			pal.SetY2NDC(1. - canvas.GetTopMargin())
 		if self.histo_type == 'FidCut' or self.histo_type == 'TrackPos' :
-			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.histo_name), rebinx = 4, rebiny = 4, xmin = 48., ymin = 48., sfx = 0.05, sfy = 0.05)
+			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 4, xmin = 48., ymin = 48., sfx = 0.05, sfy = 0.05)
 			fid_cut = self.get_fidCut()
 			fid_cut.SetLineColor(ROOT.kRed)
 #			fid_cut.Dump()
@@ -123,9 +125,9 @@ class plotter(object) :
 #			ROOT.gStyle.SetOptFit(0)
 #			self.draw_statbox(entries)
 		if self.histo_type != 'FidCut' and self.histo_type != 'TrackPos' :
-			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.histo_name), var = self.variable, bin_width = False)
-		canvas.Print('%s%s.pdf' % (self.output_path, self.histo_name))
-		canvas.Print('%s%s.tex' % (self.output_path, self.histo_name))
+			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.name), var = self.variable, bin_width = False)
+		canvas.Print('%s%s.pdf' % (self.output_path, self.name))
+		canvas.Print('%s%s.tex' % (self.output_path, self.name))
 		return -1.
 
 
@@ -240,7 +242,7 @@ class plotter(object) :
 		res['mean'    ] = histo.GetMean()
 		res['mean_err'] = histo.GetMeanError()
 		print 'Mean: %f' % res['mean']
-		helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, self.histo_name))
+		helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, self.name))
 		histos['stat'] = ROOT.TH1F('%s_stat' % self.histo_type, 'stat', histo.GetNbinsX(), 0., 1.)
 		histos['stat'].SetBinContent(1, self.run_no    )
 		histos['stat'].SetBinError  (1, 0              )
