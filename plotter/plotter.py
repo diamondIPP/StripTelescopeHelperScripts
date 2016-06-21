@@ -71,7 +71,7 @@ class plotter(object) :
 			pal.SetY1NDC(canvas.GetBottomMargin())
 			pal.SetY2NDC(1. - canvas.GetTopMargin())
 		if self.histo_type == 'FidCut' or self.histo_type == 'TrackPos' :
-			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.histo_name), rebinx = 4, rebiny = 4, xmin = 48., ymin = 48.)
+			self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.histo_name), rebinx = 4, rebiny = 4, xmin = 48., ymin = 48., sfx = 0.05, sfy = 0.05)
 			fid_cut = self.get_fidCut()
 			fid_cut.SetLineColor(ROOT.kRed)
 #			fid_cut.Dump()
@@ -178,7 +178,7 @@ class plotter(object) :
 				file.write('%s\n' % lumi_str)
 
 
-	def save_TH2histo2table(self, histo, path, rebinx = 1, rebiny = 1, xmin = 0., ymin = 0., nxbins = 85, nybins = 85) :
+	def save_TH2histo2table(self, histo, path, rebinx = 1, rebiny = 1, xmin = 0., ymin = 0., nxbins = 85, nybins = 85, sfx = 1., sfy = 1.) :
 		nbinsx = histo.GetNbinsX()
 		nbinsy = histo.GetNbinsY()
 		print 'n x bins:', nbinsx
@@ -211,15 +211,15 @@ class plotter(object) :
 					content = histo.GetBinContent(xbin, ybin)
 					if switch :
 						if content != 0. and (content > 17. or True) or True :
-							file.write('%f %f %f\n' % (xlow * 50./1000., ylow * 50./1000., content))
+							file.write('%f %f %f\n' % (xlow * sfx, ylow * sfy, content))
 						else :
-							file.write('%f %f %s\n' % (xlow * 50./1000., ylow * 50./1000., 'nan'))
+							file.write('%f %f %s\n' % (xlow * sfx, ylow * sfy, 'nan'))
 					else :
 						if content != 0. :
-							file.write('%f %f %f\n' % (xlow * 50./1000., ylow * 50./1000., content))
-							file.write('%f %f %f\n' % (xlow * 50./1000., yup  * 50./1000., content))
-							file.write('%f %f %f\n' % (xup  * 50./1000., yup  * 50./1000., content))
-							file.write('%f %f %f\n' % (xup  * 50./1000., ylow * 50./1000., content))
+							file.write('%f %f %f\n' % (xlow * sfx, ylow * sfy, content))
+							file.write('%f %f %f\n' % (xlow * sfx, yup  * sfy, content))
+							file.write('%f %f %f\n' % (xup  * sfx, yup  * sfy, content))
+							file.write('%f %f %f\n' % (xup  * sfx, ylow * sfy, content))
 
 
 	def get_histoSlices(self, histo, path) :
