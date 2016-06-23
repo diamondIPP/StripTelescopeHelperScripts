@@ -37,9 +37,9 @@ class plotter(object) :
 		if hasattr(self, 'output_dir') :
 			self.output_path += self.output_dir
 			if not self.output_path.endswith('/') : self.output_path += '/'
+		helper.mkdir(self.output_path)
 		if hasattr(self, 'rebin') :
 			self.rebin = int(self.rebin)
-		helper.mkdir(self.output_path)
 		self.root_file = self.root_file.replace('RUNNUMBER', '.%d' % self.run_no)
 		self.nstrips = 0
 		self.file_path = self.path + self.root_file
