@@ -311,7 +311,7 @@ class plotter(object) :
 		res['mean_err'] = histo.GetMeanError()
 		print 'Mean: %f' % res['mean']
 		helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, pkl_name))
-		histos['stat'] = ROOT.TH1F('%s_stat' % self.histo_type, 'stat', histo.GetNbinsX(), 0., 1.)
+		histos['stat'] = ROOT.TH1F('%s_stat' % pkl_name, 'stat', histo.GetNbinsX(), 0., 1.)
 		histos['stat'].SetBinContent(1, self.run_no    )
 		histos['stat'].SetBinError  (1, 0              )
 		histos['stat'].SetBinContent(2, res['mean'    ])
