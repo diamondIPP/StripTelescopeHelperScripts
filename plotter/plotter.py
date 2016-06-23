@@ -117,7 +117,7 @@ class plotter(object) :
 				else :
 					self.nstrips = int(projection)
 				print self.nstrips
-				histos = self.add_statistics(slices[projection])
+				histos = self.add_statistics(slices[projection], slices[projection].GetName())
 				self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, slices[projection].GetName()), var = self.variable, bin_width = False)
 			return
 		canvas.Update()
@@ -295,15 +295,16 @@ class plotter(object) :
 		return profiles
 
 
-	def add_statistics(self, histo) :
+	def add_statistics(self, histo, pkl_name = None) :
 		print 'histo %f .. %f with %d bins' % (histo.GetBinLowEdge(1), histo.GetXaxis().GetBinUpEdge(histo.GetNbinsX()), histo.GetNbinsX())
+		if pkl_name == None : pkl_name = self.name
 		histos = {}
 		histos['data'] = histo
 		res = {}
 		res['mean'    ] = histo.GetMean()
 		res['mean_err'] = histo.GetMeanError()
 		print 'Mean: %f' % res['mean']
-		helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, self.name))
+		helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, pkl_name))
 		histos['stat'] = ROOT.TH1F('%s_stat' % self.histo_type, 'stat', histo.GetNbinsX(), 0., 1.)
 		histos['stat'].SetBinContent(1, self.run_no    )
 		histos['stat'].SetBinError  (1, 0              )
