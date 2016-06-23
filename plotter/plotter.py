@@ -182,9 +182,15 @@ class plotter(object) :
 			for bin in range(1, nbins+1) :
 				file.write('%f\t%f' % (histos[processes[0]].GetXaxis().GetBinLowEdge(bin), histos[processes[0]].GetXaxis().GetBinCenter(bin)))
 				for process in processes :
-					file.write('\t%f' % histos[process].GetBinContent(bin))
+					if process == 'stat' and bin == 6 :
+						file.write('\t%e' % (histos[process].GetBinContent(bin)*1e15))
+					else :
+						file.write('\t%f' % histos[process].GetBinContent(bin))
 				for process in processes :
-					file.write('\t%f' % histos[process].GetBinError(bin))
+					if process == 'stat' and bin == 6 :
+						file.write('\t%e' % (histos[process].GetBinError(bin)*1e15))
+					else :
+						file.write('\t%f' % histos[process].GetBinError(bin))
 				if asymmErr != False :
 					for process in asymmErr :
 						file.write('\t%f' % histos_tmp[process].GetBinErrorUp(bin))
@@ -317,8 +323,8 @@ class plotter(object) :
 		if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) and self.det_type == 'Dia' :
 			histos['stat'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
 			histos['stat'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
-			histos['stat'].SetBinContent(6, eval(self.run_config.get('%d' % self.run_no, 'fluence'    )))
-			histos['stat'].SetBinError  (6, eval(self.run_config.get('%d' % self.run_no, 'fluence_err')))
+			histos['stat'].SetBinContent(6, eval(self.run_config.get('%d' % self.run_no, 'fluence'    ))/1e15)
+			histos['stat'].SetBinError  (6, eval(self.run_config.get('%d' % self.run_no, 'fluence_err'))/1e15)
 		return histos
 
 
