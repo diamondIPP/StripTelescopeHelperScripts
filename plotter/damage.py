@@ -70,7 +70,7 @@ class irr_results :
 					sys.exit(1)
 				setattr(run, res, eval(run_file.get(run_number, res)))
 			runs[run_number] = run
-			ph_file = '%s%s/DiaTranspAnaPulseHeightOf2HighestIn10Strips_mean.pkl' % (self.input_path, run_number)
+			ph_file = '%s%s/transparent/PulseHeight_nStrips_2in10_mean.pkl' % (self.input_path, run_number)
 #			pulse_height = helper.load_object('Mar23/%s/DiaTranspAnaPulseHeightOf2HighestIn10Strips_mean.pkl' % run_number)
 			pulse_height = helper.load_object(ph_file)
 			run.pulse_height     = pulse_height['mean']
