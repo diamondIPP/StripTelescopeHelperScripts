@@ -19,6 +19,8 @@ class result :
 		self.calibration_err = 0.
 		self.pulse_height = 0.
 		self.pulse_height_err = 0.
+		self.pulse_height_clustering = 0.
+		self.pulse_height_clustering_err = 0.
 		self.noise = 0.
 		self.noise_err = 0.
 		self.fluence = 0.
@@ -71,11 +73,15 @@ class irr_results :
 				setattr(run, res, eval(run_file.get(run_number, res)))
 			runs[run_number] = run
 			ph_file = '%s%s/transparent/PulseHeight_nStrips_2in10_mean.pkl' % (self.input_path, run_number)
-#			pulse_height = helper.load_object('Mar23/%s/DiaTranspAnaPulseHeightOf2HighestIn10Strips_mean.pkl' % run_number)
 			pulse_height = helper.load_object(ph_file)
 			run.pulse_height     = pulse_height['mean']
 #			run.pulse_height_err = pulse_height['mean_err']
 			run.pulse_height_err = run.noise
+			ph_file_clustering = '%s%s/clustering/PulseHeight_ClusterSize_1-2_Dia_mean.pkl' % (self.input_path, run_number)
+			pulse_height_clustering = helper.load_object(ph_file_clustering)
+			run.pulse_height_clustering     = pulse_height_clustering['mean']
+#			run.pulse_height_clustering_err = pulse_height_clustering['mean_err']
+			run.pulse_height_clustering_err = run.noise
 
 		return runs
 
