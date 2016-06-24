@@ -22,7 +22,7 @@ class results(object) :
 	def get_results(self, runs) :
 		'''get plots and results for a list of runs'''
 
-		plots = ['TrackPos', 'FidCut', 'PulseHeight', 'Noise']
+		plots = ['TrackPos', 'FidCut', 'PulseHeight', 'Noise', 'PulseHeight_BiggestSignalSNRDia', 'PulseHeight_BiggestAdjacentSNRDia', 'PulseHeight_ClusterSize', 'ClusterSize']
 		results = {}
 		for run in runs :
 			results[run['number']] = {}
