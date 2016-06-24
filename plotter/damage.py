@@ -72,16 +72,26 @@ class irr_results :
 					sys.exit(1)
 				setattr(run, res, eval(run_file.get(run_number, res)))
 			runs[run_number] = run
-			ph_file = '%s%s/transparent/PulseHeight_nStrips_2in10_mean.pkl' % (self.input_path, run_number)
+
+			# get noise
+			noise_file = '%s%s/noise/Noise_NonHitChannels_Dia_stat.pkl' % (self.input_path, run_number)
+			noise = helper.load_object(noise_file)
+			run.noise     = noise['sigma']
+			run.noise_err = noise['sigma_err']
+
+			# get pulse height
+			ph_file = '%s%s/transparent/PulseHeight_nStrips_2in10_stat.pkl' % (self.input_path, run_number)
 			pulse_height = helper.load_object(ph_file)
 			run.pulse_height     = pulse_height['mean']
-#			run.pulse_height_err = pulse_height['mean_err']
-			run.pulse_height_err = run.noise
-			ph_file_clustering = '%s%s/clustering/PulseHeight_ClusterSize_1-2_Dia_mean.pkl' % (self.input_path, run_number)
+			run.pulse_height_err = pulse_height['mean_err']
+#			run.pulse_height_err = run.noise
+
+			# get clustered pulse height
+			ph_file_clustering = '%s%s/clustering/PulseHeight_ClusterSize_1-2_Dia_stat.pkl' % (self.input_path, run_number)
 			pulse_height_clustering = helper.load_object(ph_file_clustering)
 			run.pulse_height_clustering     = pulse_height_clustering['mean']
-#			run.pulse_height_clustering_err = pulse_height_clustering['mean_err']
-			run.pulse_height_clustering_err = run.noise
+			run.pulse_height_clustering_err = pulse_height_clustering['mean_err']
+#			run.pulse_height_clustering_err = run.noise
 
 		return runs
 
