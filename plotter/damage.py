@@ -99,7 +99,7 @@ class irr_results :
 	def write_table(self) :
 		ccd_fit = self.fit()
 		with open('%sdamage.dat' % self.path, 'w') as file :
-			file.write('  run, polarity, voltage, calibration, calibration_err, pulse_height, pulse_height_err,   fluence, fluence_err,        ccd,  ccd_err,          fit,      fit_err\n')
+			file.write('  run, polarity, voltage, calibration, calibration_err,    noise, pulse_height, pulse_height_err, pulse_height_clustering, pulse_height_clustering_err,   fluence, fluence_err,        ccd,   ccd_err,          fit,      fit_err\n')
 #			for run in ['16001', '16005', '16303', '16307', '17101', '17104', '17208', '17211'] :
 			for i, run in enumerate(self.runs_list) :
 				if   self.runs[run].voltage > 0. : polarity = 'positive'
@@ -110,14 +110,17 @@ class irr_results :
 				else :
 					fit     = 0.
 					fit_err = 0.
-				file.write('%s, %s, %+7d, %11.2f, %15.2f, %12f, %16f, %9.3e, %11.3e, %f, %f, %e, %e\n' % (
+				file.write('%s, %s, %+7d, %11.2f, %15.2f, %f, %12f, %16f, %23f, %27f, %9.3e, %11.3e, %f, %f, %e, %e\n' % (
 					run,
 					polarity,
 					self.runs[run].voltage,
 					self.runs[run].calibration,
 					self.runs[run].calibration_err,
+					self.runs[run].noise,
 					self.runs[run].pulse_height,
 					self.runs[run].pulse_height_err,
+					self.runs[run].pulse_height_clustering,
+					self.runs[run].pulse_height_clustering_err,
 					self.runs[run].fluence,
 					self.runs[run].fluence_err,
 					self.runs[run].ccd,
