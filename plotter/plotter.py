@@ -129,19 +129,9 @@ class plotter(object) :
 			histos = self.add_statistics(histo)
 			processes.append('stat')
 		elif self.return_value == 'sigma' :
-			histos = {}
-			histos['data'] = histo
 			fit = histo.GetListOfFunctions().FindObject('histofitx')
-			histos['fit'] = ROOT.TH1F('%s_fit' % self.histo_type, 'fit', histo.GetNbinsX(), 0., 1.)
-			histos['fit'].SetBinContent(1, self.run_no)
-			histos['fit'].SetBinError  (1, 0          )
-			for i in [0, 1, 2] :
-				histos['fit'].SetBinContent(i+2, fit.GetParameter(i))
-				histos['fit'].SetBinError  (i+2  , fit.GetParError(i))
-			if self.run_config_file != '' and self.run_config.has_section('%d' % self.run_no) and self.det_type == 'Dia' :
-				histos['fit'].SetBinContent(5, eval(self.run_config.get('%d' % self.run_no, 'calibration'    )))
-				histos['fit'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
-			processes.append('fit')
+			histos = self.add_statistics(histo, fit = fit)
+			processes.append('stat')
 			mean  = (fit.GetParameter(1), fit.GetParError(1))
 			sigma = (fit.GetParameter(2), fit.GetParError(2))
 			print 'Mean : %s +- %s' % rn.get_roundedNumber(*mean )
@@ -301,7 +291,7 @@ class plotter(object) :
 		return profiles
 
 
-	def add_statistics(self, histo, pkl_name = None) :
+	def add_statistics(self, histo, pkl_name = None, fit = None) :
 		print 'histo %f .. %f with %d bins' % (histo.GetBinLowEdge(1), histo.GetXaxis().GetBinUpEdge(histo.GetNbinsX()), histo.GetNbinsX())
 		if pkl_name == None : pkl_name = self.name
 		histos = {}
@@ -310,7 +300,6 @@ class plotter(object) :
 		res['mean'    ] = histo.GetMean()
 		res['mean_err'] = histo.GetMeanError()
 		print 'Mean: %f' % res['mean']
-		helper.save_object(res, '%s%s_mean.pkl' % (self.output_path, pkl_name))
 		histos['stat'] = ROOT.TH1F('%s_stat' % pkl_name, 'stat', histo.GetNbinsX(), 0., 1.)
 		histos['stat'].SetBinContent(1, self.run_no    )
 		histos['stat'].SetBinError  (1, 0              )
@@ -325,6 +314,17 @@ class plotter(object) :
 			histos['stat'].SetBinError  (5, eval(self.run_config.get('%d' % self.run_no, 'calibration_err')))
 			histos['stat'].SetBinContent(6, eval(self.run_config.get('%d' % self.run_no, 'fluence'    ))/1e15)
 			histos['stat'].SetBinError  (6, eval(self.run_config.get('%d' % self.run_no, 'fluence_err'))/1e15)
+		if fit != None :
+			for i in [0, 1, 2] :
+				histos['stat'].SetBinContent(i+10, fit.GetParameter(i))
+				histos['stat'].SetBinError  (i+10, fit.GetParError(i))
+			res['sigma'    ] = fit.GetParameter(2)
+			res['sigma_err'] = fit.GetParError(2)
+			mean  = (fit.GetParameter(1), fit.GetParError(1))
+			sigma = (fit.GetParameter(2), fit.GetParError(2))
+			print 'Mean : %s +- %s' % rn.get_roundedNumber(*mean )
+			print 'Sigma: %s +- %s' % rn.get_roundedNumber(*sigma)
+		helper.save_object(res, '%s%s_stat.pkl' % (self.output_path, pkl_name))
 		return histos
 
 
