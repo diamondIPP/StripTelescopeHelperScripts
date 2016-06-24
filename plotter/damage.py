@@ -147,11 +147,14 @@ class irr_results :
 
 		# fit function
 		ccd_fit = ROOT.TF1('ccd_fit', '[0]/(1+[1]*[0]*x)', 0, 8e15)
-		ccd_fit.FixParameter(0, ccd[0])
+#		ccd_fit.FixParameter(0, ccd[0])
+		ccd_fit.SetParLimits(0, 300, 800)
 		ccd_fit.SetParLimits(1, 1e-19, 1e-17)
 
 		# fit
 		gr.Fit('ccd_fit')
+
+		print ccd_fit.GetParameter(0), ccd_fit.GetParError(0), ccd_fit.GetNpar()
 
 		return ccd_fit
 
