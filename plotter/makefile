@@ -31,6 +31,10 @@ clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-3_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-4_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-5_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1_Dia.dat
+clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_2_Dia.dat
+clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_3_Dia.dat
+clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_4_Dia.dat
+clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_5_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/ClusterSize_Dia.dat
 clustering_diamond : clustering_final
 clustering_final : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-2_Dia.dat
