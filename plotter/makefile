@@ -36,6 +36,8 @@ clustering_diamond : clustering_final
 clustering_final : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-2_Dia.dat
 signal-to-noise_diamond : $(CLUSTERINGDIR)/PulseHeight_BiggestAdjacentInSigma_Dia.dat
 signal-to-noise_diamond : $(CLUSTERINGDIR)/PulseHeight_BiggestSignalInSigma_Dia.dat
+eta_diamond : $(CLUSTERINGDIR)/Eta_Dia.dat
+eta_diamond : $(CLUSTERINGDIR)/EtaIntegral_Dia.dat
 
 # selection
 selection : $(SELECTIONDIR)/TrackPosition_OneAndOnlyOneSiCluster.dat

@@ -463,6 +463,7 @@ if __name__ == '__main__' :
 
 	# alignment plots
 	plots += ['PreAlignment_Plane2_YPred_DeltaX', 'PostAlignment_Plane2_YPred_DeltaX', 'PreAlignment_Plane2_XPred_DeltaY', 'PostAlignment_Plane2_XPred_DeltaY']
+	plots += ['Eta_Dia', 'EtaIntegral_Dia']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
