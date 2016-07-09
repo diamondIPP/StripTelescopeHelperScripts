@@ -108,9 +108,11 @@ class plotter(object) :
 			else :
 				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 2, xmin = 3000., ymin = -540., nxbins = 32, nybins = 148, sfx = 0.001, sfy = 1.)
 			return
-		if self.histo_type == 'PulseHeight_ClusterSize' :
+		if self.histo_type == 'PulseHeight_ClusterSize' or self.histo_type == 'Eta_Dia_Area' :
 			processes = ['data', 'stat']
 			slice_name = self.histo_type
+			if self.histo_type == 'Eta_Dia_Area' :
+				slice_name = 'Eta_Area'
 			slices = self.get_histoSlices(histo, path = self.output_path, slice_name = slice_name)
 			for projection in slices :
 				if '-' in projection :
@@ -465,6 +467,7 @@ if __name__ == '__main__' :
 	# alignment plots
 	plots += ['PreAlignment_Plane2_YPred_DeltaX', 'PostAlignment_Plane2_YPred_DeltaX', 'PreAlignment_Plane2_XPred_DeltaY', 'PostAlignment_Plane2_XPred_DeltaY']
 	plots += ['Eta_Dia', 'EtaIntegral_Dia']
+#	plots += ['Eta_Dia_Area',]
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
