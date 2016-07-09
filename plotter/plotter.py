@@ -110,7 +110,8 @@ class plotter(object) :
 			return
 		if self.histo_type == 'PulseHeight_ClusterSize' :
 			processes = ['data', 'stat']
-			slices = self.get_histoSlices(histo, path = self.output_path)
+			slice_name = self.histo_type
+			slices = self.get_histoSlices(histo, path = self.output_path, slice_name = slice_name)
 			for projection in slices :
 				if '-' in projection :
 					self.nstrips = int(projection.lstrip('1-'))
@@ -280,14 +281,14 @@ class plotter(object) :
 				file.write('%f, %f\n' % (x[i], y[i]))
 
 
-	def get_histoSlices(self, histo, path) :
+	def get_histoSlices(self, histo, path, slice_name = 'PulseHeight_ClusterSize', slice_name_suffix = 'Dia') :
 		nybins = histo.GetNbinsY()
 		profiles = {}
 		for i in range(1, nybins+1) :
 			cluster_size = histo.GetYaxis().GetBinCenter(i)
-			profiles['%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_%.0f_Dia' % cluster_size, i, i, 'o')
+			profiles['%.0f' % cluster_size] = histo.ProjectionX('%s_%.0f_%s' % (slice_name, cluster_size, slice_name_suffix), i, i, 'o')
 			if cluster_size > 1 :
-				profiles['1-%.0f' % cluster_size] = histo.ProjectionX('PulseHeight_ClusterSize_1-%.0f_Dia' % cluster_size, histo.GetYaxis().FindBin(1), i, 'o')
+				profiles['1-%.0f' % cluster_size] = histo.ProjectionX('%s_1-%.0f_%s' % (slice_name, cluster_size, slice_name_suffix), histo.GetYaxis().FindBin(1), i, 'o')
 		return profiles
 
 
