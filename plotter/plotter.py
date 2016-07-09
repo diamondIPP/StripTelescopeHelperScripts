@@ -100,7 +100,7 @@ class plotter(object) :
 			if 'Post' in self.histo_type :
 				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 3, rebiny = 5, xmin = 3000., ymin = -15., nxbins = 30, nybins = 96, sfx = 0.001, sfy = 1.)
 			else :
-				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 2, xmin = 3000., ymin = -260., nxbins = 32, nybins = 148, sfx = 0.001, sfy = 1.)
+				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 2, xmin = 3000., ymin = -260., nxbins = 32, nybins = 146, sfx = 0.001, sfy = 1.)
 			return
 		if 'Alignment_Plane2_XPred_DeltaY' in self.histo_type :
 			if 'Post' in self.histo_type :
