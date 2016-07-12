@@ -468,6 +468,7 @@ if __name__ == '__main__' :
 	plots += ['PreAlignment_Plane2_YPred_DeltaX', 'PostAlignment_Plane2_YPred_DeltaX', 'PreAlignment_Plane2_XPred_DeltaY', 'PostAlignment_Plane2_XPred_DeltaY']
 	plots += ['Eta_Dia', 'EtaIntegral_Dia']
 #	plots += ['Eta_Dia_Area',]
+	plots += ['ResidualHighestHit_Clustered', 'ResidualChargeWeighted_Clustered', 'ResidualHighest2Centroid_Clustered', 'ResidualEtaCorrected_Clustered']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue

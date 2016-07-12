@@ -36,8 +36,12 @@ clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_3_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_4_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_5_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/ClusterSize_Dia.dat
-clustering_diamond : clustering_final
+clustering_diamond : clustering_final clustering_residual_diamond
 clustering_final : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-2_Dia.dat
+clustering_residual_diamond : $(CLUSTERINGDIR)/Residual_ChargeWeighted_Dia.dat
+clustering_residual_diamond : $(CLUSTERINGDIR)/Residual_Digital_Dia.dat
+clustering_residual_diamond : $(CLUSTERINGDIR)/Residual_EtaCorrected_Dia.dat
+clustering_residual_diamond : $(CLUSTERINGDIR)/Residual_HighestPair_Dia.dat
 signal-to-noise_diamond : $(CLUSTERINGDIR)/PulseHeight_BiggestAdjacentInSigma_Dia.dat
 signal-to-noise_diamond : $(CLUSTERINGDIR)/PulseHeight_BiggestSignalInSigma_Dia.dat
 eta_diamond : $(CLUSTERINGDIR)/Eta_Dia.dat
