@@ -11,7 +11,7 @@ import numpy as np
 
 class plotter(object) :
 
-	def __init__(self, config_file, path, output_path, run_no, position, histo_type, run_config_file = '') :
+	def __init__(self, config_file, path, output_path, run_no, position, histo_type, run_config_file = '', event_number = 0) :
 		self.config_file = config_file
 		self.config = ConfigParser.ConfigParser()
 		self.config.optionxform = str # case sensitive options
@@ -26,9 +26,11 @@ class plotter(object) :
 		else : self.path += '/'
 		if not output_path.endswith('/') : output_path += '/'
 		self.output_path = '%s%s/' % (output_path, self.run_no)
+		self.event_number = event_number
 		rd42Style()
 
 		for key, value in self.config.items(histo_type) :
+			value = value.replace('EVENTNUMBER', '%d' % self.event_number)
 			setattr(self, key, value)
 		if not hasattr(self, 'name') :
 			self.name = self.histo_name
@@ -474,6 +476,13 @@ if __name__ == '__main__' :
 #		if plot != 'PulseHeight' : continue
 #		if plot != 'Noise' : continue
 		pl = plotter(config_file, path, output_path, run_no, position, plot, runconfig)
+		if plot in nstrips :
+			pl.nstrips = nstrips[plot]
+		pl.plot()
+
+	plot = 'Event_Dia'
+	for event in [168221, 169021, 169149, 169631, 173675, 173970, 175220, 175586, 176049, 176054, 176274, 176539, 177067, 195755, 225010, 419220, 455990, 465430] :
+		pl = plotter(config_file, path, output_path, run_no, position, plot, runconfig, event)
 		if plot in nstrips :
 			pl.nstrips = nstrips[plot]
 		pl.plot()
