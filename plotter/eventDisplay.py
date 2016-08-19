@@ -10,7 +10,7 @@ class eventDisplay :
 	'''draws strip signals of individual events'''
 
 
-	def __init__(self, ped_path) :
+	def __init__(self, ped_path, path = 'output') :
 #		self.raw_path     = raw_path
 		self.ped_path     = ped_path
 #		self.raw_file     = ROOT.TFile.Open(self.raw_path, 'READ')
@@ -24,10 +24,13 @@ class eventDisplay :
 #		friend = self.ped_tree.GetListOfFriends().FindObject('rawTree')
 #		self.ped_tree.GetListOfFriends().Remove(friend)
 		self.nevents = int(self.ped_tree.GetEntries())
+		self.path = path
+		if not self.path.endswith('/') : self.path += '/'
+		helper.mkdir(self.path)
 
 
 	def make_eventDisplays(self) :
-		pkl_path = './event_displays.pkl'
+		pkl_path = '%sevent_displays.pkl' % self.path
 		if os.path.exists(pkl_path) :
 			print '[status] loading %s..' % pkl_path
 			histo = helper.load_object(pkl_path)
@@ -80,7 +83,7 @@ class eventDisplay :
 		# save canvas
 		canvas = ROOT.TCanvas('Event', 'Event')
 		histo.Draw('pe')
-		histo.SaveAs('DiaSignalvsChannelEvents.root')
+		histo.SaveAs('%sDiaSignalvsChannelEvents.root' % self.path)
 
 		return histo
 
@@ -106,7 +109,7 @@ class eventDisplay :
 			canvas = ROOT.TCanvas(projection_name, projection_name)
 			canvas.cd()
 			projection.Draw('pe')
-			canvas.SaveAs('%s.root' % projection_name)
+			canvas.SaveAs('%s%s.root' % (self.path, projection_name))
 
 
 if __name__ == '__main__' :
@@ -114,9 +117,18 @@ if __name__ == '__main__' :
 
 	if '-p' in args :
 		ped_path = str(args[args.index('-p')+1])
+		if '--pos' in args :
+			pos = str(args[args.index('--pos')+1])
+			if not pos.endswith('/') :
+				pos += '/'
+		else : pos = ''
+		if '-o' in args :
+			output_path = str(args[args.index('-o')+1])
+		else :
+			output_path = '%s/%spedestalAnalysis/root/' % (os.path.dirname(ped_path), pos)
 	else :
 		print 'usage: eventDisplay.py -b -p <PEDESTALTREE>'
 		sys.exit(1)
 
-	display = eventDisplay(ped_path)
+	display = eventDisplay(ped_path, output_path)
 	display.make_eventDisplays()
