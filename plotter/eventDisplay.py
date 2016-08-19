@@ -32,7 +32,7 @@ class eventDisplay :
 			print '[status] loading %s..' % pkl_path
 			histo = helper.load_object(pkl_path)
 		else :
-			histo = scan_events()
+			histo = self.scan_events()
 			helper.save_object(histo, pkl_path)
 		self.draw_events(histo)
 
