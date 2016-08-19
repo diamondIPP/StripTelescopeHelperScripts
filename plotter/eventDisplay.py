@@ -127,7 +127,7 @@ if __name__ == '__main__' :
 		else :
 			output_path = '%s/%spedestalAnalysis/root/' % (os.path.dirname(ped_path), pos)
 	else :
-		print 'usage: eventDisplay.py -b -p <PEDESTALTREE>'
+		print 'usage: eventDisplay.py -b -p <PEDESTALTREE> -o <OUTPUTPATH> --pos <POSITION>'
 		sys.exit(1)
 
 	display = eventDisplay(ped_path, output_path)
