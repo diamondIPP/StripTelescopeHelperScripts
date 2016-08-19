@@ -7,7 +7,7 @@ RUN = 16001
 INPUTDIR       = Jun29
 NOISEDIR       = $(OUTPUTDIR)/analysis/$(RUN)/noise
 CLUSTERINGDIR  = $(OUTPUTDIR)/analysis/$(RUN)/clustering
-SELECTIONDIR   = $(OUTPUTDIR)/analysis/$(RUN)
+SELECTIONDIR   = $(OUTPUTDIR)/analysis/$(RUN)/selection
 TRANSPARENTDIR = $(OUTPUTDIR)/analysis/$(RUN)/transparent
 ALIGNMENTDIR   = $(OUTPUTDIR)/analysis/$(RUN)/alignment
 
