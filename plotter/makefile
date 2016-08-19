@@ -6,6 +6,7 @@ RUN = 16001
 # directories
 INPUTDIR       = Jun29
 NOISEDIR       = $(OUTPUTDIR)/analysis/$(RUN)/noise
+PEDESTALDIR    = $(OUTPUTDIR)/analysis/$(RUN)/pedestal
 CLUSTERINGDIR  = $(OUTPUTDIR)/analysis/$(RUN)/clustering
 SELECTIONDIR   = $(OUTPUTDIR)/analysis/$(RUN)/selection
 TRANSPARENTDIR = $(OUTPUTDIR)/analysis/$(RUN)/transparent
@@ -17,6 +18,11 @@ final : clustering_final transparent_final
 
 # noise
 noise : $(NOISEDIR)/Noise_NonHitChannels_Dia.dat
+
+# pedestal
+pedestal : $(PEDESTALDIR)/StripPedestal_Dia.dat
+pedestal : $(PEDESTALDIR)/HitPosition_BiggestSignal_Dia.dat
+pedestal : $(PEDESTALDIR)/StripSignals_Event176274_Dia.dat
 
 # clustering
 clustering : clustering_silicon clustering_diamond signal-to-noise_diamond
