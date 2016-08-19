@@ -4,7 +4,8 @@ import sys
 import ROOT
 
 
-def draw_map(path) :
+def draw_map(path, output_path) :
+	if not output_path.endswith('/') : output_path += '/'
 	file = ROOT.TFile.Open(path, 'read')
 	tree = file.Get('pedestalTree')
 	histo_name = 'BiggestHit_Dia'
@@ -32,11 +33,11 @@ def draw_map(path) :
 	canvas = ROOT.TCanvas(histo_name, histo_name)
 	canvas.cd()
 	histo.Draw()
-	canvas.SaveAs('%s.root' % histo_name)
+	canvas.SaveAs('%s%s.root' % (output_path, histo_name))
 	canvas = ROOT.TCanvas(ped_histo_name, ped_histo_name)
 	canvas.cd()
 	ped_histo.Draw()
-	canvas.SaveAs('%s.root' % ped_histo_name)
+	canvas.SaveAs('%s%s.root' % (output_path, ped_histo_name))
 
 
 if __name__ == '__main__' :
@@ -44,7 +45,16 @@ if __name__ == '__main__' :
 
 	if '-p' in args :
 		ped_path = str(args[args.index('-p')+1])
+		if '--pos' in args :
+			pos = str(args[args.index('--pos')+1])
+			if not pos.endswith('/') :
+				pos += '/'
+		else : pos = ''
+		if '-o' in args :
+			output_path = str(args[args.index('-o')+1])
+		else :
+			output_path = '%s/%spedestalAnalysis/root/' % (os.path.dirname(ped_path), pos)
 	else :
-		print 'usage: pedestalPlots.py -b -p <PEDESTALTREE>'
+		print 'usage: pedestalPlots.py -b -p <PEDESTALTREE> -o <OUTPUTPATH> --pos <POSITION>'
 		sys.exit(1)
-	draw_map(ped_path)
+	draw_map(ped_path, output_path)
