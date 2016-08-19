@@ -110,6 +110,32 @@ class plotter(object) :
 			else :
 				self.save_TH2histo2table(histo, path = '%s%s.dat' % (self.output_path, self.name), rebinx = 4, rebiny = 2, xmin = 3000., ymin = -540., nxbins = 32, nybins = 148, sfx = 0.001, sfy = 1.)
 			return
+		if self.histo_type == 'StripMeanPedestal_Dia' :
+			profile = histo.ProfileX('profile', 1, -1, 'os')
+			nbins = profile.GetNbinsX()
+			sigma_histo = ROOT.TH1F('ped_sigma', 'ped_sigma', nbins, profile.GetBinLowEdge(1), profile.GetXaxis().GetBinUpEdge(nbins))
+			for ibin in range(1, nbins+1) :
+				projection = histo.ProjectionY('tmp%d' % ibin, ibin, ibin, 'o')
+				sigma_histo.SetBinContent(ibin, projection.GetRMS())
+				sigma_histo.SetBinError  (ibin, projection.GetRMSError())
+			print profile.GetEntries()
+			print profile.GetBinLowEdge(1)
+			print profile.GetBinContent(1)
+			print profile.GetBinError(1)
+			histos = self.add_statistics(profile)
+			print histos['data'].GetEntries()
+			print histos['data'].GetBinLowEdge(1)
+			print histos['data'].GetBinContent(1)
+			print histos['data'].GetBinError(1)
+			histos['sigma'] = sigma_histo
+			processes = ['data', 'sigma', 'stat']
+			print profile
+			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, self.name), var = self.variable, bin_width = False)
+			# sigma spectra
+			histos = self.add_statistics(sigma_histo)
+			processes = ['data', 'stat']
+			self.save_histo2table(histos = histos, processes = processes, path = '%s%s.dat' % (self.output_path, 'StripPedestalSigma_Dia'), var = 'StripPedestalSigma', bin_width = False)
+			return
 		if self.histo_type == 'PulseHeight_ClusterSize' or self.histo_type == 'Eta_Dia_Area' :
 			processes = ['data', 'stat']
 			slice_name = self.histo_type
@@ -471,6 +497,9 @@ if __name__ == '__main__' :
 	plots += ['Eta_Dia', 'EtaIntegral_Dia']
 #	plots += ['Eta_Dia_Area',]
 	plots += ['ResidualHighestHit_Clustered', 'ResidualChargeWeighted_Clustered', 'ResidualHighest2Centroid_Clustered', 'ResidualEtaCorrected_Clustered']
+
+	plots += ['BiggestHitMap_Dia',]
+	plots += ['StripMeanPedestal_Dia']
 	for plot in plots :
 #		if plot != 'FidCut' : continue
 #		if plot != 'PulseHeight' : continue
