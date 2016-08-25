@@ -1,5 +1,5 @@
 # phony targets
-.PHONY: all pedestal signal-to-noise_silicon signal-to-noise_diamond clustering_silicon clustering_diamond eta residuals alignment selection transparent transparent_final
+.PHONY: all pedestal signal-to-noise_silicon signal-to-noise_diamond clustering clustering_silicon clustering_diamond eta residuals alignment selection transparent transparent_final
 
 # definitions
 RUN = 17101
@@ -14,8 +14,7 @@ RUNCONFIG = PW205B.dat
 all : pedestal
 all : signal-to-noise_silicon
 all : signal-to-noise_diamond
-all : clustering_silicon
-all : clustering_diamond
+all : clustering
 all : eta
 #all : residuals
 all : alignment
@@ -31,6 +30,7 @@ signal-to-noise_silicon : $(shell for i in {1..1}; do for PLANE in X; do echo "P
 signal-to-noise_diamond : PulseHeight_BiggestSignalSNRDia
 signal-to-noise_diamond : PulseHeight_BiggestAdjacentSNRDia
 
+clustering : clustering_silicon clustering_diamond
 clustering_silicon : $(shell for i in {1..3}; do echo "PulseHeight_Cluster$${i}_D1X"; done;)
 clustering_silicon : $(shell for i in {2..3}; do echo "PulseHeight_Cluster1-$${i}_D1X"; done;)
 clustering_diamond : PulseHeight_ClusterSize
