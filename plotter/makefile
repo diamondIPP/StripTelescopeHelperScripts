@@ -13,16 +13,14 @@ TRANSPARENTDIR = $(OUTPUTDIR)/analysis/$(RUN)/transparent
 ALIGNMENTDIR   = $(OUTPUTDIR)/analysis/$(RUN)/alignment
 
 # plots
-all : noise clustering selection transparent alignment
+all : pedestal clustering selection transparent alignment
 final : clustering_final transparent_final
-
-# noise
-noise : $(NOISEDIR)/Noise_NonHitChannels_Dia.dat
 
 # pedestal
 pedestal : $(PEDESTALDIR)/StripPedestal_Dia.dat
 pedestal : $(PEDESTALDIR)/HitPosition_BiggestSignal_Dia.dat
 pedestal : $(PEDESTALDIR)/StripSignals_Event176274_Dia.dat
+pedestal : $(PEDESTALDIR)/Noise_NonHitChannels_Dia.dat
 
 # clustering
 clustering : clustering_silicon clustering_diamond signal-to-noise_diamond
