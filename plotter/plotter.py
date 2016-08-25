@@ -460,61 +460,19 @@ if __name__ == '__main__' :
 	else :
 		runconfig = ''
 
-	plots = ['FidCut', 'PulseHeight', 'Noise']
-#	plots.append('PulseHeight_allCluster')
+	if ('--plots' in args) :
+		plots = []
+		plots_ind = args.index('--plots')
+		it = 1
+		while plots_ind + it < len(args) and not args[plots_ind+it].startswith('-') :
+			plots.append(args[plots_ind+it])
+			it += 1
 
-	# signal-to-noise plots
-	plots.append('PulseHeight_BiggestSignalSNRDia')
-	plots.append('PulseHeight_BiggestAdjacentSNRDia')
-	for plane in range(1, 2) :
-		for coord in ['X',] :# 'Y']
-			histo_name = 'PulseHeight_BiggestSignalSNRD%d%s'  % (plane, coord)
-			plots.append(histo_name)
-			histo_name = 'PulseHeight_BiggestAdjacentSNRD%d%s' % (plane, coord)
-			plots.append(histo_name)
-
-	nstrips = {}
-
-	# clustering pulse height plots silicon
-	for cluster_size in range(1, 4) :
-		plot_name = 'PulseHeight_Cluster%d_D1X' % cluster_size
-		plots.append(plot_name)
-		nstrips[plot_name] = cluster_size
-		if cluster_size > 1 :
-			plot_name = 'PulseHeight_Cluster1-%d_D1X' % cluster_size
-			plots.append(plot_name)
-			nstrips[plot_name] = cluster_size
-
-	# transparent pulse height plots
-	for cluster_size in range(1, 11) :
-		plot_name = 'PulseHeight_%dStrips' % cluster_size
-		plots.append(plot_name)
-		nstrips[plot_name] = cluster_size
-
-	# clustering pulse height plots
-	plots.append('PulseHeight_ClusterSize')
-	plots.append('ClusterSize')
-
-	# alignment plots
-	plots += ['PreAlignment_Plane2_YPred_DeltaX', 'PostAlignment_Plane2_YPred_DeltaX', 'PreAlignment_Plane2_XPred_DeltaY', 'PostAlignment_Plane2_XPred_DeltaY']
-	plots += ['Eta_Dia', 'EtaIntegral_Dia']
-#	plots += ['Eta_Dia_Area',]
-	plots += ['ResidualHighestHit_Clustered', 'ResidualChargeWeighted_Clustered', 'ResidualHighest2Centroid_Clustered', 'ResidualEtaCorrected_Clustered']
-
-	plots += ['BiggestHitMap_Dia',]
-	plots += ['StripMeanPedestal_Dia']
 	for plot in plots :
-#		if plot != 'FidCut' : continue
-#		if plot != 'PulseHeight' : continue
-#		if plot != 'Noise' : continue
+		if plot == 'Event_Dia' :
+			for event in [168221, 169021, 169149, 169631, 173675, 173970, 175220, 175586, 176049, 176054, 176274, 176539, 177067, 195755, 225010, 419220, 455990, 465430] :
+				pl = plotter(config_file, path, output_path, run_no, position, plot, runconfig, event)
+				pl.plot()
+			continue
 		pl = plotter(config_file, path, output_path, run_no, position, plot, runconfig)
-		if plot in nstrips :
-			pl.nstrips = nstrips[plot]
-		pl.plot()
-
-	plot = 'Event_Dia'
-	for event in [168221, 169021, 169149, 169631, 173675, 173970, 175220, 175586, 176049, 176054, 176274, 176539, 177067, 195755, 225010, 419220, 455990, 465430] :
-		pl = plotter(config_file, path, output_path, run_no, position, plot, runconfig, event)
-		if plot in nstrips :
-			pl.nstrips = nstrips[plot]
 		pl.plot()
