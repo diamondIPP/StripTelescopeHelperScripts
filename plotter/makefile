@@ -5,7 +5,6 @@ RUN = 16001
 
 # directories
 INPUTDIR       = Jun29
-NOISEDIR       = $(OUTPUTDIR)/analysis/$(RUN)/noise
 PEDESTALDIR    = $(OUTPUTDIR)/analysis/$(RUN)/pedestal
 CLUSTERINGDIR  = $(OUTPUTDIR)/analysis/$(RUN)/clustering
 SELECTIONDIR   = $(OUTPUTDIR)/analysis/$(RUN)/selection
@@ -23,14 +22,12 @@ pedestal : $(PEDESTALDIR)/StripSignals_Event176274_Dia.dat
 pedestal : $(PEDESTALDIR)/Noise_NonHitChannels_Dia.dat
 
 # clustering
-clustering : clustering_silicon clustering_diamond signal-to-noise_diamond
-clustering_silicon : $(CLUSTERINGDIR)/PulseHeight_BiggestAdjacentInSigma_D1X.dat
-clustering_silicon : $(CLUSTERINGDIR)/PulseHeight_BiggestSignalInSigma_D1X.dat
+clustering : clustering_silicon signal-to-noise_silicon clustering_diamond signal-to-noise_diamond clustering_residual_diamond
+signal-to-noise_silicon : $(CLUSTERINGDIR)/PulseHeight_BiggestAdjacentInSigma_D1X.dat
+signal-to-noise_silicon : $(CLUSTERINGDIR)/PulseHeight_BiggestSignalInSigma_D1X.dat
 clustering_silicon : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-2_D1X.dat
 clustering_silicon : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-3_D1X.dat
 clustering_silicon : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1_D1X.dat
-clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_BiggestAdjacentInSigma_Dia.dat
-clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_BiggestSignalInSigma_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-3_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-4_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-5_Dia.dat
@@ -38,9 +35,9 @@ clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_2_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_3_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_4_Dia.dat
-clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_5_Dia.dat
+#clustering_diamond : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_5_Dia.dat
 clustering_diamond : $(CLUSTERINGDIR)/ClusterSize_Dia.dat
-clustering_diamond : clustering_final clustering_residual_diamond
+clustering_diamond : clustering_final
 clustering_final : $(CLUSTERINGDIR)/PulseHeight_ClusterSize_1-2_Dia.dat
 clustering_residual_diamond : $(CLUSTERINGDIR)/Residual_ChargeWeighted_Dia.dat
 clustering_residual_diamond : $(CLUSTERINGDIR)/Residual_Digital_Dia.dat
