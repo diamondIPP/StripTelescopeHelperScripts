@@ -426,6 +426,11 @@ class plotter(object) :
 #		text.DrawText(0.5, 0.5, table)
 
 
+def usage() :
+	print 'usage: plotter.py -r <RUN_NO> -i <DATA_PATH> - p <POSITION> -c <CONFIG_FILE> -o <OUTPUT_PATH>, --runconfig <RUN_CONFIG>'
+	sys.exit(1)
+
+
 if __name__ == '__main__' :
 	args = sys.argv
 	run_no = -1
@@ -433,8 +438,7 @@ if __name__ == '__main__' :
 	position = ''
 
 	if ('--help' in args) or ('-h' in args) :
-		print 'usage: plotter.py -r <RUN_NO> -i <DATA_PATH> - p <POSITION> -c <CONFIG_FILE> -o <OUTPUT_PATH>, --runconfig <RUN_CONFIG>'
-		sys.exit(1)
+		usage()
 
 	if ('-r' in args) :
 		run_no = args[args.index('-r')+1]
@@ -467,6 +471,8 @@ if __name__ == '__main__' :
 		while plots_ind + it < len(args) and not args[plots_ind+it].startswith('-') :
 			plots.append(args[plots_ind+it])
 			it += 1
+	else :
+		usage()
 
 	for plot in plots :
 		if plot == 'Event_Dia' :
