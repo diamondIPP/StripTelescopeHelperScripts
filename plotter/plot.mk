@@ -59,5 +59,4 @@ transparent_final : PulseHeight
 
 # run plotter.py
 % :
-	echo ${$@%.*}
 	python plotter.py -b -r $(RUN) -i $(DATADIR) -p $(POS) -c $(CONFIG) -o $(OUTPUTDIR) --runconfig $(RUNCONFIG) --plots $@
