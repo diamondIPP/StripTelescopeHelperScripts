@@ -7,7 +7,7 @@ POS = .
 
 # files and directories
 DATADIR   = ../../../Data/links/
-OUTPUTDIR = $(shell date +%b%d)
+OUTPUTDIR = output/$(shell date +%b%d)
 CONFIG    = config.cfg
 RUNCONFIG = PW205B.dat
 
