@@ -36,6 +36,10 @@ class plotter(object) :
 			self.name = self.histo_name
 		if not hasattr(self, 'variable') :
 			self.variable = histo_type
+		if not hasattr(self, 'nstrips') :
+			self.nstrips = 0
+		else :
+			self.nstrips = int(self.nstrips)
 		if hasattr(self, 'output_dir') :
 			self.output_path += self.output_dir
 			if not self.output_path.endswith('/') : self.output_path += '/'
@@ -43,7 +47,6 @@ class plotter(object) :
 		if hasattr(self, 'rebin') :
 			self.rebin = int(self.rebin)
 		self.root_file = self.root_file.replace('RUNNUMBER', '.%d' % self.run_no)
-		self.nstrips = 0
 		self.file_path = self.path + self.root_file
 		self.rand = ROOT.TRandom3(0)
 
