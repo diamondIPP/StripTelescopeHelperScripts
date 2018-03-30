@@ -8,6 +8,7 @@ import sys
 from random import randrange
 from pickle import NONE
 import argparse
+import ConfigParser
 
 def extant_file(x):
     """
@@ -33,18 +34,25 @@ parser.add_argument('--reset',help='RunList.csv reset level.\nLevel:\n\t 0:\t no
         type=int,default=0,choices=range(0,4),metavar='LEVEL')
 parser.add_argument('-j','--jobs',help='Number of running jobs',
         type=int,default=3,choices=range(1,9),metavar='NJOBS')
+parser.add_argument('-p', '--config', type = extant_file, default = 'config.cfg', help = 'path config file (default: config.cfg)')
 args = parser.parse_args()
 print 'filename:', args.f
 print 'correction: ',args.add_correction
 print 'write: ',args.no_write
 print 'test: ',args.testing
-print args.verbose
-print args.reset
+print 'verbose:', args.verbose
+print 'reset:', args.reset
+print 'path config file:', args.config
 runningJobs = {}
 childs = []
 
+config_file = args.config
+config = ConfigParser.ConfigParser()
+config.optionxform = str # case sensitive options
+config.read(config_file)
+
 logfiles = {}
-mainDir  ='/scratch/analysis/'
+mainDir         = config.get('paths', 'mainDir'        )
 nMaxJobs = args.jobs
 
 freeJobs = range(0,nMaxJobs)
@@ -52,12 +60,12 @@ freeJobs = range(0,nMaxJobs)
 filename =args.f
 filename  = os.path.abspath(filename)
 run_analysis = False
-rd42Analysis = '~/sdvlp/rd42/branches/3dAnalysis/diamondAnalysis'
-settingsDir = '~/sdvlp/rd42/trunk/run_settings/'
-inputDir = '/scratch/testbeamdata'
-outputDir = '/scratch/analysis/output/new'
+rd42Analysis    = config.get('paths', 'rd42Analysis'   )
+settingsDir     = config.get('paths', 'settingsDir'    )
+inputDir        = config.get('paths', 'inputDir'       )
+outputDir       = config.get('paths', 'outputDir'      )
 if args.add_correction:
-    correctionMacro = '~/sdvlp/rd42/trunk/createAsymmetricEtaSample.C'
+    correctionMacro = config.get('paths', 'correctionMacro')
 else:
     correctionMacro = ''
 reader  = RunListReader.RunListReader(not args.no_write,correctionMacro)
@@ -65,7 +73,7 @@ reader.outputDir = outputDir
 reader.settingsDir = settingsDir
 reader.read_csv_RunList(filename,args.reset)
 leftJobs = 0
-stdOutDir = './stdOut/'
+stdOutDir       = config.get('paths', 'stdOutDir'      )
 
 def ensure_dir(f):
     d = os.path.dirname(f)
