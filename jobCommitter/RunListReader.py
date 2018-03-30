@@ -45,7 +45,7 @@ class RunListReader:
             self.correctionMacro = ''
         self.write_file = bool(write_file)
         self.add_correction = (correctionMacro!='')
-        print 'DORING CORRECTION: "%s '%self.correctionMacro
+        print 'DOING CORRECTION: %s '%self.correctionMacro
         if self.add_correction:
             ROOT.gROOT.LoadMacro('%s++'%self.correctionMacro)
 

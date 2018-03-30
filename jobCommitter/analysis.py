@@ -35,7 +35,7 @@ parser.add_argument('-j','--jobs',help='Number of running jobs',
         type=int,default=3,choices=range(1,9),metavar='NJOBS')
 args = parser.parse_args()
 print 'filename:', args.f
-print 'correctino: ',args.add_correction
+print 'correction: ',args.add_correction
 print 'write: ',args.no_write
 print 'test: ',args.testing
 print args.verbose
