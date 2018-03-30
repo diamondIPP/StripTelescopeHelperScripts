@@ -9,6 +9,7 @@ import errno
 import copy
 import os
 import shutil
+import ConfigParser
 
 def mkdir_p(path):
     try:
@@ -25,7 +26,7 @@ def uniq(input):
   return output
         
 class RunListReader:
-    def __init__(self,write_file,correctionMacro):
+    def __init__(self,write_file,correctionMacro, config_file = 'config.cfg'):
         self.rows = []
         self.header = None
         self.counter = -1 
@@ -48,13 +49,19 @@ class RunListReader:
         print 'DOING CORRECTION: %s '%self.correctionMacro
         if self.add_correction:
             ROOT.gROOT.LoadMacro('%s++'%self.correctionMacro)
+        self.config_file = config_file
+        self.config = ConfigParser.ConfigParser()
+        self.config.optionxform = str # case sensitive options
+        self.config.read(self.config_file)
+        self.csv_dialect   = self.config.get('csv', 'dialect'  )
+        self.csv_delimiter = self.config.get('csv', 'delimiter')
 
     def read_csv_RunList(self,filename,resetLevel=0):
         print 'reading: %s'%filename
         self.filename = filename
         rows =[]
         f = open('%s'%filename,'rU')
-        reader = csv.reader(f,dialect='excel',delimiter=';')
+        reader = csv.reader(f, dialect = self.csv_dialect, delimiter = self.csv_delimiter)
         for row in reader:
             rows.append(row)
         f.close()
@@ -74,7 +81,7 @@ class RunListReader:
         if not self.write_file:
             return
         ofile = open(filename,'wb')
-        writer = csv.writer(ofile, delimiter=';', dialect='excel')
+        writer = csv.writer(ofile, delimiter = self.csv_delimiter, dialect = self.csv_dialect)
         if self.header != None:
             writer.writerow(self.rawHeader)
         self.check_run_list()

@@ -34,7 +34,7 @@ parser.add_argument('--reset',help='RunList.csv reset level.\nLevel:\n\t 0:\t no
         type=int,default=0,choices=range(0,4),metavar='LEVEL')
 parser.add_argument('-j','--jobs',help='Number of running jobs',
         type=int,default=3,choices=range(1,9),metavar='NJOBS')
-parser.add_argument('-p', '--config', type = extant_file, default = 'config.cfg', help = 'path config file (default: config.cfg)')
+parser.add_argument('-p', '--config', type = extant_file, default = 'config.cfg', help = 'config file (default: config.cfg)')
 args = parser.parse_args()
 print 'filename:', args.f
 print 'correction: ',args.add_correction
@@ -68,7 +68,7 @@ if args.add_correction:
     correctionMacro = config.get('paths', 'correctionMacro')
 else:
     correctionMacro = ''
-reader  = RunListReader.RunListReader(not args.no_write,correctionMacro)
+reader  = RunListReader.RunListReader(not args.no_write,correctionMacro, config_file)
 reader.outputDir = outputDir
 reader.settingsDir = settingsDir
 reader.read_csv_RunList(filename,args.reset)
