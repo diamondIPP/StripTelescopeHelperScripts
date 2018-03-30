@@ -257,7 +257,8 @@ int createAsymmetricEtaSample(int runNo=0,Float_t silCor=999,float diaCor=999,in
 	else{
 	    cout<<"File already exists! "<<outputfileName<<endl;
 	}
-	TString command = ".! ln -s ";
+//	TString command = ".! ln -s ";
+	TString command = ".! mv ";
 	command += outputfileName;
     if (enter){
         cout<<"Enter Cor Runno: "<<flush;

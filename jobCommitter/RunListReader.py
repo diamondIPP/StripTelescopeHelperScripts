@@ -55,6 +55,7 @@ class RunListReader:
         self.config.read(self.config_file)
         self.csv_dialect   = self.config.get('csv', 'dialect'  )
         self.csv_delimiter = self.config.get('csv', 'delimiter')
+        self.symlinks = bool(eval(self.config.get('system', 'symbolic_links')))
 
     def read_csv_RunList(self,filename,resetLevel=0):
         print 'reading: %s'%filename
@@ -198,6 +199,15 @@ class RunListReader:
                 os.symlink(src, dst)
             except:
                 print 'cannot create symlink: ln -s %s %s'%(src,dst)
+
+    def move_raw_data(self, run) :
+        corRunNo = run.get_corrected_run_number()
+        dst = self.outputDir + '/%s/rawData.%d.root' % (corRunNo            , corRunNo)
+        src = self.outputDir + '/%s/rawData.%d.root' % (run.get_run_number(), corRunNo)
+        if not os.path.exists(src):
+            print 'cannot move file: %s does not exists!' % src
+        if not os.path.exists(dst):
+            os.rename(src, dst)
         
     def create_corrected_settings_file(self,run):
         corRunNo = run.get_corrected_run_number()
@@ -262,7 +272,10 @@ class RunListReader:
             print 'add feed through corrected run: %s'%runNo
             if self.calculateCorrection(run) != -1:
                 self.createCorrectedRunDirectory(run)
-                self.create_raw_data_link(run)
+                if self.symlinks :
+                    self.create_raw_data_link(run)
+                else :
+                    self.move_raw_data(run)
                 self.create_corrected_settings_file(run)
                 newRun = copy.deepcopy(run)
                 newRun.runNo = corRunNo
