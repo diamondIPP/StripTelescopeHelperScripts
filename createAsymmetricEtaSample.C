@@ -243,6 +243,15 @@ int createAsymmetricEtaSample(int runNo=0,Float_t silCor=999,float diaCor=999,in
     cout<<"ChargeShareSil: "<<chargeShareSil<<"---> "<<(int)(chargeShareSil*1e4)<<endl;
     cout<<"ChargeShaReDia: "<<chargeShareDia<<"---> "<<(int)(chargeShareDia*1e4)<<endl;
 
+	TString chargeShareLogFileName = "charge_charing_factors.txt";
+	if (!is_file_exist(chargeShareLogFileName)){
+		ofstream chargeShareLogFile;
+		chargeShareLogFile.open(chargeShareLogFileName);
+		chargeShareLogFile << "ChargeShareSil: " << chargeShareSil << "---> " << (int)(chargeShareSil*1e4) << endl;
+		chargeShareLogFile << "ChargeShaReDia: " << chargeShareDia << "---> " << (int)(chargeShareDia*1e4) << endl;
+		chargeShareLogFile.close();
+	}
+
 	TString outputfileName = TString::Format("rawData.%05d-%05d-%05d.root",runNumber,(int)(chargeShareSil*1e4),(int)(chargeShareDia*1e4));
 	cout<<outputfileName;
 	if (!is_file_exist(outputfileName)){
