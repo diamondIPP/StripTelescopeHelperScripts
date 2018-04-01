@@ -171,6 +171,10 @@ class RunListReader:
         retVal = self.runList.has_key(key)
         return retVal
 
+    def has_runNo(self, runNo) :
+        retVal = runNo in [key[0] for key in self.runList.keys()]
+        return retVal
+
     def get_row_number(self):
         if len(self.runList) == 0:
             return -1
@@ -265,8 +269,8 @@ class RunListReader:
             return
 #         print 'run %s/%s: %s'%(runNo,run.get_run_number(),run.do_correction())
         corRunNo = run.get_corrected_run_number()
-        if self.has_run(corRunNo):
-#             print 'RUN %s has already a corrected run %s'%(runNo,corRunNo)
+        if self.has_runNo(corRunNo):
+            print 'RUN %s has already a corrected run %s'%(runNo,corRunNo)
             return
         if run.has_valid_crosstalk_corrections(self.outputDir):
             print 'add feed through corrected run: %s'%runNo
