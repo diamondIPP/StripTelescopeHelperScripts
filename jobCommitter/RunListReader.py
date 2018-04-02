@@ -57,6 +57,18 @@ class RunListReader:
         self.csv_delimiter = self.config.get('csv', 'delimiter')
         self.symlinks = bool(eval(self.config.get('system', 'symbolic_links')))
 
+    def __str__(self) :
+        printout  = ''
+        printout += '%-6s  %-8s  %6s  %6s' % ('Run', 'Position', '#Tries', 'Status')
+        for key in self.runList.keys() :
+            if not self.runList[key].is_valid() : continue
+            printout += '\n%-6d  %-8s  %6d  %6d' % (
+                    self.runList[key].runNo,
+                    self.runList[key].runDes,
+                    self.runList[key].nTries,
+                    self.runList[key].status)
+        return printout
+
     def read_csv_RunList(self,filename,resetLevel=0):
         print 'reading: %s'%filename
         self.filename = filename
