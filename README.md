@@ -14,7 +14,7 @@ This script creates a new `rawData` file corrected for charge feed across.
   ```
 - Get the correction factors from `crossTalkCorrectionFactors.<RUN>.txt`
 - Average correction factors of silicon planes
-- Run the [script](createAsymmetricEtaSample.C)
+- Run the [correction script](createAsymmetricEtaSample.C)
   ```
   root <SCRIPT DIRECTORY>/createAsymmetricEtaSample.C
   ```
