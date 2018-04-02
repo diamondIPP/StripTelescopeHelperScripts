@@ -9,6 +9,9 @@ from random import randrange
 from pickle import NONE
 import argparse
 import ConfigParser
+import smtplib
+from email.mime.text import MIMEText
+import socket
 
 def extant_file(x):
     """
@@ -244,8 +247,6 @@ def start_job(rowNo,run):
     runningJobs[(jobNo,rowNo)] = child
     logfiles[rowNo] = logfile
     #print 'started job'
-    
-
 
 def wait_for_jobs_finish():
     global runningJobs
@@ -261,6 +262,21 @@ def wait_for_jobs_finish():
         time.sleep(.1)
     print ' last run finished'
 
+def send_mail(mail_text) :
+    if not config.has_option('mail', 'to') :
+        print 'Please provide your email address in the config file if you like to receive status updates!'
+        return
+    mail_subject = config.get('mail', 'subject')
+    mail_to      = config.get('mail', 'to'     )
+    mail_from    = '%s@%s' % (os.getlogin(), socket.gethostname())
+    mail_subject = mail_subject.replace('HOST', socket.gethostname())
+    msg = MIMEText(mail_text)
+    msg['Subject'] = mail_subject
+    msg['To'     ] = mail_to
+    msg['From'   ] = mail_from
+    smpt = smtplib.SMTP('localhost')
+    smpt.sendmail(mail_from, mail_to, msg.as_string())
+    smpt.quit()
 
 rownum = 0
 nColumns = 0
@@ -315,6 +331,9 @@ except Exception,e:
 
 
 reader.write_csv_RunList(filename)
+mail_text = 'The analysis jobs of the following runs have finished.\n\n'
+mail_text += reader.__str__()
+send_mail(mail_text)
 
 
 exit()
