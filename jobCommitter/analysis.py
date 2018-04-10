@@ -36,7 +36,7 @@ parser.add_argument('-c','--add-correction',help="checks for feed over correctio
 parser.add_argument('--reset',help='RunList.csv reset level.\nLevel:\n\t 0:\t none,\n\t 1:\t reset tries,\n\t 2:\t reset status,\n\t 3:\t reset both', 
         type=int,default=0,choices=range(0,4),metavar='LEVEL')
 parser.add_argument('-j','--jobs',help='Number of running jobs',
-        type=int,default=3,choices=range(1,9),metavar='NJOBS')
+        type=int,default=3,choices=range(1,11),metavar='NJOBS')
 parser.add_argument('-p', '--config', type = extant_file, default = 'config.cfg', help = 'config file (default: config.cfg)')
 args = parser.parse_args()
 print 'filename:', args.f
