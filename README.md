@@ -25,7 +25,7 @@ This script creates a new `rawData` file corrected for charge feed across.
 This script can be used to submit multiple analysis jobs.
 
 
-## Usage
+### Usage
 - Setup a directory with links to the data `RZ` files.
 - Adjust the [config file](jobCommitter/config.cfg) or create a new one.
   - paths of data, settings, analysis, and output
