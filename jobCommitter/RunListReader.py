@@ -231,6 +231,7 @@ class RunListReader:
         src = run.get_settings_file_name(self.settingsDir)
         dst = src
         dst = dst.replace('%s'%runNo, '%s'%corRunNo)
+        src = os.path.relpath(src, os.path.dirname(dst))
         if not os.path.exists(dst):
             os.symlink(src,dst)
         print 'create settings file: %s from %s, --> %s'%(dst,src,os.path.exists(dst))
