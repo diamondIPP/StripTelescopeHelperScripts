@@ -41,4 +41,4 @@ This script can be used to submit multiple analysis jobs.
   ```
   ./analysis.py --help
   ```
-  for all options.
+  to show all options.
