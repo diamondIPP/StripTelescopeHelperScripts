@@ -222,7 +222,7 @@ int createAsymmetricEtaSample(int runNo=0,Float_t silCor=999,float diaCor=999,in
 	chargeShareDia /=100;
 	cout<<"There is charge sharing of "<<chargeShareDia*100<<"%."<<endl;
 
-	TString fileName = TString::Format("rawData.%05d.root",runNumber);
+	TString fileName = TString::Format("rawData.%d.root",runNumber);
 	cout<<"Reading file '"<<fileName<<"'"<<endl;
 
 	TFile * file = (TFile*)TFile::Open(fileName);
@@ -252,7 +252,7 @@ int createAsymmetricEtaSample(int runNo=0,Float_t silCor=999,float diaCor=999,in
 		chargeShareLogFile.close();
 	}
 
-	TString outputfileName = TString::Format("rawData.%05d-%05d-%05d.root",runNumber,(int)(chargeShareSil*1e4),(int)(chargeShareDia*1e4));
+	TString outputfileName = TString::Format("rawData.%d-%05d-%05d.root",runNumber,(int)(chargeShareSil*1e4),(int)(chargeShareDia*1e4));
 	cout<<outputfileName;
 	if (!is_file_exist(outputfileName)){
         TFile* outputFile = new TFile(outputfileName,"RECREATE");
